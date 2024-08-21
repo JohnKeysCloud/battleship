@@ -1,7 +1,8 @@
 import {
-  getValidPlacement,
+  checkValidPlacement,
   Position
-} from "./helpers/get-valid-placement/get-valid-placement";
+} from "./helpers/check-valid-placement/check-valid-placement.ts";
+
 
 interface IGameboard<T> {
   board: T[][];
@@ -38,12 +39,12 @@ class BattlefieldBoard<T extends symbol> implements IGameboardSquare<T> {
 
   // 💭 --------------------------------------------------------------
 
-  getValidShipPlacement(
+  checkValidShipPlacement(
     index: number,
     pieceLength: number,
     direction: 'horizontal' | 'vertical'
   ): Position[] {
-    return getValidPlacement(
+    return checkValidPlacement(
       index,
       pieceLength,
       direction,

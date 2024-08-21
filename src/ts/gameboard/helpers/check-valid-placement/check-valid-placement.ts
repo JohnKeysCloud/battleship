@@ -7,20 +7,23 @@ export interface Position {
   stern: number[]; // [rowIndex, colIndex]
 }
 
-export function getValidPlacement<T>(
-  axisIndex: number,
-  pieceLength: number,
+export function checkValidPlacement<T>(
   direction: 'horizontal' | 'vertical', // Update to specific literals
+  axisIndex: number,
+  gamePieceSize: number,
   boardSize: number,
   gameboard: Array<Array<symbol>>
 ): Position[] {
+  // Validate piece length
+  if (gamePieceSize < 2 || gamePieceSize > 5) {
+    throw new Error(
+      'Invalid piece length. Game piece length must be between 2 and 5.'
+    );
+  }
+  
   // Edge case checks
   if (axisIndex < 0 || axisIndex >= boardSize) {
     throw new Error('Invalid axisIndex number.');
-  }
-
-  if (pieceLength <= 0) {
-    throw new Error('Ship length must be greater than zero.');
   }
 
   let validShipPositions: Position[] = [];
@@ -41,7 +44,7 @@ export function getValidPlacement<T>(
   }
 
   // Edge case check for ship length greater than row length
-  if (pieceLength > axisArray.length) {
+  if (gamePieceSize > axisArray.length) {
     throw new Error('Ship length cannot be greater than axisArray length.');
   }
 
@@ -50,11 +53,11 @@ export function getValidPlacement<T>(
     if (axisArray[i] === VACANT) {
       streak++;
 
-      if (streak >= pieceLength) {
+      if (streak >= gamePieceSize) {
         const bowPosition =
           direction === 'horizontal'
-            ? [axisIndex, i - (pieceLength - 1)]
-            : [i - (pieceLength - 1), axisIndex];
+            ? [axisIndex, i - (gamePieceSize - 1)]
+            : [i - (gamePieceSize - 1), axisIndex];
         const sternPosition =
           direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
 
