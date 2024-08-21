@@ -1,57 +1,73 @@
-// Symbols
+// Symbols to fill gameboard values
 const VACANT = Symbol('VACANT');
 const OCCUPIED = Symbol('OCCUPIED');
 
 export interface Position {
-  bow: [number, number]; // [rowIndex, colIndex]
-  stern: [number, number]; // [rowIndex, colIndex]
+  bow: number[]; // [rowIndex, colIndex]
+  stern: number[]; // [rowIndex, colIndex]
 }
 
 export function getValidPlacement<T>(
-  index: number,
+  axisIndex: number,
   pieceLength: number,
   direction: 'horizontal' | 'vertical', // Update to specific literals
   boardSize: number,
   gameboard: Array<Array<symbol>>
 ): Position[] {
   // Edge case checks
-  if (index < 0 || index >= boardSize) {
-    throw new Error('Invalid index number.');
+  if (axisIndex < 0 || axisIndex >= boardSize) {
+    throw new Error('Invalid axisIndex number.');
   }
 
   if (pieceLength <= 0) {
     throw new Error('Ship length must be greater than zero.');
   }
 
-  const row: Array<symbol> = gameboard[index];
-
-  // Edge case check for ship length greater than row length
-  if (pieceLength > row.length) {
-    throw new Error('Ship length cannot be greater than row length.');
-  }
-
   let validShipPositions: Position[] = [];
   let streak: number = 0;
+  let axisArray: Array<symbol> = [];
 
   if (direction === 'horizontal') {
-    for (let i = 0; i <= boardSize - 1; i++) {
-      if (row[i] === VACANT) {
-        streak++;
-
-        if (streak >= pieceLength) {
-          const validPosition: Position = {
-            bow: [index, i - (pieceLength - 1)],
-            stern: [index, i],
-          };
-
-          validShipPositions.push(validPosition);
-        }
-      } else if (row[i] === OCCUPIED) {
-        streak = 0;
-      }
-    }
+    // Get the row
+    axisArray = gameboard[axisIndex];
   } else if (direction === 'vertical') {
-    // youAreHere 💭
+    axisArray = [];
+
+    // Populate axisArray with column data
+    for (let i = 0; i < boardSize; i++) {
+      const currentValue = gameboard[i][axisIndex];
+      axisArray.push(currentValue);
+    }
+  }
+
+  // Edge case check for ship length greater than row length
+  if (pieceLength > axisArray.length) {
+    throw new Error('Ship length cannot be greater than axisArray length.');
+  }
+
+  // Loop through axisArray to find valid positions
+  for (let i = 0; i < boardSize; i++) {
+    if (axisArray[i] === VACANT) {
+      streak++;
+
+      if (streak >= pieceLength) {
+        const bowPosition =
+          direction === 'horizontal'
+            ? [axisIndex, i - (pieceLength - 1)]
+            : [i - (pieceLength - 1), axisIndex];
+        const sternPosition =
+          direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
+
+        const validPosition: Position = {
+          bow: bowPosition,
+          stern: sternPosition,
+        };
+
+        validShipPositions.push(validPosition);
+      }
+    } else if (axisArray[i] === OCCUPIED) {
+      streak = 0;
+    }
   }
 
   return validShipPositions;
