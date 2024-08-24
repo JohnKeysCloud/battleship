@@ -45,9 +45,9 @@ class BattlefieldBoard<T extends symbol> implements IGameboardSquare<T> {
     direction: 'horizontal' | 'vertical'
   ): Position[] {
     return checkValidPlacement(
+      direction,
       index,
       pieceLength,
-      direction,
       this.boardSize,
       this.board
     );
