@@ -1,12 +1,6 @@
 ## `bs-ship.ts`
 
-### `ShipOptions`
-
-`ShipOptions` is an `interface` that defines the structure of a `Ship` object including its properties and methods related to its state. 
-
-The question mark (`?`) appended to `hitCounter` is used to indicate that the property is optional. 
-
-In TypeScript, when a property is marked as optional, it means that classes or objects implementing the interface where the property exists may include the property, but it is not _required_ to do so.
+### Supplemental & Contextual Information
 
 #### Benefits of an Interface
 
@@ -47,14 +41,27 @@ Had I passed the `ship` object without specifying the type in the function signa
 
 8. **Error Handling in Constructor:** The interface ensures that any class implementing it will respect the required types and properties. The constructor logic in `BattleshipFactory`, like throwing an error if `size <= 0`, provides additional safeguards during object instantiation, ensuring no invalid ship objects are created. 
 
-### `BattleshipFactory`
+
+### `Version` Type
+
+There are currently two official versions of the Battleship game, represented by the years 1990 and 2002. To create an extensible system that distinguishes between these versions in the web implementation, I defined an array containing these years and used it to create a union type. This `Version` type ensures that any value assigned must conform to one of the specified years, providing strict type safety aligned with the game's official versions.
+
+### `ShipOptions` Interface
+
+`ShipOptions` is an `interface` that defines the structure of a `Ship` object including its properties and methods related to its state. 
+
+The question mark (`?`) appended to `hitCounter` is used to indicate that the property is optional. 
+
+In TypeScript, when a property is marked as optional, it means that classes or objects implementing the interface where the property exists may include the property, but it is not _required_ to do so.
+
+### `BattleshipFactory` Class
 `BattleshipFactory` implements the `ShipOptions` interface and provides the actual logic for how the ship’s state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
 
 #### `public`
 
 In TypeScript, when you define a class that implements an interface, you typically need to explicitly declare the properties of the class before you can use them in the constructor or elsewhere.
 
-Take, for example this simplified, **incorrect** implementation:
+Take, for example this **simplified**, _incorrect_ implementation:
 
 ``` typescript
 class BattleshipFactory implements ShipOptions {
@@ -139,3 +146,11 @@ In our `BattleshipFactory`'s constructor body we have safe guards that ensure ou
 
   * `this.hitCounter = Math.max(0, hitCounter);`
    - **Using `this.` Prefix:** This line assigns a safe, non-negative value to the `hitCounter` class property. The `this.` prefix is used here because we are setting the property of the class instance, ensuring that the property value is appropriately adjusted.
+
+#### Instance Methods
+
+##### `hit`
+<!-- TODO: -->
+
+##### `seaworthy`
+<!-- TODO: -->
