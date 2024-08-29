@@ -1,20 +1,20 @@
 ## `check-valid-placement.ts`
 
-This function determines all valid positions for placing a game piece of a specified length on a gameboard, considering its orientation (horizontal or vertical). It checks if the piece would fit within the board's bounds and ensures that all required spaces for placement are vacant. The function returns an array of valid positions where the piece can be placed without overlapping occupied spaces or extending beyond the board's edges.
+This function identifies all valid positions for placing a game piece of a specified size on a game board, based on its orientation (horizontal or vertical). It verifies that the piece fits within the board's boundaries and that all required spaces are unoccupied. The function returns an array of positions where the piece can be placed without overlapping existing pieces or exceeding the board’s edges.
 
 ### `VACANT` & `OCCUPIED` Symbols
 
-When pondering about what values I should fill my gameboard with I found myself in a bit of a pickle.
+When pondering about what values to fill my gameboard with initially, I found myself in a bit of a pickle.
 
-"I could use `null`" was my initial decision because it made sense syntactically and semantically, as the empty spaces on the board _can_ be described as 'representing the intentional absence of any object value'. Pretty much just fancier way of saying a placeholder.
+I could use `null`. This makes sense syntactically and semantically, as the empty spaces on the board _can_ be described as 'representing the intentional absence of any object value'. Which is pretty much just a fancier way of saying "placeholder".
 
 Settled! Cool!
 
-But now what shall become of these values once they are `OCCUPIED`? (8 bit of foreshadowing about my point).
+But now what shall become of these values once they are `OCCUPIED`? 
 
-'I could set it to `true`' was my initial thought. Syntactically it would make sense, as I could store the positions `true` value in an `isOccupied` variable to do with as I please. But, semantically, something about it not being descriptive enough. What _exactly_ is happening when the value is set to `true`? 
+'I could set the values to `true`' was my initial thought. Syntactically it would make sense, as I could store the positions `true` value in an `isOccupied` variable to do with as I please. But, semantically, something about it not being descriptive enough. What _exactly_ is happening when the value is set to `true`? 
 
-Wait, there's a thing called a `symbol`, whats that? 
+Wait, there's a thing called a `symbol` right? Whats that? 
 
 ...And _why_ am I writing expressively as a means of procrastination right now. I'll Google the first now, and figure out the latter later.
 
@@ -108,7 +108,7 @@ This function takes in vital information to determine whether or not a particula
 
   * `boardSize`: This value determines the size of the `for` loops when iterating through rows and/or columns to determine whether or not the ship fits. This particular parameter is vital because it prevents the ships from being placed out of bounds.
 
-  * `gameboard`: This parameter expects the gameboard object as its argument. As we are preparing to _mutate_ with _zombie_ ships. 
+  * `gameboard`: This parameter expects the gameboard object as its argument. As we are preparing to _mutate_ it with ship additions. 
   
   In looping through the current row/column of the `gameboard`:
     * Depending on the orientation,
@@ -144,7 +144,7 @@ gameboard.forEach(row => {
 });
 ```
 
-Traversing our rows is straightforward (literally). All items of the same row are stored contiguously (within the _same_ array). Therefore, in determining the states of horizontal positions, all we need to do is use the provided `axisIndex` to access the specific row of the 2D array under test. 
+Traversing our rows is straightforward (_literally_). All items of the same row are stored contiguously (within the _same_ array). Therefore, in determining the states of horizontal positions, all we need to do is use the provided `axisIndex` to access the specific row of the 2D array under test. 
 
 Traversing our columns? Not so simple. In order to access all items of a requested column, we need to extract the values from each row in the 2D array at `axisIndex`. It requires accessing a non-contiguous memory location. 
 
@@ -153,9 +153,9 @@ Hence, we:
 2. Use `boardSize` to iteratively access the rows via the `forEach` method.
 3. Push the value at `axisIndex` of each row to `axisArray`.
 
-This method _preserves the order of the columns values_ while _enabling us to store them contiguously_. This is the recipe that allows us to use the same methods used to process a row for our column.
+This method _preserves the order of the columns values_ while _enabling us to store them contiguously_. This recipe allows us to use the same methods used to process a row, for our column.
 
-**⚠️ Note:** We are only able to use `boardSize` in our loop because the gameboard is a square (Thus, the size of the rows and columns are the same).
+**⚠️ Note:** We are only able to use `boardSize` in our loop because the gameboard is a square. The size of the rows and columns are the same, so `axisArray` will always be a fixed length. 
 
 ##### 2. **`getValidPositions`**:
 
@@ -194,7 +194,7 @@ for (let i = 0; i < boardSize; i++) {
 
 **✨ Side Note:**
 
-When structuring code, I tend to:
+When structuring code, I tend to, at this time of writing:
 
 * Place utility functions in a globally scoped directory (`src` folder). 
 
@@ -224,7 +224,7 @@ The function iterates over `axisArray` once, checking each value:
 
 The `streak` helps determine if a sufficient number of consecutive `VACANT` positions are available for the ships placement.
 
-When `streak` is greater than or equal to `gamePieceSize`, it indicates that the current position is valid for the bow of the ship. The `stern` can be placed in the preceding `VACANT` spaces.
+When `streak` is greater than or equal to `gamePieceSize`, it indicates that the current position is valid for the `stern` of the ship. The `bow` can be placed in the preceding `VACANT` spaces.
 
 **Design Decision:**
 
