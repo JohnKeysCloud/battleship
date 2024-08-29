@@ -8,10 +8,10 @@ export interface Position {
 }
 
 export function checkValidPlacement<T>(
-  direction: 'horizontal' | 'vertical', // Update to specific literals
+  direction: 'horizontal' | 'vertical' = 'horizontal', // Update to specific literals
   axisIndex: number,
-  boardSize: number,
   gamePieceSize: number,
+  boardSize: number,
   gameboard: Array<Array<symbol>>
 ): Position[] {
   const testArguments = (
@@ -81,11 +81,13 @@ export function checkValidPlacement<T>(
         // Position is valid
         if (streak >= gamePieceSize) {
           const bowPosition =
-            direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
-          const sternPosition =
             direction === 'horizontal'
               ? [axisIndex, i - (gamePieceSize - 1)]
               : [i - (gamePieceSize - 1), axisIndex];
+          const sternPosition =
+            direction === 'horizontal'
+              ? [axisIndex, i]
+              : [i, axisIndex];
 
           const validPosition: Position = {
             bow: bowPosition,
