@@ -40,26 +40,11 @@ export function checkValidPlacement<T>(
     axisIndex: number,
     gameboard: Array<Array<symbol>>
   ): Array<symbol> => {
-    let axisArray: Array<symbol> = [];
-
-    if (direction === 'horizontal') {
-      // Get the row
-      axisArray = gameboard[axisIndex];
-    } else if (direction === 'vertical') {
-      axisArray = [];
-
-      // Populate axisArray with column data
-      gameboard.forEach(row => {
-        const columnValue = row[axisIndex];
-        axisArray.push(columnValue);
-      });
-
-      for (let i = 0; i < boardSize; i++) {
-      }
-    }
-
-    return axisArray;
+    return direction === 'horizontal'
+      ? gameboard[axisIndex]
+      : gameboard.map(row => row[axisIndex]);
   };
+
   const getValidPositions = (
     axisArray: Array<symbol>,
     direction: 'horizontal' | 'vertical',

@@ -142,20 +142,27 @@ gameboard.forEach(row => {
   const columnValue = row[axisIndex];
   axisArray.push(columnValue);
 });
+
+// Further refactored (for simplification):
+gameboard.map(row => row[axisIndex])
 ```
 
 Traversing our rows is straightforward (_literally_). All items of the same row are stored contiguously (within the _same_ array). Therefore, in determining the states of horizontal positions, all we need to do is use the provided `axisIndex` to access the specific row of the 2D array under test. 
 
 Traversing our columns? Not so simple. In order to access all items of a requested column, we need to extract the values from each row in the 2D array at `axisIndex`. It requires accessing a non-contiguous memory location. 
 
-Hence, we:
-1. Initialize `axisArray` as an empty array.
-2. Use `boardSize` to iteratively access the rows via the `forEach` method.
-3. Push the value at `axisIndex` of each row to `axisArray`.
+The original logic used a traditional `for loop` to access each row, and extract each value at the `axisIndex`.
 
-This method _preserves the order of the columns values_ while _enabling us to store them contiguously_. This recipe allows us to use the same methods used to process a row, for our column.
+The `forEach` logic:
+1. Initialized `axisArray` as an empty array.
+2. Used `boardSize` to iteratively access the rows via the `forEach` method.
+3. Pushed the value at `axisIndex` of each row to `axisArray`.
+
+This method _preserves the order of the columns values_ while _enabling us to store them contiguously_. This is the recipe that allows us to use the same methods that we use to process a row, for our column.
 
 **⚠️ Note:** We are only able to use `boardSize` in our loop because the gameboard is a square. The size of the rows and columns are the same, so `axisArray` will always be a fixed length. 
+
+In the _further_ refactored logic that uses `map`, we achieve the same functionality in one line. `map` here creates a new array from our gameboard that transforms each row array into the value of each row array at the `axisIndex`. Thus returning a new array of all values of a single column.
 
 ##### 2. **`getValidPositions`**:
 
