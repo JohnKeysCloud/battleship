@@ -15,10 +15,16 @@ export function checkValidPlacement<T>(
   gameboard: Array<Array<symbol>>
 ): Position[] {
   const testArguments = (
+    direction: 'horizontal' | 'vertical',
     gamePieceSize: number,
     axisIndex: number,
     boardSize: number
   ): void => {
+    // Validate direction
+    if (!['horizontal', 'vertical'].includes(direction)) {
+      throw new Error(`Invalid direction. Must be 'horizontal' or 'vertical'.`);
+    }
+
     // Validate piece length
     if (gamePieceSize < 2 || gamePieceSize > 5) {
       throw new Error(
@@ -33,7 +39,7 @@ export function checkValidPlacement<T>(
   };
 
   // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  testArguments(gamePieceSize, axisIndex, boardSize);
+  testArguments(direction, gamePieceSize, axisIndex, boardSize);
 
   const getAxisArray = (
     direction: 'horizontal' | 'vertical',
