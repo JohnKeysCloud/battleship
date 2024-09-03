@@ -2,7 +2,7 @@ export default {
   moduleFileExtensions: ["ts" ,"js", "json"],
   rootDir: '../',
   testEnvironment: 'node',
-  testMatch: ["<rootDir>/src/tests/**/*.test.{js,ts}"],
+  testMatch: ["<rootDir>/src/**/*.test.{js,ts}"],
   testPathIgnorePatterns: ["/node_modules/"],
   transform: {
     "^.+\\.js$": "babel-jest",
