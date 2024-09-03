@@ -1,3 +1,0 @@
-## `gameboard.ts`
-
-<!-- youAreHere 💭 -->
