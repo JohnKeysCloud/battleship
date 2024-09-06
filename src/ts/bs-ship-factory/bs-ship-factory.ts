@@ -59,4 +59,12 @@ export class BattleshipFactory implements ShipOptions {
   };
 
   isSeaworthy = (): boolean => this.hitCounter < this.size;
+
+  public get shipType(): ShipType {
+    return this.type;
+  }
+
+  public get versionYear(): Version {
+    return this.version;
+  }
 }
