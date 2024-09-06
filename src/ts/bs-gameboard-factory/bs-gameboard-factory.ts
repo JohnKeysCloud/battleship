@@ -21,7 +21,7 @@ interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number; 
 }
 
-class BattleshipBoard implements IGridGameboardSquare<symbol> {
+export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
   private readonly _fillValue: symbol = Symbol('V');
@@ -69,6 +69,6 @@ class BattleshipBoard implements IGridGameboardSquare<symbol> {
 }
 
 export const BattleshipBoards = {
-  'playerOne': new BattleshipBoard(),
-  'playerTwo': new BattleshipBoard(),
+  'playerOne': new BattleshipBoardFactory(),
+  'playerTwo': new BattleshipBoardFactory(),
 };
