@@ -1,6 +1,5 @@
-import type {Position} from './helpers/check-valid-placement/check-valid-placement.ts'
-import {checkValidPlacement} from "./helpers/check-valid-placement/check-valid-placement.ts";
-
+import type {Position} from './helpers/check-valid-placement/check-valid-placement'
+import { checkValidPlacement } from './helpers/check-valid-placement/check-valid-placement';
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
