@@ -1,35 +1,9 @@
-import { BattleshipFactory } from '../bs-ship-factory/bs-ship-factory';
+import { BattleshipFactory, ShipType } from '../bs-ship-factory/bs-ship-factory';
 import type { Version } from '../bs-ship-factory/bs-ship-factory';
-
-const shipTypes = [
-  'carrier',
-  'battleship',
-  'destroyer',
-  'submarine',
-  'cruiser',
-  'patrolBoat',
-] as const;
-
-type ShipType = (typeof shipTypes)[number];
 
 type Fleet = {
   [key in ShipType]?: BattleshipFactory;
 };
-
-/* 
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ // > The above is achieves the same as:                                 │
-  │ // type Fleet = {                                                       │
-  │ //   [shipType in                                                       │
-  │ //     | 'carrier'                                                      │
-  │ //     | 'battleship'                                                   │
-  │ //     | 'destroyer'                                                    │
-  │ //     | 'submarine'                                                    │
-  │ //     | 'cruiser'                                                      │
-  │ //     | 'patrolBoat']?: BattleshipFactory;                             │
-  │ // };                                                                   │
-  └─────────────────────────────────────────────────────────────────────────┘
- */
 
 type ShipConfig = {
   type: ShipType;
@@ -64,11 +38,11 @@ class BattleshipFleetFactory {
   static createHasbroFleet(): BattleshipFleetFactory {
     return new BattleshipFleetFactory(
       this.createFleet({
-        carrier: { type: 'carrier' },
-        battleship: { type: 'battleship' },
-        destroyer: { type: 'destroyer' },
-        submarine: { type: 'submarine' },
-        patrolBoat: { type: 'patrolBoat' },
+        carrier: { type: ShipType.Carrier },
+        battleship: { type: ShipType.Battleship },
+        destroyer: { type: ShipType.Destroyer },
+        submarine: { type: ShipType.Submarine },
+        patrolBoat: { type: ShipType.PatrolBoat },
       })
     );
   }
@@ -76,25 +50,17 @@ class BattleshipFleetFactory {
   static createMBFleet(): BattleshipFleetFactory {
     return new BattleshipFleetFactory(
       this.createFleet({
-        carrier: { type: 'carrier', version: 1990 },
-        battleship: { type: 'battleship', version: 1990 },
-        cruiser: { type: 'cruiser', version: 1990 },
-        submarine: { type: 'submarine', version: 1990 },
-        destroyer: { type: 'destroyer', version: 1990 },
+        carrier: { type: ShipType.Carrier, version: 1990 },
+        battleship: { type: ShipType.Battleship, version: 1990 },
+        cruiser: { type: ShipType.Cruiser, version: 1990 },
+        submarine: {type: ShipType.Submarine, version: 1990 },
+        destroyer: { type: ShipType.Destroyer, version: 1990 },
       })
     );
   }
 
   // Method to get a specific ship
-  getShip(
-    shipType:
-      | 'carrier'
-      | 'battleship'
-      | 'destroyer'
-      | 'submarine'
-      | 'cruiser'
-      | 'patrolBoat'
-  ): BattleshipFactory | undefined {
+  getShip(shipType: ShipType): BattleshipFactory | undefined {
     return this.fleet[shipType];
   }
 }

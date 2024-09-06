@@ -211,9 +211,11 @@ Note that the `readonly` keyword only makes the existing properties of `myFleet`
 
 ``` typescript
 
+// Explicit String Union
 type Fleet = { [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipFactory; }
 
 // Which is the same as:
+// (Explicit Property Definition)
 type Fleet = {
   carrier?: BattleshipFactory, 
   battleship?: BattleshipFactory, 
@@ -222,6 +224,12 @@ type Fleet = {
   cruiser?: BattleshipFactory, 
   patrolBoat?: BattleshipFactory, 
 }
+
+// Which is also the same as:
+// (`enum`-based definition)
+type Fleet = {
+  [key in ShipType]?: BattleshipFactory;
+};
 
 ```
 
@@ -240,7 +248,7 @@ This syntax uses a mapped type to create an object type with specific keys and v
 
 **✨ Side Note:**
 
-Using the intersection operator would result in an empty type because it'd be impossible for a string to simultaneously be multiple different strings. In other words, for example, there is no **single string** that satisfies being both '`carrier`' and '`battleship`':
+Using the intersection operator (`&`) would result in an empty type because its impossible for a string to simultaneously be multiple unique strings. In other words, there is no **single string** that satisfies being both '`carrier`' and '`battleship`':
 
 ``` typescript
 type Carrier = 'carrier';
@@ -257,7 +265,7 @@ This results in an **empty type**- a type that doesn't have any possible values.
 
 ---
 
-#### Refactored Version
+#### First Refactored Version
 
 ``` typescript
 const shipTypes = [
@@ -392,6 +400,13 @@ myValue = { name: 'submarine' }; // valid, since it matches { name: string }
 **Key Differences**
   * With `as const`: Types are exact literals or specific object structures.
   * Without `as const`: Types are generalized, allowing broader ranges of values, reducing type specificity and strictness.
+
+
+#### Current Refactored Version
+
+Instead of duplicating a type definition for ship types in the fleet factory module, I refactored `bs-ship-factory.ts` to include an enumeration (`enum`) of the ship types. This change allows us to import the `ShipType` `enum` directly into the fleet factory module, maintaining type safety and other benefits. Additionally, this approach adheres to the DRY (Don't Repeat Yourself) principle by avoiding redundant type definitions. 
+
+> Teaching while learning! 💭
 
 ### `type ShipConfig` and `type ShipConfigs`
 
