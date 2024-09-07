@@ -21,7 +21,6 @@ class BattleshipFleetFactory {
     this.fleet = fleet;
   }
 
-  // Helper method to create fleet
   private static createFleet(shipConfiigs: ShipConfigs): Fleet {
     const fleet: Fleet = {};
 
@@ -35,7 +34,7 @@ class BattleshipFleetFactory {
     return fleet;
   }
 
-  static createHasbroFleet(): BattleshipFleetFactory {
+  static createHasbroFleet(): BattleshipFleetFactory { // 2002
     return new BattleshipFleetFactory(
       this.createFleet({
         carrier: { type: ShipType.Carrier },
@@ -47,7 +46,7 @@ class BattleshipFleetFactory {
     );
   }
 
-  static createMBFleet(): BattleshipFleetFactory {
+  static createMBFleet(): BattleshipFleetFactory { // 1990
     return new BattleshipFleetFactory(
       this.createFleet({
         carrier: { type: ShipType.Carrier, version: 1990 },
@@ -59,7 +58,6 @@ class BattleshipFleetFactory {
     );
   }
 
-  // Method to get a specific ship
   getShip(shipType: ShipType): BattleshipFactory | undefined {
     return this.fleet[shipType];
   }
