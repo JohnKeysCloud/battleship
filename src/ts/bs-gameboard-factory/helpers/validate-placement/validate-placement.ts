@@ -1,3 +1,5 @@
+import { ValidPlacementParams } from "../../bs-gameboard-factory";
+
 // Symbols to fill gameboard values
 const VACANT = Symbol('V');
 const OCCUPIED = Symbol('O');
@@ -7,13 +9,9 @@ export interface Position {
   stern: number[]; // [rowIndex, colIndex]
 }
 
-export function checkValidPlacement<T>(
-  direction: 'horizontal' | 'vertical' = 'horizontal', // Update to specific literals
-  axisIndex: number,
-  gamePieceSize: number,
-  boardSize: number,
-  gameboard: Array<Array<symbol>>
-): Position[] {
+export function validatePlacement<T>(validPlacementParam: ValidPlacementParams): Position[] {
+  const { direction, gamePieceSize, axisIndex, boardSize, gameboard } = validPlacementParam;
+
   const testArguments = (
     direction: 'horizontal' | 'vertical',
     gamePieceSize: number,
@@ -39,7 +37,12 @@ export function checkValidPlacement<T>(
   };
 
   // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  testArguments(direction, gamePieceSize, axisIndex, boardSize);
+  testArguments(
+    direction,
+    gamePieceSize,
+    axisIndex,
+    boardSize
+  );
 
   const getAxisArray = (
     direction: 'horizontal' | 'vertical',

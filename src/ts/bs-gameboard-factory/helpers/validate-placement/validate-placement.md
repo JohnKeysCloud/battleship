@@ -1,4 +1,4 @@
-## `check-valid-placement.ts`
+## `validate-placement.ts`
 
 This function identifies all valid positions for placing a game piece of a specified size on a game board, based on its orientation (horizontal or vertical). It verifies that the piece fits within the board's boundaries and that all required spaces are unoccupied. The function returns an array of positions where the piece can be placed without overlapping existing pieces or exceeding the board’s edges.
 
