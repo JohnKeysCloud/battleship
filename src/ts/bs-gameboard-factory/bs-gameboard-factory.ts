@@ -1,5 +1,6 @@
-import type {Position} from './helpers/check-valid-placement/check-valid-placement'
-import { checkValidPlacement } from './helpers/check-valid-placement/check-valid-placement';
+import type { Position } from './helpers/validate-placement/validate-placement'
+import { validatePlacement } from './helpers/validate-placement/validate-placement';
+
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
@@ -20,6 +21,16 @@ interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number; 
 }
 
+export interface ValidPlacementParams {
+  direction: 'horizontal' | 'vertical';
+  axisIndex: number;
+  gamePieceSize: number;
+  boardSize: number;
+  gameboard: symbol[][];
+}
+
+interface ValidShipPlacementParams extends Omit<ValidPlacementParams, 'boardSize' | 'gameboard'> {};
+
 export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
@@ -31,18 +42,18 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     );
   }
 
-  checkValidShipPlacement(
-    axisIndex: number,
-    gamePieceSize: number,
-    direction: 'horizontal' | 'vertical'
-  ): Position[] {
-    return checkValidPlacement(
+  validateShipPlacement(validShipPlacementArg: ValidShipPlacementParams): Position[] {
+    const { direction, axisIndex, gamePieceSize } = validShipPlacementArg;
+
+    const validPlacementArg: ValidPlacementParams = {
       direction,
       axisIndex,
       gamePieceSize,
-      this._boardSize,
-      this._board
-    );
+      boardSize: this._boardSize,
+      gameboard: this._board
+    };
+
+    return validatePlacement(validPlacementArg);
   }
 
   resetBoard(): void {
