@@ -72,23 +72,21 @@ This interface is designed to define the structure of our `Position` objects, en
 
 Interfaces don't create custom types per se, but rather describe the shape of objects that are used with those types. They provide a contract that objects must adhere to.
 
-### The Meat & Potatoes - `checkValidPlacement`
+### The Meat & Potatoes - `validatePlacement`
 
 #### Parameters
 
-This function takes in vital information to determine whether or not a particularly precise position is a valid for game-piece placement:
+This function takes in vital information (in the form of a destructured object) to determine whether or not a particularly precise position is a valid for game-piece placement:
 
   * `direction`: This parameter checks the orientation of the ship being placed. This will determine whether the algorithm checks rows or columns for potential valid positions.
 
-  * `axisIndex`: The row or column number in question. Depending on the orientation of the ship, the algorithm will need to either check empty spaces of the gameboard in rows, if the ship is horizontal, or in columns, if the ship is vertical. 
+  * `axisIndex`: The row or column number under test. Depending on the orientation of the ship, the algorithm will need to either check empty spaces of the gameboard in rows, if the ship is horizontal, or in columns, if the ship is vertical. 
 
   * `gamePieceSize`: The amount of units on the gameboard that our piece takes up. To determine whether the piece would fit in the provided row/column.
 
 ---
 
-> In my writing, at this very moment, I just had an epiphany. Maybe I should add logic for ships with a size of `1`, as I've seen several implementations of the game with such ships. Instead I'll refer back to the games Wikipedia page. 
-
-> Ah! I've discovered that the smallest ship in Battleship has a size of `2` units! Work smarter not harder my friends. Now, all I have to do refactor my `gamePieceSize` constraint checks. It's a lot easier to make this small change than to add the logic for a piece that won't exist! Rules. Without them, we might as well live with the animals. 💭
+> In my writing of this documentation, at this very moment, I had an epiphany. "Maybe I should add logic for ships with a size of `1`," as I've seen several implementations of the game with such ships. Before I do that though, let me refer back to the games Wikipedia page. *_2 minutes later_* Ah! I've discovered that the smallest ship in Battleship has a size of `2` units! Work smarter not harder my friends. Now, all I have to do refactor my `gamePieceSize` constraint checks. It's a lot easier to make this small change than to add the logic for a piece that won't exist! Rules. Without them, we might as well live with the animals. 💭
 
 ``` typescript
   // Validate piece length
@@ -106,7 +104,7 @@ This function takes in vital information to determine whether or not a particula
 
 --- 
 
-  * `boardSize`: This value determines the size of the `for` loops when iterating through rows and/or columns to determine whether or not the ship fits. This particular parameter is vital because it prevents the ships from being placed out of bounds.
+  * `boardSize`: This value determines the size of the `for` loops when iterating through rows and/or columns to determine whether or not the ship fits. This particular parameter is vital because it prevents the ships from being placed out of bounds. Since the Battleship boards are squares, we need only one axis length to determine the board size.
 
   * `gameboard`: This parameter expects the gameboard object as its argument. As we are preparing to _mutate_ it with ship additions. 
   
