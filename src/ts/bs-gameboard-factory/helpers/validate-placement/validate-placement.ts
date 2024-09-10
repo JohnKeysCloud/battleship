@@ -1,4 +1,4 @@
-import { ValidPlacementParams } from "../../bs-gameboard-factory";
+import { ValidPlacementCallbackParams } from "../../bs-gameboard-factory";
 
 // Symbols to fill gameboard values
 const VACANT = Symbol('V');
@@ -9,7 +9,7 @@ export interface Position {
   stern: number[]; // [rowIndex, colIndex]
 }
 
-export function validatePlacement<T>(validPlacementParam: ValidPlacementParams): Position[] {
+export function validatePlacement(validPlacementParam: ValidPlacementCallbackParams): Position[] {
   const { direction, gamePieceSize, axisIndex, boardSize, gameboard } = validPlacementParam;
 
   const testArguments = (
