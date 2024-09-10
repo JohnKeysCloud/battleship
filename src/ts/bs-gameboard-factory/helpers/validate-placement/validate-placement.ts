@@ -9,9 +9,13 @@ export interface Position {
   stern: number[]; // [rowIndex, colIndex]
 }
 
-export function validatePlacement(validPlacementParam: ValidPlacementCallbackParams): Position[] {
-  const { direction, gamePieceSize, axisIndex, boardSize, gameboard } = validPlacementParam;
-
+export function validatePlacement({
+  direction,
+  axisIndex,
+  gamePieceSize,
+  boardSize,
+  gameboard,
+}: ValidPlacementCallbackParams): Position[] {
   const testArguments = (
     direction: 'horizontal' | 'vertical',
     gamePieceSize: number,
@@ -37,12 +41,7 @@ export function validatePlacement(validPlacementParam: ValidPlacementCallbackPar
   };
 
   // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  testArguments(
-    direction,
-    gamePieceSize,
-    axisIndex,
-    boardSize
-  );
+  testArguments(direction, gamePieceSize, axisIndex, boardSize);
 
   const getAxisArray = (
     direction: 'horizontal' | 'vertical',
@@ -51,7 +50,7 @@ export function validatePlacement(validPlacementParam: ValidPlacementCallbackPar
   ): Array<symbol> => {
     return direction === 'horizontal'
       ? gameboard[axisIndex]
-      : gameboard.map(row => row[axisIndex]);
+      : gameboard.map((row) => row[axisIndex]);
   };
 
   const getValidPositions = (
@@ -79,9 +78,7 @@ export function validatePlacement(validPlacementParam: ValidPlacementCallbackPar
               ? [axisIndex, i - (gamePieceSize - 1)]
               : [i - (gamePieceSize - 1), axisIndex];
           const sternPosition =
-            direction === 'horizontal'
-              ? [axisIndex, i]
-              : [i, axisIndex];
+            direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
 
           const validPosition: Position = {
             bow: bowPosition,
@@ -98,14 +95,18 @@ export function validatePlacement(validPlacementParam: ValidPlacementCallbackPar
     return validShipPositions;
   };
 
-  const axisArray: Array<symbol> = getAxisArray(direction, axisIndex, gameboard);
+  const axisArray: Array<symbol> = getAxisArray(
+    direction,
+    axisIndex,
+    gameboard
+  );
 
   // Loop through axisArray to find valid positions
   const validShipPositions: Position[] = getValidPositions(
     axisArray,
     direction,
     axisIndex,
-    gamePieceSize,
+    gamePieceSize
   );
 
   return validShipPositions;
