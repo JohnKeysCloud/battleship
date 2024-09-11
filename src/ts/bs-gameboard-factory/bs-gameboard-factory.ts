@@ -9,7 +9,7 @@ export interface ValidPlacementCallbackParams {
   gameboard: symbol[][];
 }
 
-interface ValidPlacementWrapperParams extends Omit<ValidPlacementCallbackParams, 'boardSize' | 'gameboard'> {};
+export interface ValidPlacementWrapperParams extends Omit<ValidPlacementCallbackParams, 'boardSize' | 'gameboard'> {};
 
 interface IGridGameboard<T> {
   readonly board: T[][];
@@ -46,7 +46,6 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     axisIndex,
     gamePieceSize,
   }: ValidPlacementWrapperParams): Position[] {
-
     const validPlacementArg: ValidPlacementCallbackParams = {
       direction,
       axisIndex,
