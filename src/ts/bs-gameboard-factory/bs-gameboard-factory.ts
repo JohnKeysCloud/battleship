@@ -1,6 +1,11 @@
 import type { Position } from './helpers/validate-placement/validate-placement'
 import { validatePlacement } from './helpers/validate-placement/validate-placement';
 
+// Symbols to fill gameboard values
+export const POSITION_STATES = {
+  vacant: Symbol('V'),
+  occupied: Symbol('O')
+};
 export interface ValidPlacementCallbackParams {
   direction: 'horizontal' | 'vertical';
   axisIndex: number;
@@ -33,7 +38,7 @@ interface IGridGameboardSquare<T> extends IGridGameboard<T> {
 export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
-  private readonly _fillValue: symbol = Symbol('V');
+  private readonly _fillValue: symbol = POSITION_STATES.vacant;
 
   constructor() {
     this._board = Array.from({ length: this._boardSize }, () =>

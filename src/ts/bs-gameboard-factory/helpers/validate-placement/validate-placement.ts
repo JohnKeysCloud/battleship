@@ -1,8 +1,5 @@
 import { ValidPlacementCallbackParams } from "../../bs-gameboard-factory";
-
-// Symbols to fill gameboard values
-const VACANT = Symbol('V');
-const OCCUPIED = Symbol('O');
+import { POSITION_STATES } from "../../bs-gameboard-factory";
 
 export interface Position {
   bow: number[]; // [rowIndex, colIndex]
@@ -46,7 +43,7 @@ export function validatePlacement({
   const getAxisArray = (
     direction: 'horizontal' | 'vertical',
     axisIndex: number,
-    gameboard: Array<Array<symbol>>
+    gameboard: Array<Array<symbol>> // or symbol[][]
   ): Array<symbol> => {
     return direction === 'horizontal'
       ? gameboard[axisIndex]
@@ -54,7 +51,7 @@ export function validatePlacement({
   };
 
   const getValidPositions = (
-    axisArray: Array<symbol>,
+    axisArray: Array<symbol>, // or symbol[]
     direction: 'horizontal' | 'vertical',
     axisIndex: number,
     gamePieceSize: number
@@ -68,7 +65,7 @@ export function validatePlacement({
     let validShipPositions: Position[] = [];
 
     for (let i = 0; i < axisArray.length; i++) {
-      if (axisArray[i] === VACANT) {
+      if (axisArray[i] === POSITION_STATES.vacant) {
         streak++;
 
         // Position is valid
@@ -87,11 +84,11 @@ export function validatePlacement({
 
           validShipPositions.push(validPosition);
         }
-      } else if (axisArray[i] === OCCUPIED) {
+      } else if (axisArray[i] === POSITION_STATES.vacant) {
         streak = 0;
       }
     }
-
+    
     return validShipPositions;
   };
 
