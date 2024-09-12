@@ -36,7 +36,7 @@ describe('`BattleshipFactory`', () => {
 
   // Test lifecycle by performing the specified number of hits
   test.each(cruiserLifeCycle)(
-    'after %d hit(s), hit method returns correct message',
+    'after several hit(s), `hit` method returns correct message: %o',
     ({ hits, expected }) => {
       let result: string = '';
 
