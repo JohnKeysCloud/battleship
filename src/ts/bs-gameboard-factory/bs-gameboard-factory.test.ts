@@ -26,7 +26,7 @@ describe('`BattleshipBoardFactory` Instantiation', () => {
   describe('`validateShipPlacement`', () => {
     // Simplify method call
     const getValidPositionsArray = (input: ValidPlacementWrapperParams) =>
-      testBoard.validateShipPlacement(input);
+      testBoard.getValidShipPositions(input);
 
     // Creates test ship configurations
     const createPlacementParams = (

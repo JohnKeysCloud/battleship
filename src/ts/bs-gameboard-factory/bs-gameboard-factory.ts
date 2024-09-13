@@ -1,5 +1,5 @@
-import type { Position } from './helpers/validate-placement/validate-placement'
-import { validatePlacement } from './helpers/validate-placement/validate-placement';
+import type { Position } from './helpers/get-valid-positions/get-valid-positions'
+import { getValidPositions } from './helpers/get-valid-positions/get-valid-positions';
 
 // Symbols to fill gameboard values
 export const POSITION_STATES = {
@@ -46,7 +46,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     );
   }
 
-  validateShipPlacement({
+  getValidShipPositions({
     direction,
     axisIndex,
     gamePieceSize,
@@ -59,7 +59,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
       gameboard: this._board,
     };
 
-    return validatePlacement(validPlacementArg);
+    return getValidPositions(validPlacementArg);
   }
 
   resetBoard(): void {

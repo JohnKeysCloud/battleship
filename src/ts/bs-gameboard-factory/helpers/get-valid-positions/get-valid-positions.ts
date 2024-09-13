@@ -6,7 +6,7 @@ export interface Position {
   stern: number[]; // [rowIndex, colIndex]
 }
 
-export function validatePlacement({
+export function getValidPositions({
   direction,
   axisIndex,
   gamePieceSize,
@@ -62,7 +62,7 @@ export function validatePlacement({
     }
 
     let streak: number = 0;
-    let validShipPositions: Position[] = [];
+    let validPositions: Position[] = [];
 
     for (let i = 0; i < axisArray.length; i++) {
       if (axisArray[i] === POSITION_STATES.vacant) {
@@ -82,14 +82,14 @@ export function validatePlacement({
             stern: sternPosition,
           };
 
-          validShipPositions.push(validPosition);
+          validPositions.push(validPosition);
         }
       } else if (axisArray[i] === POSITION_STATES.vacant) {
         streak = 0;
       }
     }
     
-    return validShipPositions;
+    return validPositions;
   };
 
   const axisArray: Array<symbol> = getAxisArray(
@@ -99,12 +99,12 @@ export function validatePlacement({
   );
 
   // Loop through axisArray to find valid positions
-  const validShipPositions: Position[] = getValidPositions(
+  const validPositions: Position[] = getValidPositions(
     axisArray,
     direction,
     axisIndex,
     gamePieceSize
   );
 
-  return validShipPositions;
+  return validPositions;
 }

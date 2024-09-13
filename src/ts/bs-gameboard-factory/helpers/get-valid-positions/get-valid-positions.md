@@ -1,4 +1,4 @@
-## `validate-placement.ts`
+## `get-valid-positions.ts`
 
 This function identifies all valid positions for placing a game piece of a specified size on a game board, based on its orientation (horizontal or vertical). It verifies that the piece fits within the board's boundaries and that all required spaces are unoccupied. The function returns an array of positions where the piece can be placed without overlapping existing pieces or exceeding the board’s edges.
 
@@ -72,7 +72,7 @@ This interface is designed to define the structure of our `Position` objects, en
 
 Interfaces don't create custom types per se, but rather describe the shape of objects that are used with those types. They provide a contract that objects must adhere to.
 
-### The Meat & Potatoes - `validatePlacement`
+### The Meat & Potatoes - `getValidPositions`
 
 #### Parameters
 

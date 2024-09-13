@@ -243,8 +243,8 @@ During construction, the board is dynamically generated as a 2D array based on t
 
 #### Instance Methods
 
-##### `checkValidShipPlacement`
-See [here](./helpers/check-valid-placement/check-valid-placement.md).
+##### `getValidShipPositions`
+See [here](./helpers/get-valid-positions/get-valid-positions.md).
 
 ##### `resetBoard`
 <!-- TODO: -->
