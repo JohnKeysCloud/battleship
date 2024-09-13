@@ -2,6 +2,42 @@
 
 ### Supplemental & Contextual Information
 
+#### Whats a `Symbol` Yo?!
+
+Using `Symbol`s in JavaScript provides several advantages, particularly when dealing with scenarios like my battleship game board implementation. 
+
+**Here's a list of benefits of using `Symbols` over other data structures or types for simple purposes:**
+
+##### 1. **Uniqueness and Collision Avoidance**
+   - **Guaranteed Uniqueness**: Each `Symbol` is unique, even if created with the same description. This ensures that keys or values using `Symbols` won't accidentally collide with others, which is especially useful in shared or global environments.
+   - **Prevents Accidental Overwrites**: When you use `Symbols` as keys in objects or elements in arrays, there is no risk of overwriting existing properties or values that might use the same string or number key.
+
+##### 2. **Hidden Properties**
+   - **Non-Enumerable by Default**: Properties defined using `Symbols` are not enumerable by default, meaning they don’t show up in loops like `for...in` or when using `Object.keys`. This makes them ideal for adding metadata or "hidden" properties that shouldn’t interfere with normal object operations.
+   - **Enhanced Privacy**: Because `Symbols` are not accessible via typical object property access patterns, they provide a weak form of encapsulation. Other code won’t accidentally interact with or modify properties that use `Symbols` as keys.
+
+##### 3. **Clarity and Intentionality**
+   - **Clear Semantics**: Using `Symbols` can make your code more expressive and intentional. For example, by using `Symbol('VACANT')` and `Symbol('OCCUPIED')`, it’s clear that these values are meant to represent specific states on the board, rather than generic strings or numbers that could be misunderstood or misused.
+   - **Avoiding String Comparisons**: Instead of comparing strings (which can be error-prone if there are typos or case differences), you can compare `Symbols` directly, ensuring that only the exact intended state or value is matched.
+
+##### 4. **Immutable Constants**
+   - **Immutable by Nature**: `Symbols` are immutable once created, meaning their value cannot be changed. This is useful for defining constants, like different states of your game board, that should never be altered.
+
+##### 5. **Compatibility with Various Data Structures**
+   - **Usage in Objects and Arrays**: `Symbols` can be used as keys in objects and as values in arrays or sets, making them versatile across different data structures. This is particularly helpful when you need unique identifiers within data collections.
+
+##### 6. **Well-Suited for Symbolic Logic**
+   - **Representing Abstract Concepts**: `Symbols` are ideal for representing abstract concepts or unique states, such as `'VACANT'` and `'OCCUPIED'` on a game board, without the risk of overlap with other strings or numbers in your code.
+
+##### 7. **Enhanced Integration with Libraries**
+   - **Interoperability**: Many JavaScript libraries and frameworks (e.g., Redux) utilize `Symbols` for defining action types or unique keys. By understanding and using `Symbols`, your code can integrate more effectively with such tools, ensuring compatibility and preventing naming conflicts.
+
+##### 8. **Reduced Risk of Magic Strings**
+   - **Avoids "Magic Strings"**: Using `Symbols` helps to avoid the pitfalls of "magic strings" (hard-coded strings that are used for logic decisions). Magic strings can be error-prone and hard to refactor, while `Symbols` provide a more robust and maintainable alternative.
+
+##### 9. **Lightweight and Performance-Friendly**
+   - **Minimal Memory Overhead**: `Symbols` are lightweight and don't carry the same memory overhead as some other data structures, making them efficient for scenarios like filling arrays or marking states.
+
 #### Gameboard Representation: Adjacency Matrix vs. Adjacency List
 
 ##### Adjacency List Benefits
@@ -159,6 +195,31 @@ The **disadvantages**?:
   - **NONE!**: In my specific use case since I want to enforce `symbol` as the only type. This design choice is sufficient.
 
 My work here is done.
+
+#### `POSITION_STATES` Symbol Object
+
+When considering initial values for filling the game board, I faced a dilemma.
+
+Using `null` seemed like a reasonable choice both syntactically and semantically, as it could signify the intentional absence of any value, a "placeholder" for empty spaces on the board.
+
+Problem solved... almost. What about the values once they become `OCCUPIED`?
+
+I considered setting them to `true`, which would work syntactically; an `isOccupied` variable could easily handle such a boolean state. However, `true` lacks semantic clarity, what does `true` really represent in this context?
+
+Then I stumbled upon `Symbol`s. Aha! A unique and descriptive approach for handling game board states.
+
+[Here is what I learned on my exploration of `Symbol`s](#whats-a-symbol-yo)
+
+In my battleship gameboard implementation, I use `Symbol('V')` stored as `vacant` and `Symbol('O')` stored as `occupied` in the `POSITION_STATES` object to fill a 2D array. This approach ensures:
+   - **No Collisions**: Other parts of the code won't mistakenly overwrite or interact with these values.
+   - **Clear Intent**: It's clear what each `Symbol` represents, improving code readability.
+   - **Efficient State Management**: I manage the state of the board in a lightweight, performance-friendly manner without the risk of confusing states or accidental changes.
+
+By leveraging `Symbols`, I am taking advantage of their unique and immutable nature, enhancing the robustness and clarity of my code.
+
+I gave the symbols single letter descriptors (accessible via a symbols `.description` property) so that when printing our board to see the values, instead of seeing an insurmountable amount of  `vacant` or `occupied` strings, we'd see single letters in monospace, giving the gameboard symmetry, enhancing readability. 
+
+They are stored in the `POSITION_STATES` object for organizational purposes.
 
 ### `IGridGameboard<T>` Interface & Members
 
