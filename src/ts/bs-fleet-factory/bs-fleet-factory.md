@@ -514,6 +514,10 @@ These static methods provide controlled ways to create instances of the class si
 
 Both methods return values that automatically conform to the `BattleshipFleetFactory` class since they instantiate the class directly. The primary difference between the methods lies in their ship configurations: Hasbro's (2002) fleet setup differs from Milton Bradley's (1990). The specific configuration differences are outside the scope of this documentation. Read the code, or read here: [Battleship Wikipedia](https://en.wikipedia.org/wiki/Battleship_(game))
 
+### `createFleets` Utility Function
+
+It simply creates an object containing player one and player twos fleets depending on the version (i.e, Hasbro - 2002 and Milton Bradley - 1990). It accepts the version _year_ in its parameters.
+
 #### Instance Methods
 
 ##### `getShip`

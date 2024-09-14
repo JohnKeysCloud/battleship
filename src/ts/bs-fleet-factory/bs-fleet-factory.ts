@@ -14,7 +14,7 @@ type ShipConfigs = {
   [key in ShipType]?: ShipConfig;
 };
 
-class BattleshipFleetFactory {
+export class BattleshipFleetFactory {
   private fleet: Fleet;
 
   private constructor(fleet: Fleet) {
@@ -63,4 +63,14 @@ class BattleshipFleetFactory {
   }
 }
 
-export { BattleshipFleetFactory };
+export function createFleets(version: Version) {
+  const createFleet =
+    version === 2002
+      ? BattleshipFleetFactory.createHasbroFleet
+      : BattleshipFleetFactory.createMBFleet;
+
+  return {
+    playerOne: createFleet(),
+    playerTwo: createFleet(),
+  };
+}
