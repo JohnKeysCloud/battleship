@@ -10,7 +10,7 @@ Using `import type` ensures that only type information is imported, which helps 
 
 In TypeScript, both `interface` and `type` can be used to define the shape of objects, but they have some differences in capabilities and use cases.  
 
-Building on the benefits of interfaces (See: [Benefits of an Interface](../bs-ship-factory/bs-ship-factory.md####Benefits-of-an-Interface)), here is a comparison between between them and TypeScripts, `type`. 
+Building on the benefits of interfaces (See: [Benefits of an Interface](../bs-ship-factory/bs-ship-factory.md#benefits-of-an-interface)), here is a comparison between between them and TypeScripts, `type`. 
 
 ##### `interface`
 

@@ -1,10 +1,10 @@
 import { BattleshipBoardFactory } from '../../bs-gameboard-factory';
 import { IValidPlacementWrapperParams } from '../../bs-gameboard-factory';
 import { IValidPositionsResult } from '../../bs-gameboard-factory';
-import { IPosition } from './get-valid-positions';
+import { IPosition } from './get-valid-ship-positions';
 import type { Coordinates } from '../../bs-gameboard-factory';
 
-describe('`validateShipPlacement`', () => {
+describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
   let testBoard: BattleshipBoardFactory = new BattleshipBoardFactory();
 
@@ -19,8 +19,8 @@ describe('`validateShipPlacement`', () => {
   }
 
   // Test function utility
-  const getValidPositionsArray = (input: IValidPlacementWrapperParams) =>
-    testBoard.getValidShipPositions(input);
+  const getValidShipPositions = (input: IValidPlacementWrapperParams) =>
+    testBoard.getValidPositions(input);
 
   // Ensure interface compliance
   const createPlacementParams = (
@@ -91,7 +91,7 @@ describe('`validateShipPlacement`', () => {
   test.each(testCases)(
     'valid position retrieval (empty board): %o',
     ({ shipConfigs, validPositions }) => {
-      expect(getValidPositionsArray(shipConfigs)).toEqual(validPositions);
+      expect(getValidShipPositions(shipConfigs)).toEqual(validPositions);
     }
   );
 });

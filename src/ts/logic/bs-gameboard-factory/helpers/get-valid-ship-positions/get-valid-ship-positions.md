@@ -1,10 +1,10 @@
-## `get-valid-positions.ts`
+## `get-valid-ship-positions.ts`
 
 This function identifies all valid positions for placing a game piece of a specified size on a game board, based on its orientation (horizontal or vertical). It verifies that the piece fits within the board's boundaries and that all required spaces are unoccupied. The function returns an array of positions where the piece can be placed without overlapping existing pieces or exceeding the board’s edges.
 
 ### The `IPosition` Interface
 
-This interface is designed to define the structure of our `IPosition` objects, ensuring they adhere to a specific format. Doing so has several benefits, such as providing type safety and improving code clarity. For more details, check out [Interface Benefits](../../../ship/ship.md####Benefits-of-an-Interface).
+This interface is designed to define the structure of our `IPosition` objects, ensuring they adhere to a specific format. Doing so has several benefits, such as providing type safety and improving code clarity. For more details, check out [Interface Benefits](../../../bs-ship-factory/bs-ship-factory.md#benefits-of-an-interface).
 
 Interfaces don't create custom types per se, but rather describe the shape of objects that are used with those types. They provide a contract that objects must adhere to.
 

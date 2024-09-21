@@ -8,7 +8,7 @@ export interface IPosition {
   stern: Coordinates; // [rowIndex, colIndex]
 }
 
-export function getValidPositions({
+export function getValidShipPositions({
   gamePieceSize,
   direction,
   gameboard,

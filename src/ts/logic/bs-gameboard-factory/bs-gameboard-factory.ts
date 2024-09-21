@@ -1,5 +1,5 @@
-import { getValidPositions } from './helpers/get-valid-positions/get-valid-positions';
-import { IPosition } from './helpers/get-valid-positions/get-valid-positions'
+import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
+import { IPosition } from './helpers/get-valid-ship-positions/get-valid-ship-positions'
 
 export type PositionStates = {
   vacant: symbol,
@@ -50,7 +50,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     );
   }
 
-  getValidShipPositions({
+  getValidPositions({
     direction,
     gamePieceSize,
   }: IValidPlacementWrapperParams): IValidPositionsResult {
@@ -60,7 +60,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
       gameboard: this,
     };
 
-    return getValidPositions(validPlacementArg);
+    return getValidShipPositions(validPlacementArg);
   }
 
   resetBoard(): void {

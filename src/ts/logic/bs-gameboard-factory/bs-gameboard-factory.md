@@ -138,7 +138,7 @@ Generics in TypeScript (`<T>`) can be used in a variety of contexts, such as fun
 
 #### `<T extends symbol>`, `<T = symbol>` or the right way?
 
-For instantiating Battleship boards, I  **decided** that the `fillValue` for the spaces on the board(s) should be represented as symbols, based on several factors mentioned [here](./helpers/validate-placement/validate-placement.md#vacant-occupied-symbols).
+For instantiating Battleship boards, I  **decided** that the `fillValue` for the spaces on the board(s) should be represented as symbols, based on several factors mentioned [here](#position_states-symbol-object).
 
 To ensure that only symbols are allowed for filling the gameboard, the class that instantiates the boards _could_ define the generic type placeholder `<T>` such that it extends the symbol type (`<T extends symbol>`). This approach would guarantee that, during the creation of class instances, only symbol and its subtypes are used. However, it would not prevent instantiation with subtypes that are not `symbol` itself (e.g., a subtype that is structurally compatible but not exactly `symbol`).
 
@@ -315,7 +315,7 @@ During construction, the board is dynamically generated as a 2D array based on t
 #### Instance Methods
 
 ##### `getValidShipPositions`
-See [here](./helpers/get-valid-positions/get-valid-positions.md).
+See [here](./helpers/get-valid-ship-positions/get-valid-ship-positions.md).
 
 ##### `resetBoard`
 <!-- TODO: -->
