@@ -2,9 +2,9 @@
 
 This function identifies all valid positions for placing a game piece of a specified size on a game board, based on its orientation (horizontal or vertical). It verifies that the piece fits within the board's boundaries and that all required spaces are unoccupied. The function returns an array of positions where the piece can be placed without overlapping existing pieces or exceeding the board’s edges.
 
-### The `Position` Interface
+### The `IPosition` Interface
 
-This interface is designed to define the structure of our `Position` objects, ensuring they adhere to a specific format. Doing so has several benefits, such as providing type safety and improving code clarity. For more details, check out [Interface Benefits](../../../ship/ship.md####Benefits-of-an-Interface).
+This interface is designed to define the structure of our `IPosition` objects, ensuring they adhere to a specific format. Doing so has several benefits, such as providing type safety and improving code clarity. For more details, check out [Interface Benefits](../../../ship/ship.md####Benefits-of-an-Interface).
 
 Interfaces don't create custom types per se, but rather describe the shape of objects that are used with those types. They provide a contract that objects must adhere to.
 
@@ -15,8 +15,6 @@ Interfaces don't create custom types per se, but rather describe the shape of ob
 This function takes in vital information (in the form of a destructured object) to determine whether or not a particularly precise position is a valid for game-piece placement:
 
   * `direction`: This parameter checks the orientation of the ship being placed. This will determine whether the algorithm checks rows or columns for potential valid positions.
-
-  * `axisIndex`: The row or column number under test. Depending on the orientation of the ship, the algorithm will need to either check empty spaces of the gameboard in rows, if the ship is horizontal, or in columns, if the ship is vertical. 
 
   * `gamePieceSize`: The amount of units on the gameboard that our piece takes up. To determine whether the piece would fit in the provided row/column.
 
@@ -40,8 +38,6 @@ This function takes in vital information (in the form of a destructured object) 
 
 --- 
 
-  * `boardSize`: This value determines the size of the `for` loops when iterating through rows and/or columns to determine whether or not the ship fits. This particular parameter is vital because it prevents the ships from being placed out of bounds. Since the Battleship boards are squares, we need only one axis length to determine the board size.
-
   * `gameboard`: This parameter expects the gameboard object as its argument. As we are preparing to _mutate_ it with ship additions. 
   
   In looping through the current row/column of the `gameboard`:
@@ -51,13 +47,15 @@ This function takes in vital information (in the form of a destructured object) 
     
   The algorithm is able to determine whether or not there is space for the current ship being placed and its specific size.
 
+  Also, the board size is extracted from the `gameboard` argument. It determines the size of the `for` loops when iterating through rows and/or columns to determine whether or not the ship fits. This is vital because it prevents the ships from being placed out of bounds.
+
 All data above is processed in the function and what's returned is an array of valid positions for the current ship being placed.
 
 #### The **Algo**
 
 For the sake of brevity, I will only cover a **couple** of snippets that, may or may not be, infinitesimally complex to an intermediate level of developer.
 
-##### 1. **`getAxisArray` Logic For Vertically Oriented Ships
+##### 1. **`extractAxisArray` Logic For Vertically Oriented Ships
 
 This logic traverses the provided gameboard. 
 Since it is implemented in the form of a 2D array, we can do so iteratively by its rows (`horizontal`) and columns (`vertical`). The logic for vertical traversal is minutely more complicated than its horizontal counterpart:
@@ -98,7 +96,7 @@ This method _preserves the order of the columns values_ while _enabling us to st
 
 In the _further_ refactored logic that uses `map`, we achieve the same functionality in one line. `map` here creates a new array from our gameboard that transforms each row array into the value of each row array at the `axisIndex`. Thus returning a new array of all values of a single column.
 
-##### 2. **`getValidPositions`**:
+##### 2. **`findValidPositionsInAxis`**:
 
 This function identifies valid positions for placing a ship on the gameboard, based on its size and orientation.
 
@@ -118,12 +116,10 @@ for (let i = 0; i < boardSize; i++) {
       const sternPosition =
         direction === 'horizontal' ? [axisIndex, i] :[i, axisIndex];
 
-      const validPosition: Position = {
+      validAxisPositions.push({
         bow: bowPosition,
         stern: sternPosition,
-      };
-
-      validShipPositions.push(validPosition);
+      });
     }
   } else if (axisArray[i] === OCCUPIED) {
     streak = 0;
@@ -147,14 +143,14 @@ When structuring code, I tend to, at this time of writing:
 
 ###### Function Dependencies:
 
-When `getValidPositions` is called, its dependencies (`axisArray`, `direction`, `axisIndex`, `gamePieceSize`) are already provided via the outer functions parameters.
+When `getValidPositions` is called, its dependencies (`direction` & `gamePieceSize`) are already provided via the outer functions parameters.
 
 **Variable Initialization:**
 
 Within the "mini-helper"::
 
   * `streak`: Tracks the number of consecutive `VACANT` positions in the specified row or column.
-  * `validShipPositions`: An array to hold valid ship positions conforming to the `Position` interface specification.
+  * `validShipPositions`: An array to hold valid ship positions conforming to the `IPosition` interface specification.
 
 **Logic Explanation:**  
 

@@ -1,23 +1,21 @@
-import { ValidPlacementCallbackParams } from "../../bs-gameboard-factory";
+import { IValidPlacementCallbackParams } from "../../bs-gameboard-factory";
 import { POSITION_STATES } from "../../bs-gameboard-factory";
+import { IValidPositionsResult } from "../../bs-gameboard-factory";
+import type { Coordinates } from "../../bs-gameboard-factory";
 
-export interface Position {
-  bow: number[]; // [rowIndex, colIndex]
-  stern: number[]; // [rowIndex, colIndex]
+export interface IPosition {
+  bow: Coordinates; // [rowIndex, colIndex]
+  stern: Coordinates; // [rowIndex, colIndex]
 }
 
 export function getValidPositions({
-  direction,
-  axisIndex,
   gamePieceSize,
-  boardSize,
+  direction,
   gameboard,
-}: ValidPlacementCallbackParams): Position[] {
-  const testArguments = (
+}: IValidPlacementCallbackParams): IValidPositionsResult {
+  const validateArguments = (
     direction: 'horizontal' | 'vertical',
     gamePieceSize: number,
-    axisIndex: number,
-    boardSize: number
   ): void => {
     // Validate direction
     if (!['horizontal', 'vertical'].includes(direction)) {
@@ -30,81 +28,81 @@ export function getValidPositions({
         'Invalid piece length. Game piece length must be between 2 and 5.'
       );
     }
-
-    // Edge case checks
-    if (axisIndex < 0 || axisIndex >= boardSize) {
-      throw new Error('Invalid axisIndex number.');
-    }
   };
 
   // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  testArguments(direction, gamePieceSize, axisIndex, boardSize);
+  validateArguments(direction, gamePieceSize);
 
-  const getAxisArray = (
+  const extractAxisArray = (
     direction: 'horizontal' | 'vertical',
     axisIndex: number,
     gameboard: Array<Array<symbol>> // or symbol[][]
   ): Array<symbol> => {
     return direction === 'horizontal'
-      ? gameboard[axisIndex]
-      : gameboard.map((row) => row[axisIndex]);
+      ? gameboard[axisIndex] // Returns row
+      : gameboard.map((row) => row[axisIndex]); // Returns column
   };
 
-  const getValidPositions = (
+  const findValidPositionsInAxis = (
     axisArray: Array<symbol>, // or symbol[]
     direction: 'horizontal' | 'vertical',
     axisIndex: number,
     gamePieceSize: number
-  ): Position[] => {
+  ): IPosition[] => {
     // Edge case check for ship length greater than row length
     if (gamePieceSize > axisArray.length) {
       throw new Error('Ship length cannot be greater than axisArray length.');
     }
 
     let streak: number = 0;
-    let validPositions: Position[] = [];
+    let validAxisPositions: IPosition[] = [];
 
     for (let i = 0; i < axisArray.length; i++) {
       if (axisArray[i] === POSITION_STATES.vacant) {
         streak++;
 
-        // Position is valid
         if (streak >= gamePieceSize) {
-          const bowPosition =
+          const bowPosition: [number, number] =
             direction === 'horizontal'
               ? [axisIndex, i - (gamePieceSize - 1)]
               : [i - (gamePieceSize - 1), axisIndex];
-          const sternPosition =
+          
+          const sternPosition: [number, number] =
             direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
 
-          const validPosition: Position = {
+          validAxisPositions.push({
             bow: bowPosition,
             stern: sternPosition,
-          };
-
-          validPositions.push(validPosition);
+          });
         }
-      } else if (axisArray[i] === POSITION_STATES.vacant) {
+      } else {
+        // Reset streak if position is occupied
         streak = 0;
       }
     }
     
-    return validPositions;
+    return validAxisPositions;
   };
 
-  const axisArray: Array<symbol> = getAxisArray(
-    direction,
-    axisIndex,
-    gameboard
-  );
+  let validPositionsPerAxis: IValidPositionsResult = {}; 
+  const board = gameboard.board;
 
-  // Loop through axisArray to find valid positions
-  const validPositions: Position[] = getValidPositions(
-    axisArray,
-    direction,
-    axisIndex,
-    gamePieceSize
-  );
+  for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {
+    const axisArray = extractAxisArray(direction, axisIndex, board);
+    const validPositions = findValidPositionsInAxis(
+      axisArray,
+      direction,
+      axisIndex,
+      gamePieceSize
+    );
 
-  return validPositions;
+    const axisTemplate =
+      direction === 'horizontal'
+        ? `row-${axisIndex}`
+        : `column-${axisIndex}`;
+    
+    validPositionsPerAxis[axisTemplate] = validPositions;
+  }
+
+  return validPositionsPerAxis;
 }

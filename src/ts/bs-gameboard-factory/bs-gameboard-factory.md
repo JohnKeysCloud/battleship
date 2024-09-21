@@ -56,6 +56,10 @@ Using `Symbol`s in JavaScript provides several advantages, particularly when dea
 4. **Ideal for Grid-Based Games**: Naturally represents gameboards, where each cell's direct neighbors are easily accessible.
 5. **Supports Uniform Movement**: Easily handles standard directional movements (up, down, left, right) with predictable index access.
 
+#### Prepending `I` to Interface Name
+
+This is a common, but not universal practice in some TypeScript codebases. It is mostly seen in older or certain large codebases. Even though some teams avoid this and name interfaces just like regular types, I decided to use the convention in this project because I am exporting and importing my interfaces into other modules. By prepending `I`, readability is enhanced in the modules where I import interfaces. It makes it clear that the import is an interface.
+
 ####  Tf is `<t>`
 
 The `<T>` syntax, representing a generic type parameter, can be used anywhere in TypeScript where you want to define a generic type. Generics in TypeScript provide a way to create reusable and flexible components, functions, classes, and interfaces that work with a variety of data types while maintaining type safety.
@@ -196,30 +200,11 @@ The **disadvantages**?:
 
 My work here is done.
 
-#### `POSITION_STATES` Symbol Object
+###  `PositionStates`, `Coordinates` & `AxisName` Types
 
-When considering initial values for filling the game board, I faced a dilemma.
+Rather than using interfaces, which are ideal for object structures and extensibility, _types_ offer flexibility for a more general type manipulation; Hence, these types define smaller, reusable pieces that can then be used within interfaces or other types. 
 
-Using `null` seemed like a reasonable choice both syntactically and semantically, as it could signify the intentional absence of any value, a "placeholder" for empty spaces on the board.
-
-Problem solved... almost. What about the values once they become `OCCUPIED`?
-
-I considered setting them to `true`, which would work syntactically; an `isOccupied` variable could easily handle such a boolean state. However, `true` lacks semantic clarity, what does `true` really represent in this context?
-
-Then I stumbled upon `Symbol`s. Aha! A unique and descriptive approach for handling game board states.
-
-[Here is what I learned on my exploration of `Symbol`s](#whats-a-symbol-yo)
-
-In my battleship gameboard implementation, I use `Symbol('V')` stored as `vacant` and `Symbol('O')` stored as `occupied` in the `POSITION_STATES` object to fill a 2D array. This approach ensures:
-   - **No Collisions**: Other parts of the code won't mistakenly overwrite or interact with these values.
-   - **Clear Intent**: It's clear what each `Symbol` represents, improving code readability.
-   - **Efficient State Management**: I manage the state of the board in a lightweight, performance-friendly manner without the risk of confusing states or accidental changes.
-
-By leveraging `Symbols`, I am taking advantage of their unique and immutable nature, enhancing the robustness and clarity of my code.
-
-I gave the symbols single letter descriptors (accessible via a symbols `.description` property) so that when printing our board to see the values, instead of seeing an insurmountable amount of  `vacant` or `occupied` strings, we'd see single letters in monospace, giving the gameboard symmetry, enhancing readability. 
-
-They are stored in the `POSITION_STATES` object for organizational purposes.
+💭 Think of types as building blocks or contracts for specific aspects, which can then be composed into more complex structures, such as interfaces. 
 
 ### `IGridGameboard<T>` Interface & Members
 
@@ -258,11 +243,36 @@ These methods provide basic functionality for any grid-based game, ensuring cons
 
 The `IGridGameboard<T>` interface defines a grid gameboard where the board is represented as a 2D array, allowing it to have any dimensions `x` by `y`. The `IGridGameboardSquare<T>` interface extends `IGridGameboard<T>` and introduces the `boardSize` property, which specifies a single dimension (`x`). This addition allows a class implementing `IGridGameboardSquare<T>` to generate a square gameboard, where both dimensions are equal (i.e., `x` by `x`). This provides a more specific use case for creating square gameboards compared to the more generic `IGridGameboard<T>`.
 
-### `ValidPlacementWrapperParams` & `ValidPlacementCallbackParams` Interfaces
+### `IValidPlacementWrapperParams` & `IValidPlacementCallbackParams` Interfaces
 
-* **`ValidPlacementWrapperParams`**: This interface defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `ValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function. To enforce this structure, `ValidPlacementWrapperParams` extends `ValidPlacementCallbackParams` but omits the two redundant properties, ensuring type safety and reducing redundancy.
+* **`IValidPlacementWrapperParams`**: This interface defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `IValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function. To enforce this structure, `IValidPlacementWrapperParams` extends `IValidPlacementCallbackParams` but omits the two redundant properties, ensuring type safety and reducing redundancy.
 
-* **`ValidPlacementCallbackParams`**: This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic.
+* **`IValidPlacementCallbackParams`**: This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic.
+
+### `POSITION_STATES` Symbol Object
+
+When considering initial values for filling the game board, I faced a dilemma.
+
+Using `null` seemed like a reasonable choice both syntactically and semantically, as it could signify the intentional absence of any value, a "placeholder" for empty spaces on the board.
+
+Problem solved... almost. What about the values once they become `OCCUPIED`?
+
+I considered setting them to `true`, which would work syntactically; an `isOccupied` variable could easily handle such a boolean state. However, `true` lacks semantic clarity, what does `true` really represent in this context?
+
+Then I stumbled upon `Symbol`s. Aha! A unique and descriptive approach for handling game board states.
+
+[Here is what I learned on my exploration of `Symbol`s](#whats-a-symbol-yo)
+
+In my battleship gameboard implementation, I use `Symbol('V')` stored as `vacant` and `Symbol('O')` stored as `occupied` in the `POSITION_STATES` object to fill a 2D array. This approach ensures:
+   - **No Collisions**: Other parts of the code won't mistakenly overwrite or interact with these values.
+   - **Clear Intent**: It's clear what each `Symbol` represents, improving code readability.
+   - **Efficient State Management**: I manage the state of the board in a lightweight, performance-friendly manner without the risk of confusing states or accidental changes.
+
+By leveraging `Symbols`, I am taking advantage of their unique and immutable nature, enhancing the robustness and clarity of my code.
+
+I gave the symbols single letter descriptors (accessible via a symbols `.description` property) so that when printing our board to see the values, instead of seeing an insurmountable amount of  `vacant` or `occupied` strings, we'd see single letters in monospace, giving the gameboard symmetry, enhancing readability. 
+
+They are stored in the `POSITION_STATES` object for organizational purposes.
 
 ### `BattleshipBoardFactory implements IGridGameboardSquare<symbol>` Class
 
@@ -318,3 +328,12 @@ See [here](./helpers/get-valid-positions/get-valid-positions.md).
 
 #####  Getters
 <!-- TODO: -->
+
+### `createBattleshipBoardSet` Function
+
+This utility function simplifies the initialization of game boards for both players in the Battleship game. Instead of creating new instances of `BattleshipBoardFactory` in multiple modules, the `createBattleshipBoardSet` function handles the creation of two game board instances:
+
+- `playerOne`: Represents the game board for Player One.
+- `playerTwo`: Represents the game board for Player Two.
+
+By centralizing the creation process, this function ensures consistent initialization across the application and reduces redundancy.

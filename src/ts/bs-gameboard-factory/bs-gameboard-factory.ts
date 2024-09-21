@@ -1,40 +1,44 @@
-import type { Position } from './helpers/get-valid-positions/get-valid-positions'
 import { getValidPositions } from './helpers/get-valid-positions/get-valid-positions';
+import { IPosition } from './helpers/get-valid-positions/get-valid-positions'
 
-// Symbols to fill gameboard values
-export const POSITION_STATES = {
-  vacant: Symbol('V'),
-  occupied: Symbol('O')
-};
-export interface ValidPlacementCallbackParams {
-  direction: 'horizontal' | 'vertical';
-  axisIndex: number;
-  gamePieceSize: number;
-  boardSize: number;
-  gameboard: symbol[][];
+export type PositionStates = {
+  vacant: symbol,
+  occupied: symbol
 }
-
-export interface ValidPlacementWrapperParams extends Omit<ValidPlacementCallbackParams, 'boardSize' | 'gameboard'> {};
+export type Coordinates = [number, number];
+export type AxisName = `row-${number}` | `column-${number}`;
 
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
   placePiece(
-    xPos: number,
-    yPos: number,
+    endpoint: Coordinates,
     length?: number,
     direction?: 'horizontal' | 'vertical'
   ): void;
-  removePiece(
-    xPos: number,
-    yPos: number
-  ): void;
+  removePiece(endpoint: Coordinates): void;
   resetBoard(): void;
 }
 
 interface IGridGameboardSquare<T> extends IGridGameboard<T> {
-  boardSize: number; 
+  boardSize: number;
 }
+export interface IValidPlacementCallbackParams {
+  direction: 'horizontal' | 'vertical';
+  gamePieceSize: number;
+  gameboard: BattleshipBoardFactory;
+}
+
+export interface IValidPlacementWrapperParams extends Omit<IValidPlacementCallbackParams, 'gameboard'> { };
+
+export interface IValidPositionsResult {
+  [key: AxisName]: IPosition[];
+}
+
+export const POSITION_STATES: PositionStates = {
+  vacant: Symbol('V'),
+  occupied: Symbol('O'),
+};
 export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
@@ -48,15 +52,12 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
 
   getValidShipPositions({
     direction,
-    axisIndex,
     gamePieceSize,
-  }: ValidPlacementWrapperParams): Position[] {
-    const validPlacementArg: ValidPlacementCallbackParams = {
+  }: IValidPlacementWrapperParams): IValidPositionsResult {
+    const validPlacementArg: IValidPlacementCallbackParams = {
       direction,
-      axisIndex,
       gamePieceSize,
-      boardSize: this._boardSize,
-      gameboard: this._board,
+      gameboard: this,
     };
 
     return getValidPositions(validPlacementArg);
@@ -68,8 +69,22 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     }
   }
 
-  placePiece(input, orientation) {}
-  removePiece(input) {}
+  // youAreHere
+  // PARAMS input, orientation
+  placePiece(bowCoordinates: Coordinates) {
+    const [ bowX, bowY ] = bowCoordinates;
+    // const [gamePieceSize, direction] = shipConfigurations;
+
+    const createPlacementParams = (
+      direction: 'horizontal' | 'vertical',
+      gamePieceSize: number
+    ): IValidPlacementWrapperParams => ({
+      direction,
+      gamePieceSize,
+    });
+  }
+
+  removePiece(bowCoordinates: Coordinates) {}
 
   public get board(): symbol[][] {
     return this._board;
@@ -84,7 +99,9 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   }
 }
 
-export const BattleshipBoards = {
-  'playerOne': new BattleshipBoardFactory(),
-  'playerTwo': new BattleshipBoardFactory(),
+export function createBattleshipBoardSet() {
+  return {
+    playerOne: new BattleshipBoardFactory(),
+    playerTwo: new BattleshipBoardFactory()
+  }
 };
