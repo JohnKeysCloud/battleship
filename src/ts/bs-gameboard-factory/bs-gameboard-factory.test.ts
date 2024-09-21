@@ -1,82 +1,118 @@
 import { BattleshipBoardFactory } from './bs-gameboard-factory';
-import { ValidPlacementWrapperParams } from './bs-gameboard-factory';
-
-describe('`BattleshipBoardFactory` Instantiation', () => {
-  let testBoard: BattleshipBoardFactory;
-
-  beforeEach(() => {
-    testBoard = new BattleshipBoardFactory();
-  });
-
+import { IValidPlacementWrapperParams } from './bs-gameboard-factory';
+import { IValidPositionsResult } from './bs-gameboard-factory';
+import { IPosition } from './helpers/get-valid-positions/get-valid-positions';
+import type { Coordinates } from './bs-gameboard-factory';
+describe('`BattleshipBoardFactory` Instance Board Creation', () => {
   test('board creation/retrieval: should match emptyBoard: %o', () => {
-    // Set up test data
+    let testBoard: BattleshipBoardFactory = new BattleshipBoardFactory();
+
+    // Hardcoded empty board representation
     const emptyBoard = Array.from({ length: 10 }, () =>
       Array(10).fill(Symbol('V'))
     );
 
     // Inline serialization logic
     const serializeBoard = (board: symbol[][]) =>
-      JSON.stringify( board, (key, value) => // {1}
-        (typeof value === 'symbol' ? value.toString() : value));
+      JSON.stringify(board, (key, value) => // {1}
+        (typeof value === 'symbol' ? value.toString() : value)
+    );
 
     // Perform the test
     expect(serializeBoard(testBoard.board)).toBe(serializeBoard(emptyBoard));
   });
+});
 
-  describe('`validateShipPlacement`', () => {
-    // Simplify method call
-    const getValidPositionsArray = (input: ValidPlacementWrapperParams) =>
-      testBoard.getValidShipPositions(input);
+describe('`validateShipPlacement`', () => {
+  // Initialized with instance to ensure definition in setup/helper functions
+  let testBoard: BattleshipBoardFactory = new BattleshipBoardFactory();
 
-    // Creates test ship configurations
-    const createPlacementParams = (
-      direction: 'horizontal' | 'vertical',
-      axisIndex: number,
-      gamePieceSize: number
-    ): ValidPlacementWrapperParams => ({
-      direction,
-      axisIndex,
-      gamePieceSize,
-    });
-
-    // Create test case object
-    const testCases = [
-      {
-        shipConfigs: createPlacementParams('horizontal', 9, 5),
-        validPositions: [
-          { bow: [9, 0], stern: [9, 4] },
-          { bow: [9, 1], stern: [9, 5] },
-          { bow: [9, 2], stern: [9, 6] },
-          { bow: [9, 3], stern: [9, 7] },
-          { bow: [9, 4], stern: [9, 8] },
-          { bow: [9, 5], stern: [9, 9] },
-        ],
-      },
-      {
-        shipConfigs: createPlacementParams('vertical', 6, 2),
-        validPositions: [
-          { bow: [0, 6], stern: [1, 6] },
-          { bow: [1, 6], stern: [2, 6] },
-          { bow: [2, 6], stern: [3, 6] },
-          { bow: [3, 6], stern: [4, 6] },
-          { bow: [4, 6], stern: [5, 6] },
-          { bow: [5, 6], stern: [6, 6] },
-          { bow: [6, 6], stern: [7, 6] },
-          { bow: [7, 6], stern: [8, 6] },
-          { bow: [8, 6], stern: [9, 6] },
-        ],
-      },
-    ];
-
-    test.each(testCases)(
-      'valid position array retrieval: %o',
-      ({ shipConfigs, validPositions }) => {
-        expect(getValidPositionsArray(shipConfigs)).toEqual(validPositions);
-      }
-    );
+  // Creates a new instance for each test run
+  beforeEach(() => {
+    testBoard = new BattleshipBoardFactory();
   });
 
-  
+  interface validPositionsTestCase {
+    shipConfigs: IValidPlacementWrapperParams;
+    validPositions: IValidPositionsResult;
+  }
+
+  // Test function utility
+  const getValidPositionsArray = (input: IValidPlacementWrapperParams) =>
+    testBoard.getValidShipPositions(input);
+
+  // Ensure interface compliance
+  const createPlacementParams = (
+    direction: 'horizontal' | 'vertical',
+    gamePieceSize: number
+  ): IValidPlacementWrapperParams => ({
+    direction,
+    gamePieceSize,
+  });
+
+  // Dynamically create expected test result
+  function createTestCaseResult(
+    direction: 'horizontal' | 'vertical',
+    gamePieceSize: number
+  ): IValidPositionsResult {
+    const createPosition = (
+      bow: Coordinates,
+      stern: Coordinates
+    ): IPosition => {
+      return { bow, stern };
+    };
+
+    // Initalizes return object to contain all valid positions
+    const validPositions: IValidPositionsResult = {};
+
+    // Creates row/column objects
+    for (let i = 0; i < testBoard.boardSize; i++) {
+      const axisTemplate =
+        direction === 'horizontal' ? `row-${i}` : `column-${i}`;
+
+      // Initializes array for row/column
+      validPositions[axisTemplate] = [];
+
+      // Populates each array
+      for (let j = 0; j + (gamePieceSize - 1) < testBoard.boardSize; j++) {
+        let position: IPosition =
+          direction === 'horizontal'
+            ? createPosition([i, j], [i, j + gamePieceSize - 1])
+            : createPosition([j, i], [j + gamePieceSize - 1, i]);
+
+        validPositions[axisTemplate].push(position);
+      }
+    }
+
+    return validPositions;
+  }
+
+  // Actual Test Object
+  const testCases: validPositionsTestCase[] = [
+    {
+      shipConfigs: createPlacementParams('horizontal', 5),
+      validPositions: createTestCaseResult('horizontal', 5),
+    },
+    {
+      shipConfigs: createPlacementParams('vertical', 2),
+      validPositions: createTestCaseResult('vertical', 2),
+    },
+    {
+      shipConfigs: createPlacementParams('horizontal', 4),
+      validPositions: createTestCaseResult('horizontal', 4),
+    },
+    {
+      shipConfigs: createPlacementParams('vertical', 3),
+      validPositions: createTestCaseResult('vertical', 3),
+    },
+  ];
+
+  test.each(testCases)(
+    'valid position retrieval (empty board): %o',
+    ({ shipConfigs, validPositions }) => {
+      expect(getValidPositionsArray(shipConfigs)).toEqual(validPositions);
+    }
+  );
 });
 
 // 💭 --------------------------------------------------------------
@@ -89,3 +125,4 @@ describe('`BattleshipBoardFactory` Instantiation', () => {
 // traversal, the key resets back to 0 for each row.In the test above, we
 // have no use for the key, we only need to replace each symbol with a
 // string representation of it, so it handles the values accordingly.
+
