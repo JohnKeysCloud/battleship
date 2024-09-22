@@ -1,4 +1,5 @@
 import { BattleshipBoardFactory } from '../../bs-gameboard-factory';
+import { createPlacementParams } from '../../bs-gameboard-factory';
 import { IValidPlacementWrapperParams } from '../../bs-gameboard-factory';
 import { IValidPositionsResult } from '../../bs-gameboard-factory';
 import { IPosition } from './get-valid-ship-positions';
@@ -21,15 +22,6 @@ describe('`getValidShipPositions`', () => {
   // Test function utility
   const getValidShipPositions = (input: IValidPlacementWrapperParams) =>
     testBoard.getValidPositions(input);
-
-  // Ensure interface compliance
-  const createPlacementParams = (
-    direction: 'horizontal' | 'vertical',
-    gamePieceSize: number
-  ): IValidPlacementWrapperParams => ({
-    direction,
-    gamePieceSize,
-  });
 
   // Dynamically create expected test result
   function createTestCaseResult(

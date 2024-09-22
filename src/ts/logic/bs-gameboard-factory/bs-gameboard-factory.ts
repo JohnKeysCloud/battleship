@@ -11,11 +11,7 @@ export type AxisName = `row-${number}` | `column-${number}`;
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
-  placePiece(
-    endpoint: Coordinates,
-    length?: number,
-    direction?: 'horizontal' | 'vertical'
-  ): void;
+  placePiece(options: IPlacePieceWrapperParams): void;
   removePiece(endpoint: Coordinates): void;
   resetBoard(): void;
 }
@@ -33,6 +29,11 @@ export interface IValidPlacementWrapperParams extends Omit<IValidPlacementCallba
 
 export interface IValidPositionsResult {
   [key: AxisName]: IPosition[];
+}
+
+export interface IPlacePieceWrapperParams {
+  endpoint: Coordinates;
+  configurations?: IValidPlacementWrapperParams;
 }
 
 export const POSITION_STATES: PositionStates = {
@@ -69,19 +70,22 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     }
   }
 
-  // youAreHere
-  // PARAMS input, orientation
-  placePiece(bowCoordinates: Coordinates) {
-    const [ bowX, bowY ] = bowCoordinates;
-    // const [gamePieceSize, direction] = shipConfigurations;
+  placePiece({
+    endpoint,
+    configurations,
+  }: IPlacePieceWrapperParams) {
+    const [bowX, bowY] = endpoint;
 
-    const createPlacementParams = (
-      direction: 'horizontal' | 'vertical',
-      gamePieceSize: number
-    ): IValidPlacementWrapperParams => ({
-      direction,
-      gamePieceSize,
-    });
+
+
+    // Check if configurations is defined
+    if (!configurations) {
+      throw new Error('Configurations must be provided');
+    }
+
+    const { direction, gamePieceSize } = configurations;
+
+    return 'test';
   }
 
   removePiece(bowCoordinates: Coordinates) {}
@@ -98,6 +102,18 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     return this._boardSize;
   }
 }
+
+// 💭 --------------------------------------------------------------
+
+export function createPlacementParams(
+  direction: 'horizontal' | 'vertical',
+  gamePieceSize: number
+): IValidPlacementWrapperParams {
+  return {
+    direction,
+    gamePieceSize
+  }
+};
 
 export function createBattleshipBoardSet() {
   return {
