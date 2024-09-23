@@ -2,7 +2,7 @@ import { BattleshipBoardFactory } from '../../bs-gameboard-factory';
 import { createPlacementParams } from '../../bs-gameboard-factory';
 import { IValidPlacementWrapperParams } from '../../bs-gameboard-factory';
 import { IValidPositionsResult } from '../../bs-gameboard-factory';
-import { IPosition } from './get-valid-ship-positions';
+import { IPosition } from '../../bs-gameboard-factory';
 import type { Coordinates } from '../../bs-gameboard-factory';
 
 describe('`getValidShipPositions`', () => {
