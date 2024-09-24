@@ -1,41 +1,15 @@
+import {
+  PositionStates,
+  IPosition,
+  IGridGameboardSquare,
+  IShipConfigurations,
+  IValidPositionsResult,
+  IPlacePieceWrapperParams,
+  IValidPlacementCallbackParams,
+} from '../bs-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { areArraysEqual } from '../../utilities/random-utilities';
 
-export type PositionStates = {
-  vacant: symbol;
-  occupied: symbol;
-};
-export type Coordinates = [number, number];
-export type AxisName = `row-${number}` | `column-${number}`;
-
-export interface IPosition {
-  bow: Coordinates; // [rowIndex, colIndex]
-  stern: Coordinates; // [rowIndex, colIndex]
-}
-interface IGridGameboard<T> {
-  readonly board: T[][];
-  fillValue: T;
-  placePiece(options: IPlacePieceWrapperParams): void;
-  removePiece(endpoint: IPosition): void;
-  resetBoard(): void;
-}
-interface IGridGameboardSquare<T> extends IGridGameboard<T> {
-  boardSize: number;
-}
-export interface IShipConfigurations {
-  direction: 'horizontal' | 'vertical';
-  gamePieceSize: number;
-}
-export interface IValidPlacementCallbackParams extends IShipConfigurations {
-  gameboard: BattleshipBoardFactory;
-}
-export interface IValidPositionsResult {
-  [key: AxisName]: IPosition[];
-}
-export interface IPlacePieceWrapperParams {
-  coordinates: Coordinates;
-  configurations?: IShipConfigurations;
-}
 
 // 💭 --------------------------------------------------------------
 
@@ -73,10 +47,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     }
   }
 
-  placePiece({
-    coordinates,
-    configurations,
-  }: IPlacePieceWrapperParams) {
+  placePiece({ coordinates, configurations }: IPlacePieceWrapperParams) {
     if (!configurations) {
       throw new Error('Configurations must be provided');
     }
@@ -105,9 +76,12 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
       }
       return false;
     };
-    const placeOnBoard = (position: IPosition, configurations: IShipConfigurations) => {
+    const placeOnBoard = (
+      position: IPosition,
+      configurations: IShipConfigurations
+    ) => {
       const gameboard = this._board;
-      
+
       const isHorizontal = configurations.direction === 'horizontal';
 
       const primary = isHorizontal ? position.bow[0] : position.bow[1];
@@ -134,7 +108,11 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     if (isPositionValid(position, configurations)) {
       return placeOnBoard(position, configurations);
     } else {
-      const errorMessage = `"${JSON.stringify(position)}" is unavailable for ship with configurations: ${JSON.stringify(configurations)}`;
+      const errorMessage = `"${JSON.stringify(
+        position
+      )}" is unavailable for ship with configurations: ${JSON.stringify(
+        configurations
+      )}`;
       throw new Error(errorMessage);
     }
   }
@@ -162,13 +140,13 @@ export function createShipConfigurations(
 ): IShipConfigurations {
   return {
     direction,
-    gamePieceSize
-  }
-};
+    gamePieceSize,
+  };
+}
 
 export function createBattleshipBoardSet() {
   return {
     playerOne: new BattleshipBoardFactory(),
-    playerTwo: new BattleshipBoardFactory()
-  }
-};
+    playerTwo: new BattleshipBoardFactory(),
+  };
+}

@@ -1,7 +1,10 @@
 import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
-  IPosition,
+  IPosition
+} from "../../../bs-types";
+
+import {
   POSITION_STATES
 } from "../../bs-gameboard-factory";
 

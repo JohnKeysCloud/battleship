@@ -3,6 +3,9 @@ import {
   IShipConfigurations,
   IValidPositionsResult,
   IPosition,
+} from '../../../bs-types';
+
+import {
   BattleshipBoardFactory,
   createShipConfigurations
 } from '../../bs-gameboard-factory';

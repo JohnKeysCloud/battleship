@@ -1,6 +1,9 @@
 import {
   Coordinates,
-  IPlacePieceWrapperParams,
+  IPlacePieceWrapperParams
+} from '../../../bs-types';
+
+import {
   BattleshipBoardFactory,
   createShipConfigurations
 } from "../../bs-gameboard-factory";
