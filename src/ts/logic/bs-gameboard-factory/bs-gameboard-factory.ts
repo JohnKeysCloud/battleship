@@ -1,17 +1,17 @@
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { areArraysEqual } from '../../utilities/random-utilities';
 
+export type PositionStates = {
+  vacant: symbol;
+  occupied: symbol;
+};
+export type Coordinates = [number, number];
+export type AxisName = `row-${number}` | `column-${number}`;
+
 export interface IPosition {
   bow: Coordinates; // [rowIndex, colIndex]
   stern: Coordinates; // [rowIndex, colIndex]
 }
-export type PositionStates = {
-  vacant: symbol,
-  occupied: symbol
-}
-export type Coordinates = [number, number];
-export type AxisName = `row-${number}` | `column-${number}`;
-
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
@@ -19,26 +19,25 @@ interface IGridGameboard<T> {
   removePiece(endpoint: IPosition): void;
   resetBoard(): void;
 }
-
 interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 }
-export interface IValidPlacementCallbackParams {
+export interface IShipConfigurations {
   direction: 'horizontal' | 'vertical';
   gamePieceSize: number;
+}
+export interface IValidPlacementCallbackParams extends IShipConfigurations {
   gameboard: BattleshipBoardFactory;
 }
-
-export interface IValidPlacementWrapperParams extends Omit<IValidPlacementCallbackParams, 'gameboard'> { };
-
 export interface IValidPositionsResult {
   [key: AxisName]: IPosition[];
 }
-
 export interface IPlacePieceWrapperParams {
-  endpoint: IPosition;
-  configurations?: IValidPlacementWrapperParams;
+  coordinates: Coordinates;
+  configurations?: IShipConfigurations;
 }
+
+// 💭 --------------------------------------------------------------
 
 export const POSITION_STATES: PositionStates = {
   vacant: Symbol('V'),
@@ -58,7 +57,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   getValidPositions({
     direction,
     gamePieceSize,
-  }: IValidPlacementWrapperParams): IValidPositionsResult {
+  }: IShipConfigurations): IValidPositionsResult {
     const validPlacementArg: IValidPlacementCallbackParams = {
       direction,
       gamePieceSize,
@@ -75,45 +74,67 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   }
 
   placePiece({
-    endpoint,
+    coordinates,
     configurations,
   }: IPlacePieceWrapperParams) {
-
-    const arePositionsEqual = (endpoint: IPosition, position: IPosition) => {
-      return areArraysEqual(endpoint.bow, position.bow) && areArraysEqual(endpoint.stern, position.stern);
+    if (!configurations) {
+      throw new Error('Configurations must be provided');
     }
 
+    const arePositionsEqual = (endpoint: IPosition, position: IPosition) => {
+      return (
+        areArraysEqual(endpoint.bow, position.bow) &&
+        areArraysEqual(endpoint.stern, position.stern)
+      );
+    };
     const isPositionValid = (
-      endpoint: IPosition,
-      configurations: IValidPlacementWrapperParams
-    ) => {      
-      // an object of axis arrays containing position objects
+      position: IPosition,
+      configurations: IShipConfigurations
+    ) => {
       const validPositions = this.getValidPositions(configurations);
 
       // for each row/column
       for (const axisArray in validPositions) {
-        if (validPositions[axisArray].some((position: IPosition) => {
-          return arePositionsEqual(endpoint, position);
-        })) {
+        if (
+          validPositions[axisArray].some((validPosition: IPosition) => {
+            return arePositionsEqual(position, validPosition);
+          })
+        ) {
           return true;
         }
       }
       return false;
     };
-
-    const placeOnBoard = () => true;
-
-    // Check if configurations is defined
-    if (!configurations) {
-      throw new Error('Configurations must be provided');
-    }
-
-    if (isPositionValid(endpoint, configurations)) {
-      return placeOnBoard();
-    } else {
-      const errorMessage = `"${endpoint}" is unavailable for ship with configurations: ${configurations}`;
+    const placeOnBoard = (position: IPosition, configurations: IShipConfigurations) => {
+      const gameboard = this._board;
       
-      console.log(errorMessage);
+      const isHorizontal = configurations.direction === 'horizontal';
+
+      const primary = isHorizontal ? position.bow[0] : position.bow[1];
+      const axisStart = isHorizontal ? position.bow[1] : position.bow[0];
+      const axisEnd = isHorizontal ? position.stern[1] : position.stern[0];
+
+      for (let i = axisStart; i <= axisEnd; i++) {
+        isHorizontal
+          ? (gameboard[primary][i] = POSITION_STATES.occupied)
+          : (gameboard[i][primary] = POSITION_STATES.occupied);
+      }
+
+      return gameboard;
+    };
+
+    const [bowRow, bowColumn] = coordinates;
+    const shipLength = configurations.gamePieceSize;
+
+    const position: IPosition =
+      configurations.direction === 'horizontal'
+        ? { bow: coordinates, stern: [bowRow, bowColumn + shipLength - 1] }
+        : { bow: coordinates, stern: [bowRow + shipLength - 1, bowColumn] };
+
+    if (isPositionValid(position, configurations)) {
+      return placeOnBoard(position, configurations);
+    } else {
+      const errorMessage = `"${JSON.stringify(position)}" is unavailable for ship with configurations: ${JSON.stringify(configurations)}`;
       throw new Error(errorMessage);
     }
   }
@@ -135,10 +156,10 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
 
 // 💭 --------------------------------------------------------------
 
-export function createPlacementParams(
+export function createShipConfigurations(
   direction: 'horizontal' | 'vertical',
   gamePieceSize: number
-): IValidPlacementWrapperParams {
+): IShipConfigurations {
   return {
     direction,
     gamePieceSize

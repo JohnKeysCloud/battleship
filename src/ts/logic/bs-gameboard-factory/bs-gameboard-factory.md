@@ -200,6 +200,75 @@ The **disadvantages**?:
 
 My work here is done.
 
+#### Creating a Range in TypeScript 
+
+The following is a recursive type that generates a union of numbers from `0` to `N`. Here's the entire definition again for reference:
+
+```typescript
+type Range<N extends number, Acc extends number[] = []> = 
+  Acc['length'] extends N 
+    ? Acc[number] 
+    : Range<N, [...Acc, Acc['length']]>; 
+```
+
+##### Components Breakdown
+
+1. **Type Parameters**:
+   - **`N extends number`**: This defines a type parameter `N`, which is constrained to be a number. It represents the upper limit of the range.
+   - **`Acc extends number[] = []`**: This defines another type parameter `Acc`, which defaults to an empty array (`[]`). It will accumulate numbers during the recursive calls.
+
+2. **Base Case**:
+   - **`Acc['length'] extends N`**: This checks if the current length of the accumulator array `Acc` is equal to `N`. If it is, this means we have accumulated enough numbers (from `0` to `N-1`).
+
+   💭 As arrays are also objects, `['length']` is used to access the length property of the array object, which returns the length of the array.
+
+   💭 `N extends number`, hence `N` must be of type `number`. `Acc['length'] extends N`. `N` is a subtype of `number` that in this case is equal to the maximum of the range. Therefore, this line performs a check to see if the length of the `acc` array is equal to `N`.
+
+   - **`? Acc[number]`**: If the condition is true (i.e., the length of `Acc` is equal to `N`), it returns a union of all numbers in `Acc`. The `Acc[number]` syntax retrieves all values from the array type `Acc` as a union.
+
+3. **Recursive Case**:
+   - **`: Range<N, [...Acc, Acc['length']]>`**: If the length of `Acc` is not equal to `N`, it makes a recursive call to `Range`:
+     - The first argument remains `N`.
+     - The second argument is a new array, created by spreading `Acc` and appending the current length of `Acc` (`Acc['length']`).
+     - This effectively adds the next number to the accumulator.
+
+##### How It Works
+
+1. **Initialization**: When you invoke `Range<5>`, it starts with `N` set to `5` and `Acc` set to its default value of `[]`.
+
+2. **First Call**:
+   - Checks if `Acc['length']` (which is `0` initially) extends `5`. It does not, so it moves to the recursive call.
+   - It calls `Range<5, [0]>`.
+
+3. **Subsequent Calls**:
+   - The recursive process continues, each time checking the length of `Acc` and adding the current length to `Acc`.
+   - The calls would look like this:
+     - `Range<5, []>` (length is `0`)
+     - `Range<5, [0]>` (length is `1`)
+     - `Range<5, [0, 1]>` (length is `2`)
+     - `Range<5, [0, 1, 2]>` (length is `3`)
+     - `Range<5, [0, 1, 2, 3]>` (length is `4`)
+     - `Range<5, [0, 1, 2, 3, 4]>` (length is `5`)
+
+4. **Final Return**:
+   - When `Acc` finally has a length of `5`, it returns `Acc[number]`, which will be `0 | 1 | 2 | 3 | 4`.
+
+##### Summary
+
+- The type `Range` generates a union type of numbers from `0` to `N-1`.
+- It does this using a recursive approach, accumulating numbers in an array until the length of that array equals `N`.
+- The base case returns the accumulated numbers as a union, while the recursive case continues to build the array until the condition is satisfied.
+
+##### Example Usage
+
+For example, invoking `Range<5>` would yield the type:
+
+```typescript
+type FiveRange = Range<5>; // Equivalent to 0 | 1 | 2 | 3 | 4
+```
+
+This approach leverages TypeScript's powerful type system to generate types based on recursive definitions, showcasing the utility of conditional types and mapped types.
+
 ###  `PositionStates`, `Coordinates` & `AxisName` Types
 
 Rather than using interfaces, which are ideal for object structures and extensibility, _types_ offer flexibility for a more general type manipulation; Hence, these types define smaller, reusable pieces that can then be used within interfaces or other types. 
@@ -243,11 +312,23 @@ These methods provide basic functionality for any grid-based game, ensuring cons
 
 The `IGridGameboard<T>` interface defines a grid gameboard where the board is represented as a 2D array, allowing it to have any dimensions `x` by `y`. The `IGridGameboardSquare<T>` interface extends `IGridGameboard<T>` and introduces the `boardSize` property, which specifies a single dimension (`x`). This addition allows a class implementing `IGridGameboardSquare<T>` to generate a square gameboard, where both dimensions are equal (i.e., `x` by `x`). This provides a more specific use case for creating square gameboards compared to the more generic `IGridGameboard<T>`.
 
-### `IValidPlacementWrapperParams` & `IValidPlacementCallbackParams` Interfaces
+### `IShipConfigurations` & `IValidPlacementCallbackParams` Interfaces
 
-* **`IValidPlacementWrapperParams`**: This interface defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `IValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function. To enforce this structure, `IValidPlacementWrapperParams` extends `IValidPlacementCallbackParams` but omits the two redundant properties, ensuring type safety and reducing redundancy.
+* **`IShipConfigurations`**: This interface defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `IValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function.
 
-* **`IValidPlacementCallbackParams`**: This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic.
+* **`IValidPlacementCallbackParams`**: This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic. This interface complies with the `IShipConfigurations` interface, so rather than writing a whole new interface, this one simply `extends` it and includes the added necessary property `gameboard`.
+
+💭 You can also create interfaces that implement others that _omit_ properties using... `omit`. For example, the following is equivalent implemented interfaces of the module:
+
+``` typescript
+export interface IValidPlacementCallbackParams {
+  direction: 'horizontal' | 'vertical';
+  gamePieceSize: number;
+  gameboard: BattleshipBoardFactory;
+}
+
+export interface IShipConfigurations extends Omit<IValidPlacementCallbackParams, 'gameboard'> { };
+```
 
 ### `POSITION_STATES` Symbol Object
 

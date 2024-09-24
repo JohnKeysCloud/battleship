@@ -1,5 +1,8 @@
-import { BattleshipFactory, ShipType } from '../bs-ship-factory/bs-ship-factory';
-import type { Version } from '../bs-ship-factory/bs-ship-factory';
+import {
+  Version,
+  BattleshipFactory,
+  ShipType
+} from '../bs-ship-factory/bs-ship-factory';
 
 type Fleet = {
   [key in ShipType]?: BattleshipFactory;

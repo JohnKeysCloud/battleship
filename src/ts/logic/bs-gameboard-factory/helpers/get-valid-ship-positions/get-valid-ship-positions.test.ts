@@ -1,9 +1,11 @@
-import { BattleshipBoardFactory } from '../../bs-gameboard-factory';
-import { createPlacementParams } from '../../bs-gameboard-factory';
-import { IValidPlacementWrapperParams } from '../../bs-gameboard-factory';
-import { IValidPositionsResult } from '../../bs-gameboard-factory';
-import { IPosition } from '../../bs-gameboard-factory';
-import type { Coordinates } from '../../bs-gameboard-factory';
+import {
+  Coordinates,
+  IShipConfigurations,
+  IValidPositionsResult,
+  IPosition,
+  BattleshipBoardFactory,
+  createShipConfigurations
+} from '../../bs-gameboard-factory';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
@@ -15,12 +17,12 @@ describe('`getValidShipPositions`', () => {
   });
 
   interface validPositionsTestCase {
-    shipConfigs: IValidPlacementWrapperParams;
+    shipConfigs: IShipConfigurations;
     validPositions: IValidPositionsResult;
   }
 
   // Test function utility
-  const getValidShipPositions = (input: IValidPlacementWrapperParams) =>
+  const getValidShipPositions = (input: IShipConfigurations) =>
     testBoard.getValidPositions(input);
 
   // Dynamically create expected test result
@@ -63,19 +65,19 @@ describe('`getValidShipPositions`', () => {
   // Actual Test Object
   const testCases: validPositionsTestCase[] = [
     {
-      shipConfigs: createPlacementParams('horizontal', 5),
+      shipConfigs: createShipConfigurations('horizontal', 5),
       validPositions: createTestCaseResult('horizontal', 5),
     },
     {
-      shipConfigs: createPlacementParams('vertical', 2),
+      shipConfigs: createShipConfigurations('vertical', 2),
       validPositions: createTestCaseResult('vertical', 2),
     },
     {
-      shipConfigs: createPlacementParams('horizontal', 4),
+      shipConfigs: createShipConfigurations('horizontal', 4),
       validPositions: createTestCaseResult('horizontal', 4),
     },
     {
-      shipConfigs: createPlacementParams('vertical', 3),
+      shipConfigs: createShipConfigurations('vertical', 3),
       validPositions: createTestCaseResult('vertical', 3),
     },
   ];

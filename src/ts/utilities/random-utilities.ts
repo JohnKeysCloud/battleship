@@ -5,4 +5,8 @@ export const areArraysEqual = <T>(arrayOne: T[], arrayTwo: T[]) =>
   arrayOne.length === arrayTwo.length
   &&
   arrayOne.every((value, index) => value === arrayTwo[index]);
-  
+
+export type Range<N extends number, Acc extends number[] = []> =
+  Acc['length'] extends N
+    ? Acc[number]
+    : Range<N, [...Acc, Acc['length']]>; 

@@ -1,7 +1,4 @@
-// * Classes && Factories
 import { BattleshipFleetFactory } from './bs-fleet-factory';
-
-// * Enumerated Types
 import { ShipType } from '../bs-ship-factory/bs-ship-factory';
 
 describe('BattleshipFleetFactory', () => {

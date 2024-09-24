@@ -1,8 +1,8 @@
 import {
+  Coordinates,
   IPlacePieceWrapperParams,
-  IPosition,
   BattleshipBoardFactory,
-  createPlacementParams
+  createShipConfigurations
 } from "../../bs-gameboard-factory";
 
 describe('`placeShip`', () => {
@@ -19,11 +19,11 @@ describe('`placeShip`', () => {
     testBoard.placePiece(input);
 
   const testObj: IPlacePieceWrapperParams = {
-    endpoint: { bow: [0, 0], stern: [0, 4] } as IPosition,
-    configurations: createPlacementParams('horizontal', 5)
+    coordinates: [0, 0] as Coordinates,
+    configurations: createShipConfigurations('horizontal', 5)
   };
 
   test('ship can be placed', () => {
-    expect(placeShip(testObj)).toBe(true);
+    expect(placeShip(testObj)).toEqual(testBoard.board);
   });
 });
