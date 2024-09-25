@@ -8,8 +8,7 @@ import {
   IValidPlacementCallbackParams,
 } from '../bs-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
-import { areArraysEqual } from '../../utilities/random-utilities';
-
+import { placeShip } from './helpers/place-ship/place-ship';
 
 // 💭 --------------------------------------------------------------
 
@@ -48,73 +47,7 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   }
 
   placePiece({ coordinates, configurations }: IPlacePieceWrapperParams) {
-    if (!configurations) {
-      throw new Error('Configurations must be provided');
-    }
-
-    const arePositionsEqual = (endpoint: IPosition, position: IPosition) => {
-      return (
-        areArraysEqual(endpoint.bow, position.bow) &&
-        areArraysEqual(endpoint.stern, position.stern)
-      );
-    };
-    const isPositionValid = (
-      position: IPosition,
-      configurations: IShipConfigurations
-    ) => {
-      const validPositions = this.getValidPositions(configurations);
-
-      // for each row/column
-      for (const axisArray in validPositions) {
-        if (
-          validPositions[axisArray].some((validPosition: IPosition) => {
-            return arePositionsEqual(position, validPosition);
-          })
-        ) {
-          return true;
-        }
-      }
-      return false;
-    };
-    const placeOnBoard = (
-      position: IPosition,
-      configurations: IShipConfigurations
-    ) => {
-      const gameboard = this._board;
-
-      const isHorizontal = configurations.direction === 'horizontal';
-
-      const primary = isHorizontal ? position.bow[0] : position.bow[1];
-      const axisStart = isHorizontal ? position.bow[1] : position.bow[0];
-      const axisEnd = isHorizontal ? position.stern[1] : position.stern[0];
-
-      for (let i = axisStart; i <= axisEnd; i++) {
-        isHorizontal
-          ? (gameboard[primary][i] = POSITION_STATES.occupied)
-          : (gameboard[i][primary] = POSITION_STATES.occupied);
-      }
-
-      return gameboard;
-    };
-
-    const [bowRow, bowColumn] = coordinates;
-    const shipLength = configurations.gamePieceSize;
-
-    const position: IPosition =
-      configurations.direction === 'horizontal'
-        ? { bow: coordinates, stern: [bowRow, bowColumn + shipLength - 1] }
-        : { bow: coordinates, stern: [bowRow + shipLength - 1, bowColumn] };
-
-    if (isPositionValid(position, configurations)) {
-      return placeOnBoard(position, configurations);
-    } else {
-      const errorMessage = `"${JSON.stringify(
-        position
-      )}" is unavailable for ship with configurations: ${JSON.stringify(
-        configurations
-      )}`;
-      throw new Error(errorMessage);
-    }
+    placeShip(this, {coordinates, configurations});
   }
 
   removePiece(bowCoordinates: IPosition) {}
