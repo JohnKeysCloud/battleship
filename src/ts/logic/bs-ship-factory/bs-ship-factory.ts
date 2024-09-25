@@ -1,23 +1,9 @@
-export enum ShipType {
-  Carrier = 'carrier',
-  Battleship = 'battleship',
-  Cruiser = 'cruiser',
-  Destroyer = 'destroyer',
-  Submarine = 'submarine',
-  PatrolBoat = 'patrolBoat',
-}
-
-export type Version = 1990 | 2002;
-
-// Export me maybe?
-type SizeLookupKey = `${ShipType}-${Version}`;
-
-export interface ShipOptions {
-  type: ShipType;
-  size: number;
-  hitCounter?: number;
-  version?: Version;
-}
+import {
+  IShipOptions,
+  ShipType,
+  SizeLookupKey,
+  Version
+} from "../bs-types"
 
 // Use Record for size lookup with known keys
 const sizeLookup: Record<SizeLookupKey, number | undefined> = {
@@ -35,7 +21,7 @@ const sizeLookup: Record<SizeLookupKey, number | undefined> = {
   'submarine-2002': 3,
 };
 
-export class BattleshipFactory implements ShipOptions {
+export class BattleshipFactory implements IShipOptions {
   public size: number;
   public seaworthy: boolean = true;
   public hitCounter: number = 0;

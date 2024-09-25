@@ -1,14 +1,14 @@
-import {
-  PositionStates,
-  IPosition,
-  IGridGameboardSquare,
-  IShipConfigurations,
-  IValidPositionsResult,
-  IPlacePieceWrapperParams,
-  IValidPlacementCallbackParams,
-} from '../bs-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
+import {
+  IGridGameboardSquare,
+  IPlacePieceWrapperParams,
+  IPosition,
+  IShipConfigurations,
+  IValidPlacementCallbackParams,
+  IValidPositionsResult,
+  PositionStates,
+} from '../bs-types';
 
 // 💭 --------------------------------------------------------------
 

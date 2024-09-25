@@ -1,9 +1,9 @@
+import { BattleshipBoardFactory, POSITION_STATES } from '../../bs-gameboard-factory';
 import {
   IPosition,
   IShipConfigurations,
   IPlacePieceWrapperParams,
 } from '../../../bs-types';
-import { BattleshipBoardFactory, POSITION_STATES } from '../../bs-gameboard-factory';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
 
 export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinates, configurations }: IPlacePieceWrapperParams) {

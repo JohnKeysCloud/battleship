@@ -1,5 +1,5 @@
 import { BattleshipFleetFactory } from './bs-fleet-factory';
-import { ShipType } from '../bs-ship-factory/bs-ship-factory';
+import { ShipType } from '../bs-types';
 
 describe('BattleshipFleetFactory', () => {
   let fleetFactory: BattleshipFleetFactory;

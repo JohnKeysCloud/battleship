@@ -1,15 +1,14 @@
 import {
+  BattleshipBoardFactory,
+  createShipConfigurations,
+  POSITION_STATES
+} from '../../bs-gameboard-factory';
+import {
   Coordinates,
   IPlacePieceWrapperParams,
   IPosition,
   IShipConfigurations
 } from '../../../bs-types';
-
-import {
-  POSITION_STATES,
-  BattleshipBoardFactory,
-  createShipConfigurations,
-} from '../../bs-gameboard-factory';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------

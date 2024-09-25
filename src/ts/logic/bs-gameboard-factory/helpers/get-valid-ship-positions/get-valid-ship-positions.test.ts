@@ -1,14 +1,11 @@
+import { createShipConfigurations, BattleshipBoardFactory } from '../../bs-gameboard-factory';
 import {
   Coordinates,
-  IShipConfigurations,
-  IValidPositionsResult,
   IPosition,
+  IShipConfigurations,
+  ITestCaseValidPositions,
+  IValidPositionsResult
 } from '../../../bs-types';
-
-import {
-  BattleshipBoardFactory,
-  createShipConfigurations
-} from '../../bs-gameboard-factory';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
@@ -18,11 +15,6 @@ describe('`getValidShipPositions`', () => {
   beforeEach(() => {
     testBoard = new BattleshipBoardFactory();
   });
-
-  interface validPositionsTestCase {
-    shipConfigs: IShipConfigurations;
-    validPositions: IValidPositionsResult;
-  }
 
   // Test function utility
   const getValidShipPositions = (input: IShipConfigurations) =>
@@ -66,7 +58,7 @@ describe('`getValidShipPositions`', () => {
   }
 
   // Actual Test Object
-  const testCases: validPositionsTestCase[] = [
+  const testCases: ITestCaseValidPositions[] = [
     {
       shipConfigs: createShipConfigurations('horizontal', 5),
       validPositions: createTestCaseResult('horizontal', 5),

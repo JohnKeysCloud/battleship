@@ -1,12 +1,9 @@
+import { POSITION_STATES } from "../../bs-gameboard-factory";
 import {
+  IPosition,
   IValidPlacementCallbackParams,
-  IValidPositionsResult,
-  IPosition
+  IValidPositionsResult
 } from "../../../bs-types";
-
-import {
-  POSITION_STATES
-} from "../../bs-gameboard-factory";
 
 export function getValidShipPositions({
   gamePieceSize,

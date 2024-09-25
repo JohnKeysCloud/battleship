@@ -1,21 +1,7 @@
 import {
-  Version,
   BattleshipFactory,
-  ShipType
 } from '../bs-ship-factory/bs-ship-factory';
-
-type Fleet = {
-  [key in ShipType]?: BattleshipFactory;
-};
-
-type ShipConfig = {
-  type: ShipType;
-  version?: Version;
-};
-
-type ShipConfigs = {
-  [key in ShipType]?: ShipConfig;
-};
+import { ShipType, Version, Fleet, ShipConfigs } from '../bs-types';
 
 export class BattleshipFleetFactory {
   private fleet: Fleet;

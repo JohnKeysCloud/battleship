@@ -158,16 +158,16 @@ console.log(getStatusMessage(Status.InProgress)); // Output: 'The task is curren
 
 #### Benefits of an Interface
 
-1. **Clear Contract for Implementations:** The interface defines a clear contract that any implementing class must adhere to. This ensures consistency across different implementations. For example, if you were to create another class that implements `ShipOptions`, you are guaranteed that it will have the properties `size`, `hitCounter` and `seaworthy`.
+1. **Clear Contract for Implementations:** The interface defines a clear contract that any implementing class must adhere to. This ensures consistency across different implementations. For example, if you were to create another class that implements `IShipOptions`, you are guaranteed that it will have the properties `size`, `hitCounter` and `seaworthy`.
 
 2. **Type Safety:** TypeScripts interfaces provide type safety by ensuring that the properties and methods in your class adhere to the specified types. This prevents errors like assigning an incorrect type to a property.
 
-3. **Reusability:** The `ShipOptions` interface can be reused in other parts of your code. For instance, if you have a function that operates on objects with these properties, you can type the function to accept `ShipOptions`, making your code more modular and flexible.
+3. **Reusability:** The `IShipOptions` interface can be reused in other parts of your code. For instance, if you have a function that operates on objects with these properties, you can type the function to accept `IShipOptions`, making your code more modular and flexible.
 
 For example:
 
 ``` typescript
-function printShipStatus(ship: ShipOptions): void {
+function printShipStatus(ship: IShipOptions): void {
   console.log(`Ship Type: ${ship.type}`);
   console.log(`Ship Size: ${ship.size}`);
   console.log(`Is Seaworthy: ${ship.seaworthy}`);
@@ -181,15 +181,15 @@ function printShipStatus(ship: ShipOptions): void {
 
 Had I passed the `ship` object without specifying the type in the function signature, there would be:
 
-  * **No Type Checking:** Without the type annotation `ship: ShipOptions`, TypeScript won't check if the object being passed has the expected properties. This could lead to runtime errors if the object doesn't match the expected shape.
+  * **No Type Checking:** Without the type annotation `ship: IShipOptions`, TypeScript won't check if the object being passed has the expected properties. This could lead to runtime errors if the object doesn't match the expected shape.
 
   * **Less Clarity:** The lack of an explicit type makes it harder to know what the function expects. This can lead to confusion, especially in a larger codebase.
 
 4. **Ease of Refactoring:** If we ever need to change the properties or types associated with ships, we can do so in the interface, and TypeScript will flag any part of our code that does not conform to the new structure. This makes refactoring easier and safer.
 
-5. **Documentation and Intellisense:** Using interfaces provides automatic documentation and better IntelliSense in code editors like VS Code. This helps us as developers understand what properties and types are expected when working with the `BattleshipFactory` class or any other class that implements `ShipOptions`.
+5. **Documentation and Intellisense:** Using interfaces provides automatic documentation and better IntelliSense in code editors like VS Code. This helps us as developers understand what properties and types are expected when working with the `BattleshipFactory` class or any other class that implements `IShipOptions`.
 
-6. **Separation of Concerns:** By separating the structure (`ShipOptions`) from the behavior (methods of `BattleshipFactory` instances), we maintain a clear distinction between what a ship "is" and what a ship "does." This separation can lead to cleaner and more maintainable code. 
+6. **Separation of Concerns:** By separating the structure (`IShipOptions`) from the behavior (methods of `BattleshipFactory` instances), we maintain a clear distinction between what a ship "is" and what a ship "does." This separation can lead to cleaner and more maintainable code. 
 
 7. **Default Values in Constructor:** In our `BattleshipFactory` class, we have default values for `hitCounter` and `seaworthy` in the constructor. This simplifies object creation, as we don't need to specify all values when creating an instance. The interface helps ensure that even with default values, the structure remains consistent.
 
@@ -217,9 +217,9 @@ As of 9/4/24, there are two official versions of the Battleship board game, repr
 
 The type `SizeLookupKey` is defined as `${ShipType}-${Version}`. This type ensures that the keys used in the `sizeLookup` table adhere to a specific format. By using this template literal type, TypeScript enforces that keys in the `sizeLookup` table must combine a valid `ShipType` with a valid Version, separated by a hyphen. This helps maintain consistency and type safety, making sure that only properly formatted keys are used throughout the code.
 
-### `ShipOptions` Interface
+### `IShipOptions` Interface
 
-`ShipOptions` is an `interface` that defines the structure of a `Ship` object including its properties and methods related to its state. 
+`IShipOptions` is an `interface` that defines the structure of a `Ship` object including its properties and methods related to its state. 
 
 The question mark (`?`) appended to `hitCounter` and `version` is used to indicate that the property is optional. 
 
@@ -238,7 +238,7 @@ This `sizeLookup` object was defined as a `Record` to ensure that all potential 
 - **Explicit Handling**: Including all possible keys, even with `undefined` values, makes it clear which combinations are valid but currently not used, and allows for future flexibility if these keys become relevant.
 
 ### `BattleshipFactory` Class
-`BattleshipFactory` implements the `ShipOptions` interface and provides the actual logic for how the ship’s state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
+`BattleshipFactory` implements the `IShipOptions` interface and provides the actual logic for how the ship’s state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
 
 #### `public` Keyword 
 
@@ -247,7 +247,7 @@ In TypeScript, when you define a class that implements an interface, you typical
 Take, for example this **simplified**, _incorrect_ implementation:
 
 ``` typescript
-class BattleshipFactory implements ShipOptions {
+class BattleshipFactory implements IShipOptions {
   constructor(
     type: string, 
     size: number, 
@@ -266,7 +266,7 @@ This code is _attempting_ to assign values to `this.size`, `this.hitCounter`, an
 Here is one fix:
 
 ``` typescript
-class BattleshipFactory implements ShipOptions {
+class BattleshipFactory implements IShipOptions {
   type: string, 
   size: number;
   seaworthy: boolean;
@@ -298,7 +298,7 @@ Using the `public`, `private`, or `protected` prefixes in constructor parameters
 Here is the refactored version:
 
 ``` typescript
-class BattleshipFactory implements ShipOptions {
+class BattleshipFactory implements IShipOptions {
   constructor(
     public type: string,
     public size: number,
