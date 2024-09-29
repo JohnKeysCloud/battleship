@@ -8,14 +8,13 @@ import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   PositionStates,
-} from '../bs-types';
-
-// 💭 --------------------------------------------------------------
+} from '../../types/logic-types/logic-types';
 
 export const POSITION_STATES: PositionStates = {
   vacant: Symbol('V'),
   occupied: Symbol('O'),
 };
+
 export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
@@ -64,8 +63,6 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     return this._boardSize;
   }
 }
-
-// 💭 --------------------------------------------------------------
 
 export function createShipConfigurations(
   direction: 'horizontal' | 'vertical',

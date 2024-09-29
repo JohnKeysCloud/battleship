@@ -2,8 +2,8 @@ import { BattleshipFactory } from './bs-ship-factory';
 import {
   ITestCaseShipHit,
   ShipType,
-  Version
-} from '../bs-types';
+  Version,
+} from '../../types/logic-types/logic-types';
 
 // Helper function to create a new instance of a ship
 const createShip = (

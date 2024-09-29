@@ -1,7 +1,7 @@
 import {
   BattleshipFactory,
 } from '../bs-ship-factory/bs-ship-factory';
-import { ShipType, Version, Fleet, ShipConfigs } from '../bs-types';
+import { ShipType, Version, Fleet, ShipConfigs } from '../../types/logic-types/logic-types';
 
 export class BattleshipFleetFactory {
   private fleet: Fleet;

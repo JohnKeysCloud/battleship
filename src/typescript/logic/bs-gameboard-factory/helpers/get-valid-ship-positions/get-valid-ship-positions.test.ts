@@ -5,7 +5,7 @@ import {
   IShipConfigurations,
   ITestCaseValidPositions,
   IValidPositionsResult
-} from '../../../bs-types';
+} from '../../../../types/logic-types/logic-types';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions

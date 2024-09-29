@@ -1,11 +1,20 @@
 import {
   IShipOptions,
   ShipType,
+  ShipStates,
   SizeLookupKey,
-  Version
-} from "../bs-types"
+  Version,
+} from '../../types/logic-types/logic-types';
 
-// Use Record for size lookup with known keys
+export const SHIP_SYMBOLS: ShipStates = {
+  [ShipType.Carrier]: Symbol('Ca'),
+  [ShipType.Battleship]: Symbol('B'),
+  [ShipType.Cruiser]: Symbol('Cr'),
+  [ShipType.Submarine]: Symbol('S'),
+  [ShipType.Destroyer]: Symbol('D'),
+  [ShipType.PatrolBoat]: Symbol('P')
+};
+
 const sizeLookup: Record<SizeLookupKey, number | undefined> = {
   'battleship-1990': 4,
   'battleship-2002': 4,
@@ -25,10 +34,17 @@ export class BattleshipFactory implements IShipOptions {
   public size: number;
   public seaworthy: boolean = true;
   public hitCounter: number = 0;
+  public symbol: symbol;
 
   constructor(public type: ShipType, public version: Version = 2002) {
-    const key: SizeLookupKey = `${type}-${version}`;
+    const symbol = SHIP_SYMBOLS[type];
+    if (!symbol) {
+      throw new Error(`No symbol found for ship type: ${type}`);
+    }
 
+    this.symbol = symbol;
+
+    const key: SizeLookupKey = `${type}-${version}`;
     const size = sizeLookup[key]; // Access using the typed key
     if (size === undefined) {
       throw new Error(`Invalid ship type/version combination: ${key}`);

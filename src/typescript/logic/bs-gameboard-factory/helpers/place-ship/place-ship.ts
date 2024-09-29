@@ -3,7 +3,7 @@ import {
   IPosition,
   IShipConfigurations,
   IPlacePieceWrapperParams,
-} from '../../../bs-types';
+} from '../../../../types/logic-types/logic-types';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
 
 export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinates, configurations }: IPlacePieceWrapperParams) {

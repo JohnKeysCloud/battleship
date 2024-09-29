@@ -1,7 +1,7 @@
-import { BattleshipFactory } from "./bs-ship-factory/bs-ship-factory";
+import { BattleshipFactory } from '../../logic/bs-ship-factory/bs-ship-factory';
 
 // 💭 --------------------------------------------------------------
-// 💭 Enums
+// 💭 Enumerations
 
 export enum ShipType {
   Carrier = 'carrier',
