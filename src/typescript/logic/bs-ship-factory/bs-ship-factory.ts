@@ -7,12 +7,12 @@ import {
 } from '../../types/logic-types/logic-types';
 
 export const SHIP_SYMBOLS: ShipStates = {
-  [ShipType.Carrier]: Symbol('Ca'),
-  [ShipType.Battleship]: Symbol('B'),
-  [ShipType.Cruiser]: Symbol('Cr'),
-  [ShipType.Submarine]: Symbol('S'),
-  [ShipType.Destroyer]: Symbol('D'),
-  [ShipType.PatrolBoat]: Symbol('P')
+  [ShipType.Carrier]: Symbol('CA'),
+  [ShipType.Battleship]: Symbol('BS'),
+  [ShipType.Cruiser]: Symbol('CR'),
+  [ShipType.Submarine]: Symbol('SB'),
+  [ShipType.Destroyer]: Symbol('DD'),
+  [ShipType.PatrolBoat]: Symbol('PB')
 };
 
 const sizeLookup: Record<SizeLookupKey, number | undefined> = {

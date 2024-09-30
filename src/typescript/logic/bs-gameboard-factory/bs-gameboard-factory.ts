@@ -11,8 +11,8 @@ import {
 } from '../../types/logic-types/logic-types';
 
 export const POSITION_STATES: PositionStates = {
-  vacant: Symbol('V'),
-  occupied: Symbol('O'),
+  vacant: Symbol('VC'),
+  occupied: Symbol('O'), // To be deleted!
 };
 
 export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {

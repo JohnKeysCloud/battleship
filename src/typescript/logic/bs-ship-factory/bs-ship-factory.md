@@ -11,8 +11,14 @@ In TypeScript, the `Record` utility type is used to create a type for an object 
 * When using `Record<SizeLookupKey, number | undefined>`, TypeScript expects that the `sizeLookup` object will include all possible keys defined by the `SizeLookupKey` type. `Record` ensures that the object conforms to the types shape, which means it should have all the keys that the `SizeLookupKey` type can produce. This is to ensure the prevention of runtime errors.
 
 ### `SHIP_SYMBOLS` 
-<!-- TODO: -->
 
+This object complies with the `ShipStates` type, which says that the keys should match those in the `ShipType` enumeration. The `?` symbol (known as the optional property indicator) denotes that the object doesn't need to contain _all_ properties of the enumeration. The value associated with each key must be a symbol. 
+
+The keys of the object are defined in the form of computed properties. This is done so that they conform to the type's enumeration.
+
+`[ShipType.Carrier]: Symbol('CA')` computes to `Carrier: Symbol('Ca')`
+
+The values are symbols that will represent each ship as positions on the gameboard (i.e, `row-1: [VC, VC, VC, CA, CA, CA, CA, CA, VC, VC]`, where `VC` is "vacant").
 
 ### `sizeLookup: Record<SizeLookupKey, number | undefined>`
 
