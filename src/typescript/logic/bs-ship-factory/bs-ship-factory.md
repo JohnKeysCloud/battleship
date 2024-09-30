@@ -16,7 +16,7 @@ This object complies with the `ShipStates` type, which says that the keys should
 
 The keys of the object are defined in the form of computed properties. This is done so that they conform to the type's enumeration.
 
-`[ShipType.Carrier]: Symbol('CA')` computes to `Carrier: Symbol('Ca')`
+`[ShipType.Carrier]: Symbol('CA')` computes to `Carrier: Symbol('CA')`
 
 The values are symbols that will represent each ship as positions on the gameboard (i.e, `row-1: [VC, VC, VC, CA, CA, CA, CA, CA, VC, VC]`, where `VC` is "vacant").
 

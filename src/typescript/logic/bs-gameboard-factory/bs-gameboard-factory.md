@@ -17,7 +17,7 @@ Using `Symbol`s in JavaScript provides several advantages, particularly when dea
    - **Enhanced Privacy**: Because `Symbols` are not accessible via typical object property access patterns, they provide a weak form of encapsulation. Other code won’t accidentally interact with or modify properties that use `Symbols` as keys.
 
 ##### 3. **Clarity and Intentionality**
-   - **Clear Semantics**: Using `Symbols` can make your code more expressive and intentional. For example, by using `Symbol('VACANT')` and `Symbol('OCCUPIED')`, it’s clear that these values are meant to represent specific states on the board, rather than generic strings or numbers that could be misunderstood or misused.
+   - **Clear Semantics**: Using `Symbols` can make your code more expressive and intentional. For example, by using `Symbol('VC')` (for vacant) and `Symbol('CA')` (for carrier), it’s clear that these values are meant to represent specific states on the board, rather than generic strings or numbers that could be misunderstood or misused.
    - **Avoiding String Comparisons**: Instead of comparing strings (which can be error-prone if there are typos or case differences), you can compare `Symbols` directly, ensuring that only the exact intended state or value is matched.
 
 ##### 4. **Immutable Constants**
@@ -27,7 +27,7 @@ Using `Symbol`s in JavaScript provides several advantages, particularly when dea
    - **Usage in Objects and Arrays**: `Symbols` can be used as keys in objects and as values in arrays or sets, making them versatile across different data structures. This is particularly helpful when you need unique identifiers within data collections.
 
 ##### 6. **Well-Suited for Symbolic Logic**
-   - **Representing Abstract Concepts**: `Symbols` are ideal for representing abstract concepts or unique states, such as `'VACANT'` and `'OCCUPIED'` on a game board, without the risk of overlap with other strings or numbers in your code.
+   - **Representing Abstract Concepts**: `Symbols` are ideal for representing abstract concepts or unique states, such as vacancy or ship-type on a game board, without the risk of overlap with other strings or numbers in your code.
 
 ##### 7. **Enhanced Integration with Libraries**
    - **Interoperability**: Many JavaScript libraries and frameworks (e.g., Redux) utilize `Symbols` for defining action types or unique keys. By understanding and using `Symbols`, your code can integrate more effectively with such tools, ensuring compatibility and preventing naming conflicts.
@@ -62,7 +62,7 @@ When considering initial values for filling the game board, I faced a dilemma.
 
 Using `null` seemed like a reasonable choice both syntactically and semantically, as it could signify the intentional absence of any value, a "placeholder" for empty spaces on the board.
 
-Problem solved... almost. What about the values once they become `OCCUPIED`?
+Problem solved... almost. What about the values once they become occupied?
 
 I considered setting them to `true`, which would work syntactically; an `isOccupied` variable could easily handle such a boolean state. However, `true` lacks semantic clarity, what does `true` really represent in this context?
 
@@ -70,16 +70,14 @@ Then I stumbled upon `Symbol`s. Aha! A unique and descriptive approach for handl
 
 [Here is what I learned on my exploration of `Symbol`s](#whats-a-symbol-yo)
 
-In my battleship gameboard implementation, I use `Symbol('V')` stored as `vacant` and `Symbol('O')` stored as `occupied` in the `POSITION_STATES` object to fill a 2D array. This approach ensures:
+In my battleship gameboard implementation, I use `Symbol('VC')` stored as `vacant` and other symbols with 2-letter labels stored as the ship types. This approach ensures:
    - **No Collisions**: Other parts of the code won't mistakenly overwrite or interact with these values.
    - **Clear Intent**: It's clear what each `Symbol` represents, improving code readability.
    - **Efficient State Management**: I manage the state of the board in a lightweight, performance-friendly manner without the risk of confusing states or accidental changes.
 
 By leveraging `Symbols`, I am taking advantage of their unique and immutable nature, enhancing the robustness and clarity of my code.
 
-I gave the symbols single letter descriptors (accessible via a symbols `.description` property) so that when printing our board to see the values, instead of seeing an insurmountable amount of  `vacant` or `occupied` strings, we'd see single letters in monospace, giving the gameboard symmetry, enhancing readability. 
-
-They are stored in the `POSITION_STATES` object for organizational purposes.
+I gave the symbols 2-letter descriptors (accessible via a symbols `.description` property) so that when printing our board to see the values, instead of seeing an insurmountable amount of `vacant` or ship-type strings, we'd see 2-letters in monospace in each position, giving the gameboard symmetry, enhancing readability. 
 
 ### `BattleshipBoardFactory implements IGridGameboardSquare<symbol>` Class
 
@@ -101,11 +99,11 @@ However, this approach trades off some performance (since creating a new array i
 
 * **`private readonly _boardSize: number = 10`:** This private, read-only property defines the standard size of the Battleship board. It being private ensures that the board size cannot be accessed or modified directly from outside the class. Marking it as `readonly` guarantees that the board size is fixed upon initialization and cannot be changed later, ensuring consistency throughout the board's lifecycle.
 
-* **`private readonly _fillValue: symbol = Symbol('V')`:** This private, read-only property represents the default fill value used to initialize and reset the board cells. Being private ensures that the property cannot be accessed or modified directly from outside the class. The `readonly` keyword ensures that once `_fillValue` is set during the instantiation of `BattleshipBoard`, it remains constant throughout the lifetime of the instance. This design choice helps maintain a consistent fill state across the board and prevents unintended changes to the fill value.
+* **`private readonly _fillValue: symbol = POSITION_STATES.vacant;`:** This private, read-only property represents the default fill value used to initialize and reset the board cells. Being private ensures that the property cannot be accessed or modified directly from outside the class. The `readonly` keyword ensures that once `_fillValue` is set during the instantiation of `BattleshipBoard`, it remains constant throughout the lifetime of the instance. This design choice helps maintain a consistent fill state across the board and prevents unintended changes to the fill value.
 
-In the pre-refactored version (before I applied the fixed type of `symbol` in the refactored logic and used a _generic type_ of `<T>`) of the class logic, I used the `as T` type assertion in the declaration `private readonly _fillValue: T = Symbol('V') as T`. In order to satisfy the TypeScript type system when initializing a property with a generic type `T` that extends `symbol`. `BattleshipBoard` used a generic type parameter `T` constrained to `symbol` types, which means `T` can be any type that is a subtype of `symbol`. A potential subtype in TypeScript is `unique symbol` (more [here](https://www.typescriptlang.org/docs/handbook/symbols.html#:~:text=unique%20symbol%20is%20a%20subtype,to%20use%20the%20typeof%20operator.)). This was when I realized the disadvantage to using a generic type in my class. 
+In the pre-refactored version (before I applied the fixed type of `symbol` in the refactored logic and used a _generic type_ of `<T>`) of the class logic, I used the `as T` type assertion in the declaration `private readonly _fillValue: T = Symbol('VC') as T`. In order to satisfy the TypeScript type system when initializing a property with a generic type `T` that extends `symbol`. `BattleshipBoard` used a generic type parameter `T` constrained to `symbol` types, which means `T` can be any type that is a subtype of `symbol`. A potential subtype in TypeScript is `unique symbol` (more [here](https://www.typescriptlang.org/docs/handbook/symbols.html#:~:text=unique%20symbol%20is%20a%20subtype,to%20use%20the%20typeof%20operator.)). This was when I realized the disadvantage to using a generic type in my class. 
 
-When initializing `_fillValue` with `Symbol('V')`, TypeScript infers the type as `symbol`. However, this does not guarantee that this `symbol` specifically matches the generic type `T`, which could be any subtype of `symbol`. To satisfy the TypeScript compiler and indicate that we are intentionally assigning a `symbol` to a variable of type `T`, we use the `as T` type assertion. This tells TypeScript, "Trust me, `Symbol('V')` will work as type `T`." 
+When initializing `_fillValue` with `Symbol('VC')`, TypeScript infers the type as `symbol`. However, this does not guarantee that this `symbol` specifically matches the generic type `T`, which could be any subtype of `symbol`. To satisfy the TypeScript compiler and indicate that we are intentionally assigning a `symbol` to a variable of type `T`, we use the `as T` type assertion. This tells TypeScript, "Trust me, `Symbol('VC')` will work as type `T`." 
 
 The issue with this logic is that it allowed the instantiation of the class with incompatible subtypes which would result in runtime errors. Hence the switch to the explicit `symbol` type declaration in the `implements` clause of the class. This also had a side-effect of simplifying the logic, allowing the safe removal of `as T`. 
 
