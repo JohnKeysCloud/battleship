@@ -4,7 +4,7 @@ import {
   ShipStates,
   SizeLookupKey,
   Version,
-} from '../../types/logic-types/logic-types';
+} from '../../types/logic-types';
 
 export const SHIP_SYMBOLS: ShipStates = {
   [ShipType.Carrier]: Symbol('CA'),

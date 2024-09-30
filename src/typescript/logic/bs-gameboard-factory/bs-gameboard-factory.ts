@@ -8,7 +8,7 @@ import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   PositionStates,
-} from '../../types/logic-types/logic-types';
+} from '../../types/logic-types';
 
 export const POSITION_STATES: PositionStates = {
   vacant: Symbol('VC'),

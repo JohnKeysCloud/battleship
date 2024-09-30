@@ -3,7 +3,7 @@ import {
   ITestCaseShipHit,
   ShipType,
   Version,
-} from '../../types/logic-types/logic-types';
+} from '../types/logic-types';
 
 // Helper function to create a new instance of a ship
 const createShip = (

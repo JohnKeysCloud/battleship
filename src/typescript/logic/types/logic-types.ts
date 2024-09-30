@@ -1,4 +1,4 @@
-import { BattleshipFactory } from '../../logic/bs-ship-factory/bs-ship-factory';
+import { BattleshipFactory } from '../bs-ship-factory/bs-ship-factory';
 
 // 💭 --------------------------------------------------------------
 // 💭 Enumerations

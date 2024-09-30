@@ -8,7 +8,7 @@ import {
   IPlacePieceWrapperParams,
   IPosition,
   IShipConfigurations,
-} from '../../../../types/logic-types/logic-types';
+} from '../../../types/logic-types';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
