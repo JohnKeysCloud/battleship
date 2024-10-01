@@ -14,7 +14,6 @@ describe('BattleshipFleetFactory', () => {
     expect(fleetFactory.getShip(ShipType.Cruiser)).toBeDefined();
     expect(fleetFactory.getShip(ShipType.Destroyer)).toBeDefined();
     expect(fleetFactory.getShip(ShipType.Submarine)).toBeDefined();
-    expect(fleetFactory.getShip(ShipType.PatrolBoat)).toBeUndefined(); // Not in this fleet
   });
 
   test('should create a fleet with specified versions for MBFleet', () => {
@@ -24,8 +23,10 @@ describe('BattleshipFleetFactory', () => {
     expect(carrier?.versionYear).toBe(1990);
   });
 
-  test('should return undefined for a ship type not in the fleet', () => {
+  test('should throw an error for a ship type not in the fleet', () => {
     const fleet = BattleshipFleetFactory.createHasbroFleet();
-    expect(fleet.getShip(ShipType.Cruiser)).toBeUndefined(); // Not in this fleet
+    expect(() => fleet.getShip(ShipType.Cruiser)).toThrow(
+      'Ship of type cruiser not found in fleet.'
+    ); 
   });
 });

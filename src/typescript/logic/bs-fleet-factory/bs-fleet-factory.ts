@@ -14,7 +14,7 @@ export class BattleshipFleetFactory {
     const fleet: Fleet = {};
 
     for (const [shipType, config] of Object.entries(shipConfiigs)) {
-      fleet[shipType as ShipType] = new BattleshipFactory(
+      fleet[shipType] = new BattleshipFactory(
         config.type,
         config.version
       );
@@ -47,19 +47,25 @@ export class BattleshipFleetFactory {
     );
   }
 
-  getShip(shipType: ShipType): BattleshipFactory | undefined {
-    return this.fleet[shipType];
+  getShip(shipType: ShipType): BattleshipFactory {
+    const ship = this.fleet[shipType];
+
+    if (!ship) {
+      throw new Error(`Ship of type ${shipType} not found in fleet.`);
+    }
+
+    return ship;
   }
 }
 
 export function createFleets(version: Version) {
-  const createFleet =
+  const fleet =
     version === 2002
       ? BattleshipFleetFactory.createHasbroFleet
       : BattleshipFleetFactory.createMBFleet;
 
   return {
-    playerOne: createFleet(),
-    playerTwo: createFleet(),
+    playerOne: fleet(),
+    playerTwo: fleet(),
   };
 }

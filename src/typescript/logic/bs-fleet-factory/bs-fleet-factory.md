@@ -38,7 +38,7 @@ In summary, the private constructor in `BattleshipFleetFactory` is used to enfor
 
 ##### Why it private?
 
-Since it is a utility function that helps to generate a `Fleet` based on provided configurations. Since it's a helper method that doesn't depend on the instances state, it does not need access to instance-specific data. Making it static allows it to be called without needing to create an instance. 
+Since it is a utility function that helps to generate a `Fleet` based on provided configurations. It's a helper method that doesn't depend on the instances state, it does not need access to instance-specific data. Making it static allows it to be called without needing to create an instance. 
 
 ##### `createFleet` Parameter Explained
 
@@ -75,7 +75,7 @@ The use of optional properties means that not all ship types need to be included
 const fleet: Fleet = {};
 
 for (const [shipType, config] of Object.entries(shipConfigs)) {
-  fleet[shipType as ShipType] = new BattleshipFactory(
+  fleet[shipType] = new BattleshipFactory(
     config.type,
     config.version
   );
@@ -96,11 +96,14 @@ These static methods provide controlled ways to create instances of the class si
 
 Both methods return values that automatically conform to the `BattleshipFleetFactory` class since they instantiate the class directly. The primary difference between the methods lies in their ship configurations: Hasbro's (2002) fleet setup differs from Milton Bradley's (1990). The specific configuration differences are outside the scope of this documentation. Read the code, or read here: [Battleship Wikipedia](https://en.wikipedia.org/wiki/Battleship_(game))
 
-### `createFleets` Utility Function
-
-It simply creates an object containing player one and player twos fleets depending on the version (i.e, Hasbro - 2002 and Milton Bradley - 1990). It accepts the version _year_ in its parameters.
-
 #### Instance Methods
 
 ##### `getShip`
-<!-- TODO: -->
+
+This method simply retrieves one of the ships of a fleet. It's parameter accepts a type of ship that conforms to an enumeration. This means that the carrier ship of a fleet is accessible via `ShipType.carrier`. 
+
+Since the method must return an instance of the `BattleshipFactory`, it must ensure that the ship is defined, hence the conditional check. TypeScript's typing system would throw an error otherwise.
+
+### `createFleets` Utility Function
+
+It simply creates an object containing player one and player twos fleets depending on the version (i.e, Hasbro - 2002 and Milton Bradley - 1990). It accepts the version _year_ in its parameters.
