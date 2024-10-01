@@ -6,7 +6,7 @@ describe('`BattleshipBoardFactory` Instance Board Creation', () => {
 
     // Hardcoded empty board representation
     const emptyBoard = Array.from({ length: 10 }, () =>
-      Array(10).fill(Symbol('V'))
+      Array(10).fill(Symbol('VC'))
     );
 
     // Inline serialization logic

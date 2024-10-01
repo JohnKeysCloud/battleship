@@ -3,7 +3,7 @@ import {
   IPosition,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
-} from '../../../../types/logic-types';
+} from '../../../types/logic-types';
 
 export function getValidShipPositions({
   gamePieceSize,

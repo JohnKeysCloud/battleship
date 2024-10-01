@@ -4,7 +4,7 @@ import {
   IPosition,
   IShipConfigurations,
   ITestCaseValidPositions,
-  IValidPositionsResult
+  IValidPositionsResult,
 } from '../../../types/logic-types';
 
 describe('`getValidShipPositions`', () => {
