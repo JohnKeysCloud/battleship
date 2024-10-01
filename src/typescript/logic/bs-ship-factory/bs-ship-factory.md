@@ -22,7 +22,7 @@ The values are symbols that will represent each ship as positions on the gameboa
 
 ### `sizeLookup: Record<SizeLookupKey, number | undefined>`
 
-This `sizeLookup` object was defined as a `Record` to ensure that all potential combinations of `ShipType` and `Version` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type, which combines `ShipType` and `Version`. 
+This `sizeLookup` object was defined as a `Record` to ensure that all potential combinations of `ShipType` and `Version` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type.
 
 #### Key Points:
 
@@ -32,7 +32,7 @@ This `sizeLookup` object was defined as a `Record` to ensure that all potential 
 
 - **Explicit Handling**: Including all possible keys, even with `undefined` values, makes it clear which combinations are valid but currently not used, and allows for future flexibility if these keys become relevant.
 
-### `BattleshipFactory imlements IShipOptions` Class
+### `BattleshipFactory imlements IShipOptions` Class 
 
 `BattleshipFactory` implements the `IShipOptions` interface and provides the actual logic for how the ship’s state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
 
@@ -107,6 +107,8 @@ class BattleshipFactory implements IShipOptions {
 }
 ```
 
+**However**, the parameters of a constructor should only include what's completely necessary for creating an instance of the class. In this particular scenario, `size`, `seaworthy` and `hitCounter` can be set dynamically using solely the `type` of ship and `version` of Battleship game. For this reason, those are the only  the parameters acceptable for the constructor. 
+
 #### The Constructor Body
 
 Inside the curly braces `{}` of a class constructor, you generally find the logic that initializes the class, sets up initial state, or performs any other operations that are necessary when creating an instance of the class. 
@@ -117,7 +119,9 @@ Such operations include:
   * **Event Listeners:** Setting up necessary event listeners or other callbacks.
   * **Method calls:** Triggering certain methods to initialize state or set up necessary data.
 
-In the `BattleshipFactory` constructor, I initialized the `key` variable as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `Version` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
+In the `BattleshipFactory` constructor, the symbol that represents that particular ship is set as a property on the instance (more on why [here](#ship_symbols)). If there is no symbol for the given ship `type`, an error is thrown. This check ensures that the proper symbol has been correctly identified prior to assignment.
+
+I also initialized the `key` variable as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `Version` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
 
 Subsequently, I created a `size` variable that utilizes the constructed `key` to look up the corresponding ship size in the `sizeLookup` `Record`. If the `size` retrieved from the lookup is `undefined`, indicating that the combination of `ShipType` and `Version` is invalid or unsupported, an error is thrown to signal the issue. Otherwise, the `size` property of the instance is assigned the retrieved value, ensuring the ship's size is correctly set based on its type and version.
 
