@@ -1,4 +1,8 @@
-import { BattleshipFactory } from '../bs-ship-factory/bs-ship-factory';
+import { BattleshipBoardBuilder } from '../bs-gameboard-builder/bs-gameboard-builder';
+import {
+  BattleshipBuilder,
+  SHIP_SYMBOLS
+} from '../bs-ship-builder/bs-ship-builder';
 
 // 💭 --------------------------------------------------------------
 // 💭 Enumerations
@@ -18,22 +22,20 @@ export enum ShipType {
 export type AxisName = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type Fleet = {
-  [key in ShipType]?: BattleshipFactory;
+  [key in ShipType]?: BattleshipBuilder;
 };
-export type PositionStates = {
-  vacant: symbol;
-  occupied: symbol;
+export type FleetConfigs = {
+  [key in ShipType]?: ShipConfig;
 };
+export type Orientation = 'horizontal' | 'vertical';
 export type ShipConfig = {
   type: ShipType;
   version?: Version;
 };
-export type ShipConfigs = {
-  [key in ShipType]?: ShipConfig;
+export type ShipSymbols = {
+  [key in ShipType]: symbol; // Each key in ShipType maps to a symbol
 };
-export type ShipStates = {
-  [key in ShipType]?: symbol;
-};
+export type ShipSymbolValue = typeof SHIP_SYMBOLS[ShipType];
 export type SizeLookupKey = `${ShipType}-${Version}`;
 export type Version = 1990 | 2002;
 
@@ -51,33 +53,37 @@ export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 }
 export interface IPlacePieceWrapperParams {
+  ship: BattleshipBuilder;
   coordinates: Coordinates;
-  configurations?: IShipConfigurations;
+  orientation: Orientation;
+}
+export interface IPlacePieceCallbackParams extends IPlacePieceWrapperParams {
+  gameboardInstance: BattleshipBoardBuilder
 }
 export interface IPosition {
   bow: Coordinates; // [rowIndex, colIndex]
   stern: Coordinates; // [rowIndex, colIndex]
 }
-export interface IShipConfigurations {
-  direction: 'horizontal' | 'vertical';
-  gamePieceSize: number;
-}
 export interface IShipOptions {
   type: ShipType;
-  size: number;
-  hitCounter?: number;
-  version?: Version;
+  length: number;
+  hitCounter: number;
+  version: Version;
+}
+export interface IShipPlacementConfigurations {
+  shipLength: number;
+  orientation: Orientation;
 }
 export interface ITestCaseShipHit {
   hits: number; // Function returning the string to be tested
   expected: string; // Expected output
 }
 export interface ITestCaseValidPositions {
-  shipConfigs: IShipConfigurations;
+  shipPlacementConfigs: IShipPlacementConfigurations;
   validPositions: IValidPositionsResult;
 }
-export interface IValidPlacementCallbackParams extends IShipConfigurations {
-  gameboard: IGridGameboardSquare<symbol>;
+export interface IValidPlacementCallbackParams extends IShipPlacementConfigurations {
+  gameboardInstance: BattleshipBoardBuilder;
 }
 export interface IValidPositionsResult {
   [key: AxisName]: IPosition[];

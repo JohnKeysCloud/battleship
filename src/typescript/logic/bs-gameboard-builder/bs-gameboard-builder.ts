@@ -3,22 +3,20 @@ import { placeShip } from './helpers/place-ship/place-ship';
 import {
   IGridGameboardSquare,
   IPlacePieceWrapperParams,
+  IPlacePieceCallbackParams,
   IPosition,
-  IShipConfigurations,
+  IShipPlacementConfigurations,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
-  PositionStates,
+  Orientation,
 } from '../types/logic-types';
 
-export const POSITION_STATES: PositionStates = {
-  vacant: Symbol('VC'),
-  occupied: Symbol('O'), // To be deleted!
-};
+export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
+  private static readonly vacant = Symbol('VC');
 
-export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   private readonly _board: symbol[][];
   private readonly _boardSize: number = 10;
-  private readonly _fillValue: symbol = POSITION_STATES.vacant;
+  private readonly _fillValue: symbol = BattleshipBoardBuilder.vacant;
 
   constructor() {
     this._board = Array.from({ length: this._boardSize }, () =>
@@ -27,13 +25,13 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
   }
 
   getValidPositions({
-    direction,
-    gamePieceSize,
-  }: IShipConfigurations): IValidPositionsResult {
+    orientation,
+    shipLength,
+  }: IShipPlacementConfigurations): IValidPositionsResult {
     const validPlacementArg: IValidPlacementCallbackParams = {
-      direction,
-      gamePieceSize,
-      gameboard: this,
+      orientation,
+      shipLength,
+      gameboardInstance: this,
     };
 
     return getValidShipPositions(validPlacementArg);
@@ -45,8 +43,19 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
     }
   }
 
-  placePiece({ coordinates, configurations }: IPlacePieceWrapperParams) {
-    placeShip(this, {coordinates, configurations});
+  placePiece({
+    ship,
+    coordinates,
+    orientation
+  }: IPlacePieceWrapperParams): void {
+    const placeShipArg: IPlacePieceCallbackParams = {
+      ship,
+      coordinates,
+      orientation,
+      gameboardInstance: this
+    }
+
+    placeShip(placeShipArg);
   }
 
   removePiece(bowCoordinates: IPosition) {}
@@ -65,18 +74,18 @@ export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
 }
 
 export function createShipConfigurations(
-  direction: 'horizontal' | 'vertical',
-  gamePieceSize: number
-): IShipConfigurations {
+  shipLength: number,
+  orientation: Orientation,
+): IShipPlacementConfigurations {
   return {
-    direction,
-    gamePieceSize,
+    orientation,
+    shipLength,
   };
 }
 
 export function createBattleshipBoardSet() {
   return {
-    playerOne: new BattleshipBoardFactory(),
-    playerTwo: new BattleshipBoardFactory(),
+    playerOne: new BattleshipBoardBuilder(),
+    playerTwo: new BattleshipBoardBuilder(),
   };
 }

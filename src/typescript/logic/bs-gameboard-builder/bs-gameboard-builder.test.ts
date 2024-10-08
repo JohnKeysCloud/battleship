@@ -1,8 +1,8 @@
-import { BattleshipBoardFactory } from './bs-gameboard-factory';
+import { BattleshipBoardBuilder } from './bs-gameboard-builder';
 
-describe('`BattleshipBoardFactory` Instance Board Creation', () => {
+describe('`BattleshipBoardBuilder` Instance Board Creation', () => {
   test('board creation/retrieval: should match emptyBoard: %o', () => {
-    let testBoard: BattleshipBoardFactory = new BattleshipBoardFactory();
+    let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
 
     // Hardcoded empty board representation
     const emptyBoard = Array.from({ length: 10 }, () =>

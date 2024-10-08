@@ -1,29 +1,30 @@
-import { createShipConfigurations, BattleshipBoardFactory } from '../../bs-gameboard-factory';
+import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 import {
   Coordinates,
   IPosition,
-  IShipConfigurations,
+  IShipPlacementConfigurations,
   ITestCaseValidPositions,
   IValidPositionsResult,
+  Orientation,
 } from '../../../types/logic-types';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
-  let testBoard: BattleshipBoardFactory = new BattleshipBoardFactory();
+  let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
 
   // Creates a new instance for each test run
   beforeEach(() => {
-    testBoard = new BattleshipBoardFactory();
+    testBoard = new BattleshipBoardBuilder();
   });
 
   // Test function utility
-  const getValidShipPositions = (input: IShipConfigurations) =>
+  const getValidShipPositions = (input: IShipPlacementConfigurations) =>
     testBoard.getValidPositions(input);
 
   // Dynamically create expected test result
   function createTestCaseResult(
-    direction: 'horizontal' | 'vertical',
-    gamePieceSize: number
+    gamePieceSize: number,
+    orientation: Orientation,
   ): IValidPositionsResult {
     const createPosition = (
       bow: Coordinates,
@@ -38,7 +39,7 @@ describe('`getValidShipPositions`', () => {
     // Creates row/column objects
     for (let i = 0; i < testBoard.boardSize; i++) {
       const axisTemplate =
-        direction === 'horizontal' ? `row-${i}` : `column-${i}`;
+        orientation === 'horizontal' ? `row-${i}` : `column-${i}`;
 
       // Initializes array for row/column
       validPositions[axisTemplate] = [];
@@ -46,7 +47,7 @@ describe('`getValidShipPositions`', () => {
       // Populates each array
       for (let j = 0; j + (gamePieceSize - 1) < testBoard.boardSize; j++) {
         let position: IPosition =
-          direction === 'horizontal'
+          orientation === 'horizontal'
             ? createPosition([i, j], [i, j + gamePieceSize - 1])
             : createPosition([j, i], [j + gamePieceSize - 1, i]);
 
@@ -60,27 +61,27 @@ describe('`getValidShipPositions`', () => {
   // Actual Test Object
   const testCases: ITestCaseValidPositions[] = [
     {
-      shipConfigs: createShipConfigurations('horizontal', 5),
-      validPositions: createTestCaseResult('horizontal', 5),
+      shipPlacementConfigs: createShipConfigurations(5, 'horizontal'),
+      validPositions: createTestCaseResult(5, 'horizontal'),
     },
     {
-      shipConfigs: createShipConfigurations('vertical', 2),
-      validPositions: createTestCaseResult('vertical', 2),
+      shipPlacementConfigs: createShipConfigurations(2, 'vertical'),
+      validPositions: createTestCaseResult(2, 'vertical'),
     },
     {
-      shipConfigs: createShipConfigurations('horizontal', 4),
-      validPositions: createTestCaseResult('horizontal', 4),
+      shipPlacementConfigs: createShipConfigurations(4, 'horizontal'),
+      validPositions: createTestCaseResult(4,'horizontal'),
     },
     {
-      shipConfigs: createShipConfigurations('vertical', 3),
-      validPositions: createTestCaseResult('vertical', 3),
+      shipPlacementConfigs: createShipConfigurations(3, 'vertical'),
+      validPositions: createTestCaseResult(3, 'vertical'),
     },
   ];
 
   test.each(testCases)(
     'valid position retrieval (empty board): %o',
-    ({ shipConfigs, validPositions }) => {
-      expect(getValidShipPositions(shipConfigs)).toEqual(validPositions);
+    ({ shipPlacementConfigs, validPositions }) => {
+      expect(getValidShipPositions(shipPlacementConfigs)).toEqual(validPositions);
     }
   );
 });

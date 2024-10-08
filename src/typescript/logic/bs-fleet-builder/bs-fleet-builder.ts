@@ -1,30 +1,26 @@
 import {
-  BattleshipFactory,
-} from '../bs-ship-factory/bs-ship-factory';
-import { ShipType, Version, Fleet, ShipConfigs } from '../types/logic-types';
+  BattleshipBuilder,
+} from '../bs-ship-builder/bs-ship-builder';
+import { ShipType, Version, Fleet, FleetConfigs } from '../types/logic-types';
 
-export class BattleshipFleetFactory {
-  private fleet: Fleet;
-
-  private constructor(fleet: Fleet) {
+export class BattleshipFleetBuilder {
+  private constructor(private readonly fleet: Fleet) {
     this.fleet = fleet;
   }
 
-  private static createFleet(shipConfiigs: ShipConfigs): Fleet {
+  private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};
 
-    for (const [shipType, config] of Object.entries(shipConfiigs)) {
-      fleet[shipType] = new BattleshipFactory(
-        config.type,
-        config.version
-      );
+    for (const [shipType, config] of Object.entries(fleetConfigs)) {
+      fleet[shipType] = new BattleshipBuilder(config.type, config.version);
     }
 
     return fleet;
   }
 
-  static createHasbroFleet(): BattleshipFleetFactory { // 2002
-    return new BattleshipFleetFactory(
+  public static createHasbroFleet(): BattleshipFleetBuilder {
+    // 2002
+    return new BattleshipFleetBuilder(
       this.createFleet({
         carrier: { type: ShipType.Carrier },
         battleship: { type: ShipType.Battleship },
@@ -35,19 +31,20 @@ export class BattleshipFleetFactory {
     );
   }
 
-  static createMBFleet(): BattleshipFleetFactory { // 1990
-    return new BattleshipFleetFactory(
+  public static createMBFleet(): BattleshipFleetBuilder {
+    // 1990
+    return new BattleshipFleetBuilder(
       this.createFleet({
         carrier: { type: ShipType.Carrier, version: 1990 },
         battleship: { type: ShipType.Battleship, version: 1990 },
         cruiser: { type: ShipType.Cruiser, version: 1990 },
-        submarine: {type: ShipType.Submarine, version: 1990 },
+        submarine: { type: ShipType.Submarine, version: 1990 },
         destroyer: { type: ShipType.Destroyer, version: 1990 },
       })
     );
   }
 
-  getShip(shipType: ShipType): BattleshipFactory {
+  getShip(shipType: ShipType): BattleshipBuilder {
     const ship = this.fleet[shipType];
 
     if (!ship) {
@@ -61,8 +58,8 @@ export class BattleshipFleetFactory {
 export function createFleets(version: Version) {
   const fleet =
     version === 2002
-      ? BattleshipFleetFactory.createHasbroFleet
-      : BattleshipFleetFactory.createMBFleet;
+      ? BattleshipFleetBuilder.createHasbroFleet
+      : BattleshipFleetBuilder.createMBFleet;
 
   return {
     playerOne: fleet(),

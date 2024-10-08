@@ -1,4 +1,4 @@
-import { BattleshipFactory } from './bs-ship-factory';
+import { BattleshipBuilder } from './bs-ship-builder';
 import {
   ITestCaseShipHit,
   ShipType,
@@ -9,13 +9,13 @@ import {
 const createShip = (
   type: ShipType,
   version: Version = 2002
-): BattleshipFactory => {
-  return new BattleshipFactory(type, version);
+): BattleshipBuilder => {
+  return new BattleshipBuilder(type, version);
 };
 
-describe('`BattleshipFactory`', () => {
+describe('`BattleshipBuilder`', () => {
   // Create ship instances in the test setup
-  let cruiser: BattleshipFactory;
+  let cruiser: BattleshipBuilder;
 
   // Setup a new cruiser before each test
   beforeEach(() => {
@@ -27,8 +27,8 @@ describe('`BattleshipFactory`', () => {
     { hits: 1, expected: 'Hit registered. Hit count: 1.' },
     { hits: 2, expected: 'Hit registered. Hit count: 2.' },
     { hits: 3, expected: 'Hit registered. Hit count: 3.' },
-    { hits: 4, expected: 'This ship has perished.' },
-    { hits: 5, expected: 'This ship has perished.' },
+    { hits: 4, expected: 'This ship has already perished.' },
+    { hits: 5, expected: 'This ship has already perished.' },
   ];
 
 

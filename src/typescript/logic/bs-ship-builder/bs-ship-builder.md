@@ -12,17 +12,15 @@ In TypeScript, the `Record` utility type is used to create a type for an object 
 
 ### `SHIP_SYMBOLS` 
 
-This object complies with the `ShipStates` type, which says that the keys should match those in the `ShipType` enumeration. The `?` symbol (known as the optional property indicator) denotes that the object doesn't need to contain _all_ properties of the enumeration. The value associated with each key must be a symbol. 
+This object complies with the `ShipSymbols` type, where its keys conform to the `ShipType` enumeration and the their values are symbols.
 
-The keys of the object are defined in the form of computed properties. This is done so that they conform to the type's enumeration.
+The keys of the object are defined in the form of computed properties. This enables said conformity. `[ShipType.Carrier]: Symbol('CA')` computes to `Carrier: Symbol('CA')`
 
-`[ShipType.Carrier]: Symbol('CA')` computes to `Carrier: Symbol('CA')`
-
-The values are symbols that will represent each ship as positions on the gameboard (i.e, `row-1: [VC, VC, VC, CA, CA, CA, CA, CA, VC, VC]`, where `VC` is "vacant").
+The values are symbols that will represent ship positions on the gameboard by replacing its vacant symbols (i.e, `row-1: [VC, VC, VC, CA, CA, CA, CA, CA, VC, VC]`, where `VC` is the label for "vacant" symbols).
 
 ### `sizeLookup: Record<SizeLookupKey, number | undefined>`
 
-This `sizeLookup` object was defined as a `Record` to ensure that all potential combinations of `ShipType` and `Version` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type.
+This `sizeLookup` object was defined as a [`Record`](#whats-a-record) to ensure that all potential combinations of `ShipType` and `Version` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type.
 
 #### Key Points:
 
@@ -32,9 +30,9 @@ This `sizeLookup` object was defined as a `Record` to ensure that all potential 
 
 - **Explicit Handling**: Including all possible keys, even with `undefined` values, makes it clear which combinations are valid but currently not used, and allows for future flexibility if these keys become relevant.
 
-### `BattleshipFactory imlements IShipOptions` Class 
+### `BattleshipBuilder imlements IShipOptions` Class 
 
-`BattleshipFactory` implements the `IShipOptions` interface and provides the actual logic for how the ship’s state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
+`BattleshipBuilder` implements the `IShipOptions` interface and provides the logic for how the ship instance's state changes, such as updating hits, checking if it's sunk, and any other behavior associated with the ship.
 
 #### `public` Keyword 
 
@@ -43,38 +41,38 @@ In TypeScript, when you define a class that implements an interface, you typical
 Take, for example this **simplified**, _incorrect_ implementation:
 
 ``` typescript
-class BattleshipFactory implements IShipOptions {
+class BattleshipBuilder implements IShipOptions {
   constructor(
     type: string, 
-    size: number, 
+    length: number, 
     seaworthy: boolean,
     hitCounter: number 
     ) {
-    this.size = size;
+    thislength = length;
     this.seaworthy = seaworthy;
     this.hitCounter = hitCounter;
   }
 }
 ```
 
-This code is _attempting_ to assign values to `this.size`, `this.hitCounter`, and `this.seaworthy`, but these properties haven't been declared in the class. TypeScript expects you to **explicitly** declare these properties within the class before using them.
+This code is _attempting_ to assign values to `thislength`, `this.hitCounter`, and `this.seaworthy`, but these properties haven't been declared in the class. TypeScript expects you to **explicitly** declare these properties within the class before using them.
 
 Here is one fix:
 
 ``` typescript
-class BattleshipFactory implements IShipOptions {
+class BattleshipBuilder implements IShipOptions {
   type: string, 
-  size: number;
+  length: number;
   seaworthy: boolean;
   hitCounter: number;
 
   constructor(
     type: string, 
-    size: number, 
+    length: number, 
     seaworthy: boolean,
     hitCounter: number
     ) {
-    this.size = size;
+    thislength = length;
     this.seaworthy = seaworthy;
     this.hitCounter = hitCounter;
   }
@@ -94,10 +92,10 @@ Using the `public`, `private`, or `protected` prefixes in constructor parameters
 Here is the refactored version:
 
 ``` typescript
-class BattleshipFactory implements IShipOptions {
+class BattleshipBuilder implements IShipOptions {
   constructor(
     public type: string,
-    public size: number,
+    public length: number,
     public seaworthy: boolean = true;
     public hitCounter: number,
   ) {
@@ -107,7 +105,7 @@ class BattleshipFactory implements IShipOptions {
 }
 ```
 
-**However**, the parameters of a constructor should only include what's completely necessary for creating an instance of the class. In this particular scenario, `size`, `seaworthy` and `hitCounter` can be set dynamically using solely the `type` of ship and `version` of Battleship game. For this reason, those are the only  the parameters acceptable for the constructor. 
+**However**, the parameters of a constructor should only include what's completely necessary for creating an instance of the class. In this particular scenario, `length`, `seaworthy` and `hitCounter` are set dynamically by using the ship `type` and `version`; Hence, these are the two properties required in the parameters.
 
 #### The Constructor Body
 
@@ -119,18 +117,18 @@ Such operations include:
   * **Event Listeners:** Setting up necessary event listeners or other callbacks.
   * **Method calls:** Triggering certain methods to initialize state or set up necessary data.
 
-In the `BattleshipFactory` constructor, the symbol that represents that particular ship is set as a property on the instance (more on why [here](#ship_symbols)). If there is no symbol for the given ship `type`, an error is thrown. This check ensures that the proper symbol has been correctly identified prior to assignment.
+In the `BattleshipBuilder` constructor, the symbol that represents the ship instance is set as a property on a newly created instance (more on why [here](#ship_symbols)).
 
-I also initialized the `key` variable as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `Version` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
+I also initialized `key` as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `Version` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
 
-Subsequently, I created a `size` variable that utilizes the constructed `key` to look up the corresponding ship size in the `sizeLookup` `Record`. If the `size` retrieved from the lookup is `undefined`, indicating that the combination of `ShipType` and `Version` is invalid or unsupported, an error is thrown to signal the issue. Otherwise, the `size` property of the instance is assigned the retrieved value, ensuring the ship's size is correctly set based on its type and version.
+In addition, I created a `length` variable that utilizes the constructed `key` to look up the corresponding ship length in the `sizeLookup` `Record`. If the `length` retrieved from the lookup is `undefined`, indicating that the combination of `ShipType` and `Version` is invalid or unsupported, an error is thrown to signal the issue. Otherwise, the `length` property of the instance is assigned the retrieved value, ensuring the ship's length is correctly set based on its type and version.
 
 #### Instance Methods
 
 ##### `hit` & `isSeaworthy`
 
-* **`isSeaworthy` Check:** This check determines if the ship has exceeded its hit capacity.
+* **`hit`**: First a check is performed that determines whether or not the ship is seaworthy and returns a message stating this if that is the case, otherwise, the instances hit counter is incremented.
 
-* **`hitCounter` Increment:** Only increments if the ship is still seaworthy.
+* **`isSeaworthy`**: This check determines if the ship has exceeded its hit capacity.
 
-* **Messages:** Different messages are returned based on the ships status.
+* **`get hitCounter`**: Retrieves the hit counter for the ship instance.

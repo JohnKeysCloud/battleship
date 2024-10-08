@@ -1,19 +1,20 @@
 import {
   IShipOptions,
   ShipType,
-  ShipStates,
+  ShipSymbols,
   SizeLookupKey,
   Version,
+  ShipSymbolValue,
 } from '../types/logic-types';
 
-export const SHIP_SYMBOLS: ShipStates = {
+export const SHIP_SYMBOLS: ShipSymbols = {
   [ShipType.Carrier]: Symbol('CA'),
   [ShipType.Battleship]: Symbol('BS'),
   [ShipType.Cruiser]: Symbol('CR'),
   [ShipType.Submarine]: Symbol('SB'),
   [ShipType.Destroyer]: Symbol('DD'),
   [ShipType.PatrolBoat]: Symbol('PB')
-};
+} as const;
 
 const sizeLookup: Record<SizeLookupKey, number | undefined> = {
   'battleship-1990': 4,
@@ -30,43 +31,34 @@ const sizeLookup: Record<SizeLookupKey, number | undefined> = {
   'submarine-2002': 3,
 };
 
-export class BattleshipFactory implements IShipOptions {
-  public size: number;
-  public seaworthy: boolean = true;
-  public hitCounter: number = 0;
-  public symbol: symbol;
+export class BattleshipBuilder implements IShipOptions {
+  public readonly length: number;
+  public readonly seaworthy: boolean = true;
+  public readonly symbol: ShipSymbolValue;
+  private _hitCounter: number = 0;
 
-  constructor(public type: ShipType, public version: Version = 2002) {
-    const symbol = SHIP_SYMBOLS[type];
-    if (!symbol) {
-      throw new Error(`No symbol found for ship type: ${type}`);
-    }
-
-    this.symbol = symbol;
+  constructor(public readonly type: ShipType, public readonly version: Version = 2002) {
+    this.symbol = SHIP_SYMBOLS[type];
 
     const key: SizeLookupKey = `${type}-${version}`;
-    const size = sizeLookup[key]; // Access using the typed key
-    if (size === undefined) {
+    const length = sizeLookup[key]; // Access using the typed key
+    if (length === undefined) {
       throw new Error(`Invalid ship type/version combination: ${key}`);
     }
 
-    this.size = size;
+    this.length = length;
   }
 
   hit = (): string => {
-    if (!this.isSeaworthy()) return 'This ship has perished.';
-    this.hitCounter++;
-
+    if (!this.isSeaworthy()) return 'This ship has already perished.';
+    
+    this._hitCounter++;
     return `Hit registered. Hit count: ${this.hitCounter}.`; // Return the updated hit counter
   };
 
-  isSeaworthy = (): boolean => this.hitCounter < this.size;
+  isSeaworthy = (): boolean => this.hitCounter < this.length;
 
-  public get shipType(): ShipType {
-    return this.type;
-  }
-
-  public get versionYear(): Version {
-    return this.version;
+  public get hitCounter(): number {
+    return this._hitCounter;
   }
 }

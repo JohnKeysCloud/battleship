@@ -14,7 +14,7 @@ Using `import type` ensures that only type information is imported, which helps 
 
 In TypeScript, both `interface` and `type` can be used to define the shape of objects, but they have some differences in capabilities and use cases.  
 
-Building on the benefits of interfaces (See: [Benefits of an Interface](../bs-ship-factory/bs-ship-factory.md#benefits-of-an-interface)), here is a comparison between between them and TypeScripts, `type`. 
+Building on the benefits of interfaces (See: [Benefits of an Interface](../bs-ship-builder/bs-ship-builder.md#benefits-of-an-interface)), here is a comparison between between them and TypeScripts, `type`. 
 
 #### `interface`
 
@@ -169,15 +169,15 @@ As a refresher, `Pet` here is a _union_ type that can either be a `Dog` or an ob
 
 ``` typescript
 type Fleet = {
-  [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipFactory;
+  [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipBuilder;
 };
 ```
 
 * `[key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']`: This part iterates over each key in the union of string literals.
 
-* `?: BattleshipFactory`: The type for each value associated with these keys is `BattleshipFactory`. The `?` indicates that each property is optional. 
+* `?: BattleshipBuilder`: The type for each value associated with these keys is `BattleshipBuilder`. The `?` indicates that each property is optional. 
 
-In this case, `Fleet` is a type where each key (one of the strings in the union) is an optional property with a value of type `BattleshipFactory`.
+In this case, `Fleet` is a type where each key (one of the strings in the union) is an optional property with a value of type `BattleshipBuilder`.
 
 `Fleet` only allows the properties specified in the union of string literals. Any property with a key not included in this list will result in a TypeScript error if you try to add it. 
 
@@ -189,16 +189,16 @@ Mapped Types can also include additional transformations and modifiers. For inst
 
 ``` typescript
 type ReadonlyFleet = {
-  readonly [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipFactory;
+  readonly [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipBuilder;
 };
 
 const myFleet: ReadonlyFleet = {
-  carrier: new BattleshipFactory(),
-  battleship: new BattleshipFactory(),
+  carrier: new BattleshipBuilder(),
+  battleship: new BattleshipBuilder(),
 };
 
 // Attempting to reassign a fleet property will cause a TypeScript error
-myFleet.carrier = new BattleshipFactory(); // Error: Cannot assign to 'carrier' because it is a read-only property.
+myFleet.carrier = new BattleshipBuilder(); // Error: Cannot assign to 'carrier' because it is a read-only property.
 ```
 Note that the `readonly` keyword only makes the existing properties of `myFleet` immutable; it does not prevent adding new properties to the object, provided that the new properties match the shape defined by the type. 
 
@@ -373,7 +373,7 @@ For example:
 ``` typescript
 function printShipStatus(ship: IShipOptions): void {
   console.log(`Ship Type: ${ship.type}`);
-  console.log(`Ship Size: ${ship.size}`);
+  console.log(`Ship Size: ${ship.length}`);
   console.log(`Is Seaworthy: ${ship.seaworthy}`);
   console.log(
     ship.hitCounter !== undefined 
@@ -391,13 +391,13 @@ Had I passed the `ship` object without specifying the type in the function signa
 
 4. **Ease of Refactoring:** If we ever need to change the properties or types associated with ships, we can do so in the interface, and TypeScript will flag any part of our code that does not conform to the new structure. This makes refactoring easier and safer.
 
-5. **Documentation and Intellisense:** Using interfaces provides automatic documentation and better IntelliSense in code editors like VS Code. This helps us as developers understand what properties and types are expected when working with the `BattleshipFactory` class or any other class that implements `IShipOptions`.
+5. **Documentation and Intellisense:** Using interfaces provides automatic documentation and better IntelliSense in code editors like VS Code. This helps us as developers understand what properties and types are expected when working with the `BattleshipBuilder` class or any other class that implements `IShipOptions`.
 
-6. **Separation of Concerns:** By separating the structure (`IShipOptions`) from the behavior (methods of `BattleshipFactory` instances), we maintain a clear distinction between what a ship "is" and what a ship "does." This separation can lead to cleaner and more maintainable code. 
+6. **Separation of Concerns:** By separating the structure (`IShipOptions`) from the behavior (methods of `BattleshipBuilder` instances), we maintain a clear distinction between what a ship "is" and what a ship "does." This separation can lead to cleaner and more maintainable code. 
 
-7. **Default Values in Constructor:** In our `BattleshipFactory` class, we have default values for `hitCounter` and `seaworthy` in the constructor. This simplifies object creation, as we don't need to specify all values when creating an instance. The interface helps ensure that even with default values, the structure remains consistent.
+7. **Default Values in Constructor:** In our `BattleshipBuilder` class, we have default values for `hitCounter` and `seaworthy` in the constructor. This simplifies object creation, as we don't need to specify all values when creating an instance. The interface helps ensure that even with default values, the structure remains consistent.
 
-8. **Error Handling in Constructor:** The interface ensures that any class implementing it will respect the required types and properties. The constructor logic in `BattleshipFactory`, like throwing an error if `size <= 0`, provides additional safeguards during object instantiation, ensuring no invalid ship objects are created. 
+8. **Error Handling in Constructor:** The interface ensures that any class implementing it will respect the required types and properties. The constructor logic in `BattleshipBuilder`, like throwing an error if `size <= 0`, provides additional safeguards during object instantiation, ensuring no invalid ship objects are created. 
 
 ### `Interface` vs `Type`
 
@@ -495,7 +495,7 @@ Because of this limitation and because I wanted to ensure that _only_ `symbol` i
 
 An alternative would be to assign the generic type explicitly via `<T = symbol>`, which emphasizes simplicity and consistency while sacrificing some flexibility. This approach disallows the use of `symbol` subtypes, such as `unique symbol`.
 
-Of those 2 options, I'd go with the latter (`<T = symbol>`) for this particular scenario. The default `symbol` type is sufficient for my needs, and the added simplicity outweighs the potential benefits of supporting subtypes.
+Of those 2 approaches, I'd go with the latter (`<T = symbol>`) for this particular scenario. The default `symbol` type is sufficient for my needs, and the added simplicity outweighs the potential benefits of supporting subtypes.
 
 **Example:**
 
@@ -525,10 +525,10 @@ With those disadvantages in mind, I give you **my** way. The **right** way, for 
 
 ##### The Right Way
 
-_Finally_, I decided that rather than setting the type on the class, that I would set an explicit type of `symbol` directly in the `implements` clause of my class. Seeing as my goal was to **strictly prevent** the class from being instantiated with any type other than `symbol`:
+I decided that rather than setting the type on the class, that I would set an explicit type of `symbol` directly in the `implements` clause of my class. Seeing as my goal was to **strictly prevent** the class from being instantiated with any type other than `symbol`:
 
 ``` typescript
-export class BattleshipBoardFactory implements IGridGameboardSquare<symbol> {
+export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
   // Class implementation...
 }
 ```
@@ -548,7 +548,6 @@ The **disadvantages**?:
   - **NONE!**: In my specific use case since I want to enforce `symbol` as the only type. This design choice is sufficient.
 
 My work here is done.
-
 
 #### Components Breakdown
 
@@ -616,17 +615,13 @@ As of 9/4/24, the Battleship board game features a variety of ship types, each w
 
 By using the `ShipType` `enum`, the code enforces type safety by ensuring that any value assigned to a variable of this type must correspond to one of the specified ship types. This approach provides a clear and structured way to handle different ship types, improving code readability and reducing the risk of errors by limiting the values to a defined set of constants.
 
-### `Version` Enumeration
-
-As of 9/4/24, there are two official versions of the Battleship board game, represented by the years 1990 and 2002. To create a flexible system that can distinguish between these versions in the web implementation, I defined an `type` called `Version`. This `type` includes these years as its members, and it is used to enforce type safety by ensuring that any value assigned to a variable of this type must match one of the specified years. This approach provides a strict type constraint that aligns with the official versions of the game, enhancing code clarity and reliability.
-
 ## Types
 
 ### `AxisName` Type
 
 Meh.
 
-### `Coordiantes` Type
+### `Coordinates` Type
 
 Blah.
 
@@ -637,23 +632,23 @@ Blah.
 ``` typescript
 
 // Explicit String Union
-type Fleet = { [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipFactory; }
+type Fleet = { [key in 'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat']?: BattleshipBuilder; }
 
 // Which is the same as:
 // (Explicit Property Definition)
 type Fleet = {
-  carrier?: BattleshipFactory, 
-  battleship?: BattleshipFactory, 
-  destroyer?: BattleshipFactory, 
-  submarine?: BattleshipFactory, 
-  cruiser?: BattleshipFactory, 
-  patrolBoat?: BattleshipFactory, 
+  carrier?: BattleshipBuilder, 
+  battleship?: BattleshipBuilder, 
+  destroyer?: BattleshipBuilder, 
+  submarine?: BattleshipBuilder, 
+  cruiser?: BattleshipBuilder, 
+  patrolBoat?: BattleshipBuilder, 
 }
 
 // Which is also the same as:
 // (`enum`-based definition)
 type Fleet = {
-  [key in ShipType]?: BattleshipFactory;
+  [key in ShipType]?: BattleshipBuilder;
 };
 
 ```
@@ -667,7 +662,7 @@ The syntax uses a _mapped type_ to create an object type with specific keys and 
 
 * The `?` after each key means that the property is optional. This means you could have a `Fleet` object without some of these properties.
 
-* The value for each key must be of type `BattleshipFactory`.
+* The value for each key must be of type `BattleshipBuilder`.
 
 ---
 
@@ -706,7 +701,7 @@ type ShipType = (typeof shipTypes)[number];
 
 // Define the type for a fleet with optional properties
 type Fleet = {
-  [key in ShipType]?: BattleshipFactory;
+  [key in ShipType]?: BattleshipBuilder;
 };
 ```
 
@@ -795,11 +790,11 @@ type ShipType = (typeof shipTypes)[number];
 // Define the type for a fleet with optional properties
 type Fleet = {
   // Mapped Type
-  [key in ShipType]?: BattleshipFactory;
+  [key in ShipType]?: BattleshipBuilder;
 };
 ```
 
-Creates a `type` where the keys of conforming objects must be in `ShipType`. The question mark here means the same as it did in the previous version of this `type` setup. The keys are all optional. Meaning that an object still conforms to the `Fleet` `type` if only some of they keys are present (so long as the keys _values_ conform to the `BattleshipFactory` class).
+Creates a `type` where the keys of conforming objects must be in `ShipType`. The question mark here means the same as it did in the previous version of this `type` setup. The keys are all optional. Meaning that an object still conforms to the `Fleet` `type` if only some of they keys are present (so long as the keys _values_ conform to the `BattleshipBuilder` class).
 
 If the array were to be declared without `as const`, TypeScript would not treat its elements as literal types but instead infers broader, more general types for each element based on its value. Here’s what happens in that case:
 
@@ -829,27 +824,39 @@ myValue = { name: 'submarine' }; // valid, since it matches { name: string }
 
 #### Current Refactored Version
 
-Instead of duplicating a type definition for ship types in the fleet factory module, I created an enumeration (`enum`) of the ship types (declared [here](../types/logic-types.ts)). This change allows us to import the `ShipType` `enum` directly into the fleet factory module in order to maintain type safety. Additionally, this approach adheres to the DRY (Don't Repeat Yourself) principle by avoiding redundant type definitions. 
+Instead of duplicating a type definition for ship types in the fleet builder module, I created an enumeration (`enum`) of the ship types (declared [here](../types/logic-types.ts)). This change allows us to import the `ShipType` `enum` directly into the fleet builder module in order to maintain type safety. Additionally, this approach adheres to the DRY (Don't Repeat Yourself) principle by avoiding redundant type definitions. 
 
 > Teaching while learning! 💭
 
-### `PositionStates` Type
+### `FleetConfigs` Type
 
-Hmph.
+This `type` declaration is used to simplify the parameter definition of the `createFleet` static method, which is responsible for creating fleets and ensuring proper class instantiation. It defines the shape of the `fleetConfigs` object that the method accepts. It ensures that the object has keys that conform to `ShipType` and that the corresponding values conform to the `ShipConfig` type.
 
-### `ShipConfigs` Type
+### `Orientation` Type
 
-This `type` declaration is used to simplify the parameter definition of the `createFleet` static method, which is responsible for creating fleets and ensuring proper class instantiation. It defines the shape of the `shipConfigs` object that the method accepts. It ensures that the object has keys that conform to `ShipType` and that the corresponding values conform to the `ShipConfig` type.
+Bleh.
+
+### `ShipSymbols` Type
+
+Shrug.
+
+### `ShipSymbolValue`
+
+Creates a union of the keys in `ShipType`.
 
 ### `ShipConfig` Type
 
 This `type` declaration is used to simplify the parameter definition of the `createFleet` static method, which is responsible for creating fleets and ensuring proper class instantiation. It specifies that the object should have a `type` key whose value conforms to `ShipType` and an optional `version` key whose value conforms to `Version`.
 
-By using this type and the `ShipConfigs` type, the static method can enforce type safety and clear structure in the passed configurations, making the code more readable and maintainable.
+By using this type and the `FleetConfigs` type, the static method can enforce type safety and clear structure in the passed configurations, making the code more readable and maintainable.
 
 ### `SizeLookupKey` Type
 
 The type `SizeLookupKey` is defined as `${ShipType}-${Version}`. This type ensures that the keys used in the `sizeLookup` table adhere to a specific format. By using this template literal type, TypeScript enforces that keys in the `sizeLookup` table must combine a valid `ShipType` with a valid Version, separated by a hyphen. This helps maintain consistency and type safety, making sure that only properly formatted keys are used throughout the code.
+
+### `Version` Type
+
+As of 9/4/24, there are two official versions of the Battleship board game, represented by the years 1990 and 2002. To create a flexible system that can distinguish between these versions in the web implementation, I defined an `type` called `Version`. This `type` includes these years as its members, and it is used to enforce type safety by ensuring that any value assigned to a variable of this type must match one of the specified years. This approach provides a strict type constraint that aligns with the official versions of the game, enhancing code clarity and reliability.
 
 ## Interfaces
 
@@ -890,13 +897,17 @@ These methods provide basic functionality for any grid-based game, ensuring cons
 
 The `IGridGameboard<T>` interface defines a grid gameboard where the board is represented as a 2D array, allowing it to have any dimensions `x` by `y`. The `IGridGameboardSquare<T>` interface extends `IGridGameboard<T>` and introduces the `boardSize` property, which specifies a single dimension (`x`). This addition allows a class implementing `IGridGameboardSquare<T>` to generate a square gameboard, where both dimensions are equal (i.e., `x` by `x`). This provides a more specific use case for creating square gameboards compared to the more generic `IGridGameboard<T>`.
 
+### `IPlacePieceWrapperParams` Interface
+
+This interface defines the shape of the object that contains all but one necessary properties for placing a ship on the gameboard. This object is passed as a parameter to the [`placePiece`](../bs-gameboard-builder/bs-gameboard-builder.ts) method. 
+
+### `IPlacePieceCallbackParams extends IShipPlacementConfigurations` Interface
+
+This interface extends `IPlacePieceWrapperParams` and includes the last necessary property for placing a ship on the gameboard, the instance that contains the gameboard itself.
+
 ### The `IPosition` Interface
 
 Pfft.
-
-### `IShipConfigurations` Interface
-
-This interface defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `IValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function.
 
 ### `IShipOptions` Interface
 
@@ -906,18 +917,37 @@ The question mark (`?`) appended to `hitCounter` and `version` is used to indica
 
 In TypeScript, when a property is marked as optional, it means that classes or objects implementing the interface where the property exists may include the property, but it is not _required_ to do so.
 
-### `IValidPlacementCallbackParams` Interface
+### `IShipPlacementConfigurations` Interface
 
-This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic. This interface complies with the `IShipConfigurations` interface, so rather than writing a whole new interface, this one simply `extends` it and includes the added necessary property `gameboard`.
+Defines the structure for the parameter of an outer function that wraps the validation logic. Since the nested callback function already has access to two of the five properties defined in `IValidPlacementCallbackParams`, these properties do not need to be passed as arguments when calling the wrapper function.
 
-💭 You can also create interfaces that implement others that _omit_ properties using... `omit`. For example, the following is equivalent implemented interfaces of the module:
+### `ITestCaseShipHit` Interface
+
+Defines the shape of the object that holds the test cases for the `hit` method on ships including the number of hits and expected return values.
+
+### `ITestCaseValidPositions` Interface
+
+Defines the shape of the object that holds the test cases for the helper function `getValidShipPositions` which retrieves valid positions including the ship configurations and the expected result object containing the valid positions.
+
+
+### `IValidPlacementCallbackParams extends IShipPlacementConfigurations` Interface
+
+This interface defines the complete structure of the object needed to determine if a specific position on a Battleship gameboard is valid for ship placement. Any callback function that performs this validation must use an argument that conforms to this interface, ensuring all required data is available for the validation logic. This interface complies with the `IShipPlacementConfigurations` interface, so rather than writing a whole new interface, this one simply `extends` it and includes the added necessary property `gameboard`.
+
+💭 You can also create interfaces that implement others that _omit_ properties using... `omit`. For example, the following is equivalent to the actual interface implementations:
 
 ``` typescript
 export interface IValidPlacementCallbackParams {
-  direction: 'horizontal' | 'vertical';
+  orientation: Orientation;
   gamePieceSize: number;
-  gameboard: BattleshipBoardFactory;
+  gameboard: BattleshipBoardBuilder;
 }
 
-export interface IShipConfigurations extends Omit<IValidPlacementCallbackParams, 'gameboard'> { };
+export interface IShipPlacementConfigurations extends Omit<IValidPlacementCallbackParams, 'gameboard'> { };
 ```
+
+### `IValidPositionsResult` Interface
+
+The full object that contains all valid positions for any given ship after running `getValidShipPositions` contains objects that conform to this interface. The keys must be in [`AxisName`](#axisname-type) format and the values are arrays filled with objects that conform to the [`IPosition`](#the-iposition-interface) interface.
+
+

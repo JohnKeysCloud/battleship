@@ -1,16 +1,17 @@
-import { BattleshipBoardFactory, POSITION_STATES } from '../../bs-gameboard-factory';
 import {
   IPosition,
-  IShipConfigurations,
-  IPlacePieceWrapperParams,
+  IShipPlacementConfigurations,
+  IPlacePieceCallbackParams,
+  ShipSymbolValue,
 } from '../../../types/logic-types';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
 
-export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinates, configurations }: IPlacePieceWrapperParams) {
-  if (!configurations) {
-    throw new Error('Configurations must be provided');
-  }
-
+export function placeShip({
+  gameboardInstance,
+  ship,
+  coordinates,
+  orientation
+}: IPlacePieceCallbackParams) {
   const arePositionsEqual = (endpoint: IPosition, position: IPosition) => {
     return (
       areArraysEqual(endpoint.bow, position.bow) &&
@@ -19,7 +20,7 @@ export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinat
   };
   const isPositionValid = (
     position: IPosition,
-    configurations: IShipConfigurations
+    configurations: IShipPlacementConfigurations
   ) => {
     const validPositions = gameboardInstance.getValidPositions(configurations);
 
@@ -37,11 +38,10 @@ export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinat
   };
   const placeOnBoard = (
     position: IPosition,
-    configurations: IShipConfigurations
+    shipSymbol: ShipSymbolValue,
+    isHorizontal: Boolean
   ) => {
     const gameboard = gameboardInstance.board;
-
-    const isHorizontal = configurations.direction === 'horizontal';
 
     const primary = isHorizontal ? position.bow[0] : position.bow[1];
     const axisStart = isHorizontal ? position.bow[1] : position.bow[0];
@@ -49,24 +49,25 @@ export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinat
 
     for (let i = axisStart; i <= axisEnd; i++) {
       isHorizontal
-        ? (gameboard[primary][i] = POSITION_STATES.occupied)
-        : (gameboard[i][primary] = POSITION_STATES.occupied);
+        ? (gameboard[primary][i] = shipSymbol)
+        : (gameboard[i][primary] = shipSymbol);
     }
 
     return gameboard;
   };
-  const areCoordinatesInBounds = (axisStart: number, shipLength: number) => {
-    const errorMessage = `The ship placement starting at ${coordinates} with length ${shipLength} exceeds the board size of ${gameboardInstance.boardSize}.`;
+  const checkIfCoordinatesInBounds = (axisStart: number, shipLength: number) => {
+    const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
     if (axisStart + shipLength >= gameboardInstance.boardSize)
       throw new Error(errorMessage);
   };
 
-  const { direction, gamePieceSize: shipLength } = configurations;
-  const isHorizontal = direction === 'horizontal';
+  const shipSymbol = ship.symbol;
+  const shipLength = ship.length;
   const [bowRow, bowColumn] = coordinates;
+  const isHorizontal = orientation === 'horizontal';
   const axisStart = isHorizontal ? bowColumn : bowRow;
 
-  areCoordinatesInBounds(axisStart, shipLength);
+  checkIfCoordinatesInBounds(axisStart, shipLength);
 
   const position: IPosition = {
     bow: coordinates,
@@ -75,14 +76,19 @@ export function placeShip(gameboardInstance: BattleshipBoardFactory, { coordinat
       : [bowRow + shipLength - 1, bowColumn],
   };
 
+  const configurations: IShipPlacementConfigurations = {
+    shipLength,
+    orientation
+  };
+
   if (isPositionValid(position, configurations)) {
-    placeOnBoard(position, configurations);
+    placeOnBoard(position, shipSymbol, isHorizontal);
   } else {
     const errorMessage = `"${JSON.stringify(
       position
-    )}" is unavailable for ship with configurations: ${JSON.stringify(
-      configurations
-    )}`;
+    )}" is unavailable for ship with Size: ${
+      shipLength
+    } and Orientation: ${orientation}.`;
     throw new Error(errorMessage);
   }
 }

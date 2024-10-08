@@ -1,53 +1,54 @@
-import { POSITION_STATES } from '../../bs-gameboard-factory';
 import {
+  Coordinates,
   IPosition,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
+  Orientation,
 } from '../../../types/logic-types';
 
 export function getValidShipPositions({
-  gamePieceSize,
-  direction,
-  gameboard,
+  shipLength,
+  orientation,
+  gameboardInstance,
 }: IValidPlacementCallbackParams): IValidPositionsResult {
   const validateArguments = (
-    direction: 'horizontal' | 'vertical',
-    gamePieceSize: number,
+    orientation: Orientation,
+    shipLength: number,
   ): void => {
-    // Validate direction
-    if (!['horizontal', 'vertical'].includes(direction)) {
-      throw new Error(`Invalid direction. Must be 'horizontal' or 'vertical'.`);
+    // Validate orientation
+    if (!['horizontal', 'vertical'].includes(orientation)) {
+      throw new Error(`Invalid orientation. Must be 'horizontal' or 'vertical'.`);
     }
 
     // Validate piece length
-    if (gamePieceSize < 2 || gamePieceSize > 5) {
+    if (shipLength < 2 || shipLength > 5) {
       throw new Error(
-        'Invalid piece length. Game piece length must be between 2 and 5.'
+        'Invalid piece length. Ship length must be between 2 and 5 units.'
       );
     }
   };
 
   // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  validateArguments(direction, gamePieceSize);
+  validateArguments(orientation, shipLength);
 
   const extractAxisArray = (
-    direction: 'horizontal' | 'vertical',
     axisIndex: number,
+    orientation: Orientation,
     gameboard: Array<Array<symbol>> // or symbol[][]
   ): Array<symbol> => {
-    return direction === 'horizontal'
+    return orientation === 'horizontal'
       ? gameboard[axisIndex] // Returns row
-      : gameboard.map((row) => row[axisIndex]); // Returns column
+      : gameboard.map(row => row[axisIndex]); // Returns column
   };
 
   const findValidPositionsInAxis = (
     axisArray: Array<symbol>, // or symbol[]
-    direction: 'horizontal' | 'vertical',
+    orientation: Orientation,
     axisIndex: number,
-    gamePieceSize: number
+    shipLength: number
   ): IPosition[] => {
     // Edge case check for ship length greater than row length
-    if (gamePieceSize > axisArray.length) {
+    if (shipLength > axisArray.length) {
       throw new Error('Ship length cannot be greater than axisArray length.');
     }
 
@@ -55,17 +56,17 @@ export function getValidShipPositions({
     let validAxisPositions: IPosition[] = [];
 
     for (let i = 0; i < axisArray.length; i++) {
-      if (axisArray[i] === POSITION_STATES.vacant) {
+      if (axisArray[i] === gameboardInstance.fillValue) {
         streak++;
 
-        if (streak >= gamePieceSize) {
-          const bowPosition: [number, number] =
-            direction === 'horizontal'
-              ? [axisIndex, i - (gamePieceSize - 1)]
-              : [i - (gamePieceSize - 1), axisIndex];
+        if (streak >= shipLength) {
+          const bowPosition: Coordinates =
+            orientation === 'horizontal'
+              ? [axisIndex, i - (shipLength - 1)]
+              : [i - (shipLength - 1), axisIndex];
           
-          const sternPosition: [number, number] =
-            direction === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
+          const sternPosition: Coordinates =
+            orientation === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
 
           validAxisPositions.push({
             bow: bowPosition,
@@ -73,7 +74,6 @@ export function getValidShipPositions({
           });
         }
       } else {
-        // Reset streak if position is occupied
         streak = 0;
       }
     }
@@ -82,19 +82,19 @@ export function getValidShipPositions({
   };
 
   let validPositionsPerAxis: IValidPositionsResult = {}; 
-  const board = gameboard.board;
+  const board = gameboardInstance.board;
 
   for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {
-    const axisArray = extractAxisArray(direction, axisIndex, board);
+    const axisArray = extractAxisArray(axisIndex, orientation, board);
     const validPositions = findValidPositionsInAxis(
       axisArray,
-      direction,
+      orientation,
       axisIndex,
-      gamePieceSize
+      shipLength
     );
 
     const axisTemplate =
-      direction === 'horizontal'
+      orientation === 'horizontal'
         ? `row-${axisIndex}`
         : `column-${axisIndex}`;
     
