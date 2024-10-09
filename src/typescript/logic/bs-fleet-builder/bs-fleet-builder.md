@@ -63,12 +63,14 @@ The use of optional properties means that not all ship types need to be included
 
 ``` typescript
 const fleet: Fleet = {};
+const isShipType = (shipType: string): shipType is ShipType => {
+  return Object.values(ShipType).includes(shipType as ShipType);
+};
 
 for (const [shipType, config] of Object.entries(fleetConfigs)) {
-  fleet[shipType] = new BattleshipBuilder(
-    config.type,
-    config.version
-  );
+  if (config && isShipType(shipType)) {
+    fleet[shipType] = new BattleshipBuilder(config.type, config.version);
+  }
 }
 
 return fleet;
@@ -94,6 +96,6 @@ This method simply retrieves one of the ships of a fleet. It's parameter accepts
 
 Since the method must return an instance of the `BattleshipBuilder`, it must ensure that the ship is defined, hence the conditional check. TypeScript's typing system would throw an error otherwise.
 
-### `createFleets` Factory Function
+### `createBattleshipFleets` Factory Function
 
 This factory function creates an object containing player one's and player two's fleets depending on the version (i.e, Hasbro - 2002 and Milton Bradley - 1990). It accepts the version _year_ in its parameters.
