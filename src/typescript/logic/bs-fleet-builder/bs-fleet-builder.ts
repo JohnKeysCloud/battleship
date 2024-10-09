@@ -10,9 +10,14 @@ export class BattleshipFleetBuilder {
 
   private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};
+    const isShipType = (key: string): key is ShipType => {
+      return Object.values(ShipType).includes(key as ShipType);
+    };
 
     for (const [shipType, config] of Object.entries(fleetConfigs)) {
-      fleet[shipType] = new BattleshipBuilder(config.type, config.version);
+      if (config && isShipType(shipType)) {
+        fleet[shipType] = new BattleshipBuilder(config.type, config.version);
+      }
     }
 
     return fleet;
@@ -55,7 +60,7 @@ export class BattleshipFleetBuilder {
   }
 }
 
-export function createFleets(version: Version) {
+export function createBattleshipFleets(version: Version = 2002) {
   const fleet =
     version === 2002
       ? BattleshipFleetBuilder.createHasbroFleet
