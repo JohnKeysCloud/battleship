@@ -1,4 +1,5 @@
 import {
+  AxisArrayKey,
   Coordinates,
   IPosition,
   IValidPlacementCallbackParams,
@@ -93,7 +94,7 @@ export function getValidShipPositions({
       shipLength
     );
 
-    const axisTemplate =
+    const axisTemplate: AxisArrayKey =
       orientation === 'horizontal'
         ? `row-${axisIndex}`
         : `column-${axisIndex}`;
