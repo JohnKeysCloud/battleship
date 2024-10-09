@@ -3,6 +3,7 @@ import {
   IShipPlacementConfigurations,
   IPlacePieceCallbackParams,
   ShipSymbolValue,
+  AxisArrayKey,
 } from '../../../types/logic-types';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
 
@@ -11,41 +12,33 @@ export function placeShip({
   ship,
   coordinates,
   orientation
-}: IPlacePieceCallbackParams) {
-  const arePositionsEqual = (endpoint: IPosition, position: IPosition) => {
+}: IPlacePieceCallbackParams): void {
+  const arePositionsEqual = (testPosition: IPosition, validPosition: IPosition) => {
     return (
-      areArraysEqual(endpoint.bow, position.bow) &&
-      areArraysEqual(endpoint.stern, position.stern)
+      areArraysEqual(testPosition.bow, validPosition.bow) &&
+      areArraysEqual(testPosition.stern, validPosition.stern)
     );
   };
   const isPositionValid = (
     position: IPosition,
-    configurations: IShipPlacementConfigurations
+    shipConfigurations: IShipPlacementConfigurations,
+    axisArrayKey: AxisArrayKey
   ) => {
-    const validPositions = gameboardInstance.getValidPositions(configurations);
-
-    // for each row/column
-    for (const axisArray in validPositions) {
-      if (
-        validPositions[axisArray].some((validPosition: IPosition) =>
-          arePositionsEqual(position, validPosition)
-        )
-      ) {
-        return true;
-      }
-    }
-    return false;
+    const validPositions = gameboardInstance.getValidPositions(shipConfigurations);
+    
+    return validPositions[axisArrayKey].some((validPosition: IPosition) => 
+      arePositionsEqual(position, validPosition));
   };
   const placeOnBoard = (
-    position: IPosition,
+    validPosition: IPosition,
     shipSymbol: ShipSymbolValue,
     isHorizontal: Boolean
   ) => {
     const gameboard = gameboardInstance.board;
 
-    const primary = isHorizontal ? position.bow[0] : position.bow[1];
-    const axisStart = isHorizontal ? position.bow[1] : position.bow[0];
-    const axisEnd = isHorizontal ? position.stern[1] : position.stern[0];
+    const primary = isHorizontal ? validPosition.bow[0] : validPosition.bow[1];
+    const axisStart = isHorizontal ? validPosition.bow[1] : validPosition.bow[0];
+    const axisEnd = isHorizontal ? validPosition.stern[1] : validPosition.stern[0];
 
     for (let i = axisStart; i <= axisEnd; i++) {
       isHorizontal
@@ -61,34 +54,35 @@ export function placeShip({
       throw new Error(errorMessage);
   };
 
-  const shipSymbol = ship.symbol;
   const shipLength = ship.length;
-  const [bowRow, bowColumn] = coordinates;
+  const [bowX, bowY] = coordinates;
   const isHorizontal = orientation === 'horizontal';
-  const axisStart = isHorizontal ? bowColumn : bowRow;
+  const axisStart = isHorizontal ? bowY : bowX;
 
   checkIfCoordinatesInBounds(axisStart, shipLength);
-
+  
   const position: IPosition = {
     bow: coordinates,
     stern: isHorizontal
-      ? [bowRow, bowColumn + shipLength - 1]
-      : [bowRow + shipLength - 1, bowColumn],
+      ? [bowX, bowY + shipLength - 1]
+      : [bowX + shipLength - 1, bowY],
   };
 
-  const configurations: IShipPlacementConfigurations = {
+  const shipConfigurations: IShipPlacementConfigurations = {
     shipLength,
     orientation
   };
 
-  if (isPositionValid(position, configurations)) {
-    placeOnBoard(position, shipSymbol, isHorizontal);
+    const axisArrayKey: AxisArrayKey = isHorizontal
+      ? `row-${bowX}`
+      : `column-${bowY}`; 
+
+  if (isPositionValid(position, shipConfigurations, axisArrayKey)) {
+    placeOnBoard(position, ship.symbol, isHorizontal);
   } else {
     const errorMessage = `"${JSON.stringify(
       position
-    )}" is unavailable for ship with Size: ${
-      shipLength
-    } and Orientation: ${orientation}.`;
+    )}" is unavailable for ship with Size: ${shipLength} and Orientation: ${orientation}.`;
     throw new Error(errorMessage);
   }
 }

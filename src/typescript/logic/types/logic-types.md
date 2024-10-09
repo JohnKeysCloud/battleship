@@ -617,7 +617,7 @@ By using the `ShipType` `enum`, the code enforces type safety by ensuring that a
 
 ## Types
 
-### `AxisName` Type
+### `AxisArrayKey` Type
 
 Meh.
 
@@ -948,6 +948,4 @@ export interface IShipPlacementConfigurations extends Omit<IValidPlacementCallba
 
 ### `IValidPositionsResult` Interface
 
-The full object that contains all valid positions for any given ship after running `getValidShipPositions` contains objects that conform to this interface. The keys must be in [`AxisName`](#axisname-type) format and the values are arrays filled with objects that conform to the [`IPosition`](#the-iposition-interface) interface.
-
-
+The full object that contains all valid positions for any given ship after running `getValidShipPositions` contains objects that conform to this interface. The keys must be in `AxisArrayKey` format and the values are arrays filled with objects that conform to the [`IPosition`](#the-iposition-interface) interface.

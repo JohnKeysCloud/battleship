@@ -19,7 +19,7 @@ export enum ShipType {
 // 💭 --------------------------------------------------------------
 // 💭 Types
 
-export type AxisName = `row-${number}` | `column-${number}`;
+export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;
@@ -86,5 +86,5 @@ export interface IValidPlacementCallbackParams extends IShipPlacementConfigurati
   gameboardInstance: BattleshipBoardBuilder;
 }
 export interface IValidPositionsResult {
-  [key: AxisName]: IPosition[];
+  [key: AxisArrayKey]: IPosition[];
 }
