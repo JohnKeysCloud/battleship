@@ -1,5 +1,6 @@
 import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 import {
+  AxisArrayKey,
   Coordinates,
   IPosition,
   IShipPlacementConfigurations,
@@ -38,7 +39,7 @@ describe('`getValidShipPositions`', () => {
 
     // Creates row/column objects
     for (let i = 0; i < testBoard.boardSize; i++) {
-      const axisTemplate =
+      const axisTemplate: AxisArrayKey =
         orientation === 'horizontal' ? `row-${i}` : `column-${i}`;
 
       // Initializes array for row/column
