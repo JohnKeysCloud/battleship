@@ -73,9 +73,9 @@ export function placeShip({
     orientation
   };
 
-    const axisArrayKey: AxisArrayKey = isHorizontal
-      ? `row-${bowX}`
-      : `column-${bowY}`; 
+  const axisArrayKey: AxisArrayKey = isHorizontal
+    ? `row-${bowX}`
+    : `column-${bowY}`; 
 
   if (isPositionValid(position, shipConfigurations, axisArrayKey)) {
     placeOnBoard(position, ship.symbol, isHorizontal);
