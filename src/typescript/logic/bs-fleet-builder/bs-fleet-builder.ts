@@ -4,7 +4,7 @@ import {
 import { ShipType, Version, Fleet, FleetConfigs } from '../types/logic-types';
 
 export class BattleshipFleetBuilder {
-  private constructor(private readonly fleet: Fleet) {
+  private constructor(public readonly fleet: Fleet) {
     this.fleet = fleet;
   }
 
