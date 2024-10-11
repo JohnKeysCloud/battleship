@@ -26,7 +26,7 @@ export class BattleshipFleetBuilder {
   public static createHasbroFleet(): BattleshipFleetBuilder {
     // 2002
     return new BattleshipFleetBuilder(
-      this.createFleet({
+      BattleshipFleetBuilder.createFleet({
         carrier: { type: ShipType.Carrier },
         battleship: { type: ShipType.Battleship },
         destroyer: { type: ShipType.Destroyer },
@@ -39,7 +39,7 @@ export class BattleshipFleetBuilder {
   public static createMBFleet(): BattleshipFleetBuilder {
     // 1990
     return new BattleshipFleetBuilder(
-      this.createFleet({
+      BattleshipFleetBuilder.createFleet({
         carrier: { type: ShipType.Carrier, version: 1990 },
         battleship: { type: ShipType.Battleship, version: 1990 },
         cruiser: { type: ShipType.Cruiser, version: 1990 },
