@@ -58,7 +58,14 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     placeShip(placeShipArg);
   }
 
-  removePiece(bowCoordinates: IPosition) {}
+  removePiece(bowCoordinates: IPosition) { }
+  
+  public prettyPrint() {
+    return this._board.map((row) =>
+      row.map(symbol =>
+        symbol.description === 'VC' ? null : symbol.description)
+    );
+  } 
 
   public get board(): symbol[][] {
     return this._board;
@@ -71,6 +78,7 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
   public get boardSize(): number {
     return this._boardSize;
   }
+  
 }
 
 export function createShipConfigurations(
