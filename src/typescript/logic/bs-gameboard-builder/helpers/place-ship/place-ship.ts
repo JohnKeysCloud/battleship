@@ -50,7 +50,7 @@ export function placeShip({
   };
   const checkIfCoordinatesInBounds = (axisStart: number, shipLength: number) => {
     const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
-    if (axisStart + shipLength >= gameboardInstance.boardSize)
+    if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
       throw new Error(errorMessage);
   };
 
