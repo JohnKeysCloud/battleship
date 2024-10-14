@@ -1,12 +1,12 @@
 import {
-  BattleshipBuilder,
-} from '../bs-ship-builder/bs-ship-builder';
-import {
   Fleet,
   FleetConfigs,
   ShipType,
   Version
 } from '../types/logic-types';
+import {
+  BattleshipBuilder,
+} from '../bs-ship-builder/bs-ship-builder';
 
 export class BattleshipFleetBuilder {
   private constructor(public readonly fleet: Fleet) {

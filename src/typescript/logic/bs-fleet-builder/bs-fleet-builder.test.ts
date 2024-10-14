@@ -1,5 +1,6 @@
-import { BattleshipFleetBuilder } from './bs-fleet-builder';
 import { ShipType } from '../types/logic-types';
+import { BattleshipFleetBuilder } from './bs-fleet-builder';
+import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 
 describe('BattleshipFleetBuilder', () => {
   let fleetBuilder: BattleshipFleetBuilder;
@@ -17,14 +18,14 @@ describe('BattleshipFleetBuilder', () => {
   });
 
   test('should create a fleet with specified versions for MBFleet', () => {
-    const fleet = BattleshipFleetBuilder.createMBFleet();
-    const carrier = fleet.getShip(ShipType.Carrier);
+    const fleet: BattleshipFleetBuilder = BattleshipFleetBuilder.createMBFleet();
+    const carrier: BattleshipBuilder = fleet.getShip(ShipType.Carrier);
     expect(carrier).toBeDefined();
-    expect(carrier?.version).toBe(1990);
+    expect(carrier.version).toBe(1990);
   });
 
   test('should throw an error for a ship type not in the fleet', () => {
-    const fleet = BattleshipFleetBuilder.createHasbroFleet();
+    const fleet: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
     expect(() => fleet.getShip(ShipType.Cruiser)).toThrow(
       'Ship of type cruiser not found in fleet.'
     ); 
