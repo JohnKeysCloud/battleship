@@ -41,7 +41,7 @@ export class BattleshipBuilder implements IShipOptions {
     this.symbol = SHIP_SYMBOLS[type];
 
     const key: SizeLookupKey = `${type}-${version}`;
-    const length = sizeLookup[key]; // Access using the typed key
+    const length: number | undefined = sizeLookup[key]; // Access using the typed key
     if (length === undefined) {
       throw new Error(`Invalid ship type/version combination: ${key}`);
     }
