@@ -8,12 +8,12 @@ import {
 // 💭 Enumerations
 
 export enum ShipType {
-  Carrier = 'carrier',
   Battleship = 'battleship',
+  Carrier = 'carrier',
   Cruiser = 'cruiser',
   Destroyer = 'destroyer',
-  Submarine = 'submarine',
   PatrolBoat = 'patrolBoat',
+  Submarine = 'submarine',
 }
 
 // 💭 --------------------------------------------------------------
@@ -21,11 +21,18 @@ export enum ShipType {
 
 export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
+export type CoordinatesArray = Coordinates[];
+export type CoordinatesSet = Set<CoordinatesSetMember>;
+export type CoordinatesSetMember = `[${number}, ${number}]`;
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;
 };
 export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
+};
+export type Gameboard = symbol[][];
+export type OccupiedPositionsMap = {
+  [key in ShipType]?: CoordinatesSet;
 };
 export type Orientation = 'horizontal' | 'vertical';
 export type ShipConfig = {
@@ -52,10 +59,11 @@ interface IGridGameboard<T> {
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 }
+export interface IFleetCoordinates extends OccupiedPositionsMap {}
 export interface IPlacePieceWrapperParams {
-  ship: BattleshipBuilder;
   coordinates: Coordinates;
   orientation: Orientation;
+  ship: BattleshipBuilder;
 }
 export interface IPlacePieceCallbackParams extends IPlacePieceWrapperParams {
   gameboardInstance: BattleshipBoardBuilder
@@ -65,18 +73,18 @@ export interface IPosition {
   stern: Coordinates; // [rowIndex, colIndex]
 }
 export interface IShipOptions {
-  type: ShipType;
-  length: number;
   hitCounter: number;
+  length: number;
+  type: ShipType;
   version: Version;
 }
 export interface IShipPlacementConfigurations {
-  shipLength: number;
   orientation: Orientation;
+  shipLength: number;
 }
 export interface ITestCaseShipHit {
-  hits: number; // Function returning the string to be tested
   expected: string; // Expected output
+  hits: number; // Function returning the string to be tested
 }
 export interface ITestCaseValidPositions {
   shipPlacementConfigs: IShipPlacementConfigurations;

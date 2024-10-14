@@ -1,8 +1,4 @@
 import {
-  BattleshipBoardBuilder,
-} from '../../bs-gameboard-builder';
-import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
-import {
   Coordinates,
   IPlacePieceWrapperParams,
   IPosition,
@@ -10,6 +6,10 @@ import {
   Orientation,
   ShipType
 } from '../../../types/logic-types';
+import {
+  BattleshipBoardBuilder,
+} from '../../bs-gameboard-builder';
+import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 
 describe('`placeShip`', () => {

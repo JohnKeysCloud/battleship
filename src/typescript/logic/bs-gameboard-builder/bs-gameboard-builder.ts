@@ -1,6 +1,6 @@
-import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
-import { placeShip } from './helpers/place-ship/place-ship';
 import {
+  Gameboard,
+  IFleetCoordinates,
   IGridGameboardSquare,
   IPlacePieceWrapperParams,
   IPlacePieceCallbackParams,
@@ -10,13 +10,16 @@ import {
   IValidPositionsResult,
   Orientation,
 } from '../types/logic-types';
+import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
+import { placeShip } from './helpers/place-ship/place-ship';
 
 export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
   private static readonly vacant = Symbol('VC');
 
-  private readonly _board: symbol[][];
+  private readonly _board: Gameboard;
   private readonly _boardSize: number = 10;
   private readonly _fillValue: symbol = BattleshipBoardBuilder.vacant;
+  private readonly _fleetCoordinates: IFleetCoordinates = {};
 
   constructor() {
     this._board = Array.from({ length: this._boardSize }, () =>
@@ -46,39 +49,43 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
   placePiece({
     ship,
     coordinates,
-    orientation
+    orientation,
   }: IPlacePieceWrapperParams): void {
     const placeShipArg: IPlacePieceCallbackParams = {
       ship,
       coordinates,
       orientation,
-      gameboardInstance: this
-    }
+      gameboardInstance: this,
+    };
 
     placeShip(placeShipArg);
   }
 
-  removePiece(bowCoordinates: IPosition) { }
-  
+  removePiece(bowCoordinates: IPosition) {}
+
   public prettyPrint() {
     return this._board.map((row) =>
-      row.map(symbol =>
-        symbol.description === 'VC' ? null : symbol.description)
+      row.map((symbol) =>
+        symbol.description === 'VC' ? null : symbol.description
+      )
     );
-  } 
-
-  public get board(): symbol[][] {
-    return this._board;
   }
 
-  public get fillValue(): symbol {
-    return this._fillValue;
+  public get board(): Gameboard {
+    return this._board;
   }
 
   public get boardSize(): number {
     return this._boardSize;
   }
   
+  public get fillValue(): symbol {
+    return this._fillValue;
+  }
+
+  public get fleetCoordinates(): IFleetCoordinates {
+    return this._fleetCoordinates;
+  }
 }
 
 export function createShipConfigurations(

@@ -1,6 +1,7 @@
 import {
   AxisArrayKey,
   Coordinates,
+  Gameboard,
   IPosition,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
@@ -35,7 +36,7 @@ export function getValidShipPositions({
   const extractAxisArray = (
     axisIndex: number,
     orientation: Orientation,
-    gameboard: Array<Array<symbol>> // or symbol[][]
+    gameboard: Gameboard
   ): Array<symbol> => {
     return orientation === 'horizontal'
       ? gameboard[axisIndex] // Returns row

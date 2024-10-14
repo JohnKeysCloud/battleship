@@ -1,3 +1,4 @@
+import { Gameboard } from '../types/logic-types';
 import { BattleshipBoardBuilder } from './bs-gameboard-builder';
 
 describe('`BattleshipBoardBuilder` Instance Board Creation', () => {
@@ -5,12 +6,12 @@ describe('`BattleshipBoardBuilder` Instance Board Creation', () => {
     let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
 
     // Hardcoded empty board representation
-    const emptyBoard = Array.from({ length: 10 }, () =>
+    const emptyBoard: Gameboard = Array.from({ length: 10 }, () =>
       Array(10).fill(Symbol('VC'))
     );
 
     // Inline serialization logic
-    const serializeBoard = (board: symbol[][]) =>
+    const serializeBoard = (board: Gameboard): string =>
       JSON.stringify(board, (key, value) => // {1}
         (typeof value === 'symbol' ? value.toString() : value)
     );

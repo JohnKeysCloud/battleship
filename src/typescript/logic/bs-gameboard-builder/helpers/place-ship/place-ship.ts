@@ -1,11 +1,20 @@
 import {
+  AxisArrayKey,
+  Coordinates,
+  CoordinatesArray,
+  CoordinatesSet,
+  CoordinatesSetMember,
+  Gameboard,
+  IFleetCoordinates,
+  IPlacePieceCallbackParams,
   IPosition,
   IShipPlacementConfigurations,
-  IPlacePieceCallbackParams,
+  IValidPositionsResult,
   ShipSymbolValue,
-  AxisArrayKey,
+  ShipType,
 } from '../../../types/logic-types';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
+import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 
 export function placeShip({
   gameboardInstance,
@@ -13,7 +22,26 @@ export function placeShip({
   coordinates,
   orientation
 }: IPlacePieceCallbackParams): void {
-  const arePositionsEqual = (testPosition: IPosition, validPosition: IPosition) => {
+  const checkIfCoordinatesInBounds = (
+    axisStart: number,
+    shipLength: number
+  ) => {
+    const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
+    if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
+      throw new Error(errorMessage);
+  };
+
+  const shipLength: number = ship.length;
+  const [bowX, bowY]: Coordinates = coordinates;
+  const isHorizontal: boolean = orientation === 'horizontal';
+  const axisStart: number = isHorizontal ? bowY : bowX;
+
+  checkIfCoordinatesInBounds(axisStart, shipLength);
+  
+  const arePositionsEqual = (
+    testPosition: IPosition,
+    validPosition: IPosition
+  ): boolean => {
     return (
       areArraysEqual(testPosition.bow, validPosition.bow) &&
       areArraysEqual(testPosition.stern, validPosition.stern)
@@ -23,43 +51,14 @@ export function placeShip({
     position: IPosition,
     shipConfigurations: IShipPlacementConfigurations,
     axisArrayKey: AxisArrayKey
-  ) => {
-    const validPositions = gameboardInstance.getValidPositions(shipConfigurations);
-    
-    return validPositions[axisArrayKey].some((validPosition: IPosition) => 
-      arePositionsEqual(position, validPosition));
+  ): boolean => {
+    const validPositions: IValidPositionsResult =
+      gameboardInstance.getValidPositions(shipConfigurations);
+
+    return validPositions[axisArrayKey].some((validPosition: IPosition) =>
+      arePositionsEqual(position, validPosition)
+    );
   };
-  const placeOnBoard = (
-    validPosition: IPosition,
-    shipSymbol: ShipSymbolValue,
-    isHorizontal: Boolean
-  ) => {
-    const gameboard = gameboardInstance.board;
-
-    const primary = isHorizontal ? validPosition.bow[0] : validPosition.bow[1];
-    const axisStart = isHorizontal ? validPosition.bow[1] : validPosition.bow[0];
-    const axisEnd = isHorizontal ? validPosition.stern[1] : validPosition.stern[0];
-
-    for (let i = axisStart; i <= axisEnd; i++) {
-      isHorizontal
-        ? (gameboard[primary][i] = shipSymbol)
-        : (gameboard[i][primary] = shipSymbol);
-    }
-
-    return gameboard;
-  };
-  const checkIfCoordinatesInBounds = (axisStart: number, shipLength: number) => {
-    const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
-    if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
-      throw new Error(errorMessage);
-  };
-
-  const shipLength = ship.length;
-  const [bowX, bowY] = coordinates;
-  const isHorizontal = orientation === 'horizontal';
-  const axisStart = isHorizontal ? bowY : bowX;
-
-  checkIfCoordinatesInBounds(axisStart, shipLength);
   
   const position: IPosition = {
     bow: coordinates,
@@ -67,20 +66,75 @@ export function placeShip({
       ? [bowX, bowY + shipLength - 1]
       : [bowX + shipLength - 1, bowY],
   };
-
   const shipConfigurations: IShipPlacementConfigurations = {
     shipLength,
     orientation
   };
-
   const axisArrayKey: AxisArrayKey = isHorizontal
     ? `row-${bowX}`
     : `column-${bowY}`; 
 
   if (isPositionValid(position, shipConfigurations, axisArrayKey)) {
-    placeOnBoard(position, ship.symbol, isHorizontal);
+    const getPlacementCoordinates = (
+      validPosition: IPosition,
+      isHorizontal: Boolean
+    ): CoordinatesArray => {
+      const placementCoordinates: CoordinatesArray = [];
+
+      const primary: number = isHorizontal
+        ? validPosition.bow[0]
+        : validPosition.bow[1];
+      const axisStart: number = isHorizontal
+        ? validPosition.bow[1]
+        : validPosition.bow[0];
+      const axisEnd: number = isHorizontal
+        ? validPosition.stern[1]
+        : validPosition.stern[0];
+
+      for (let i = axisStart; i <= axisEnd; i++) {
+        placementCoordinates.push(isHorizontal ? [primary, i] : [i, primary]);
+      }
+
+      return placementCoordinates;
+    };
+    const placeOnBoard = (
+      ship: BattleshipBuilder,
+      shipPlacementCoordinates: CoordinatesArray
+    ): void => {
+      const gameboard: Gameboard = gameboardInstance.board;
+      const shipSymbol: ShipSymbolValue = ship.symbol;
+
+      shipPlacementCoordinates.forEach((coordinates) => {
+        const [x, y] = coordinates;
+        gameboard[x][y] = shipSymbol;
+      });
+    };
+    const updateOccupiedCoordinatesSet = (
+      shipType: ShipType,
+      placementCoordinates: CoordinatesArray
+    ): void => {
+      const fleetCoordinates: IFleetCoordinates = gameboardInstance.fleetCoordinates;
+
+      if (!fleetCoordinates[shipType]) fleetCoordinates[shipType] = new Set();
+
+      const shipCoordinatesSet: CoordinatesSet = fleetCoordinates[shipType];
+
+      placementCoordinates.forEach((coordinates: Coordinates) => {
+        const [x, y] = coordinates;
+        const setMemberTemplate: CoordinatesSetMember = `[${x}, ${y}]`;
+        shipCoordinatesSet.add(setMemberTemplate);
+      });
+    };
+
+    const placementCoordinates: CoordinatesArray = getPlacementCoordinates(
+      position,
+      isHorizontal
+    );
+
+    placeOnBoard(ship, placementCoordinates);
+    updateOccupiedCoordinatesSet(ship.type, placementCoordinates);
   } else {
-    const errorMessage = `"${JSON.stringify(
+    const errorMessage: string = `"${JSON.stringify(
       position
     )}" is unavailable for ship with Size: ${shipLength} and Orientation: ${orientation}.`;
     throw new Error(errorMessage);

@@ -1,10 +1,10 @@
 import {
   IShipOptions,
-  ShipType,
   ShipSymbols,
-  SizeLookupKey,
-  Version,
   ShipSymbolValue,
+  ShipType,
+  SizeLookupKey,
+  Version
 } from '../types/logic-types';
 
 export const SHIP_SYMBOLS: ShipSymbols = {

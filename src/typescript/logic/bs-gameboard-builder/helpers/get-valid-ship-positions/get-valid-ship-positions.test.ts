@@ -1,4 +1,3 @@
-import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 import {
   AxisArrayKey,
   Coordinates,
@@ -8,6 +7,7 @@ import {
   IValidPositionsResult,
   Orientation,
 } from '../../../types/logic-types';
+import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
