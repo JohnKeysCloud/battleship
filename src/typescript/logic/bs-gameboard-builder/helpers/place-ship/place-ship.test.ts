@@ -1,9 +1,11 @@
 import {
   Coordinates,
+  Gameboard,
   IPlacePieceWrapperParams,
   IPosition,
   IShipPlacementConfigurations,
   Orientation,
+  ShipSymbolValue,
   ShipType
 } from '../../../types/logic-types';
 import {
@@ -30,14 +32,14 @@ describe('`placeShip`', () => {
   // 💭 Helpers
 
   const generateExpectedBoard = (input: IPlacePieceWrapperParams) => {
-    const expectedBoard = Array.from({ length: 10 }, () =>
+    const expectedBoard: Gameboard = Array.from({ length: 10 }, () =>
       Array(10).fill(testBoard.fillValue)
     );
 
-    const shipSymbol = input.ship.symbol;
-    const coordinates = input.coordinates;
-    const shipLength = input.ship.length;
-    const orientation = input.orientation;
+    const shipSymbol: ShipSymbolValue = input.ship.symbol;
+    const coordinates: Coordinates = input.coordinates;
+    const shipLength: number = input.ship.length;
+    const orientation: Orientation = input.orientation;
 
     if (orientation === 'horizontal') {
       for (let i = coordinates[1]; i < coordinates[1] + shipLength; i++) {
@@ -52,7 +54,7 @@ describe('`placeShip`', () => {
     return expectedBoard;
   };
 
-  const generateCoordinates = (xBow: number, yBow: number): Coordinates => [xBow, yBow];
+  const generateCoordinates = (bowX: number, bowY: number): Coordinates => [bowX, bowY];
 
   const generateOrientation = (orientation: Orientation): Orientation => {
     return orientation;
@@ -65,8 +67,8 @@ describe('`placeShip`', () => {
       shipLength: input.ship.length,
       orientation: input.orientation
     };
-    const isHorizontal = configurations.orientation === 'horizontal';
-    const shipLength = input.ship.length;
+    const isHorizontal: boolean = configurations.orientation === 'horizontal';
+    const shipLength: number = input.ship.length;
 
     return {
       bow: coordinates,
@@ -77,10 +79,10 @@ describe('`placeShip`', () => {
     };
   }
 
-  const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams) =>
+  const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string =>
     `"${JSON.stringify(generatePosition({ ship, coordinates, orientation }))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
 
-  const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams) => {
+  const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string => {
     return `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
   };
 
@@ -160,7 +162,7 @@ describe('`placeShip`', () => {
     expect(() => placeShip(input)).toThrow(expectedError);
   });
 
-  const outOfBoundTestCases = [
+  const outOfBoundsTestCases = [
     {
       input: {
         ship: testShip,
@@ -186,7 +188,7 @@ describe('`placeShip`', () => {
       }),
     },
   ]; 
-  test.each(outOfBoundTestCases)(
+  test.each(outOfBoundsTestCases)(
     'ship placement out of bounds throws error',
     ({ input, expectedError }) => {
       expect(() => placeShip(input)).toThrow(expectedError)

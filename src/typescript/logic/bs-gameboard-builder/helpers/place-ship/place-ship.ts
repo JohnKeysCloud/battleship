@@ -25,7 +25,7 @@ export function placeShip({
   const checkIfCoordinatesInBounds = (
     axisStart: number,
     shipLength: number
-  ) => {
+  ): void => {
     const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
     if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
       throw new Error(errorMessage);
@@ -81,15 +81,18 @@ export function placeShip({
     ): CoordinatesArray => {
       const placementCoordinates: CoordinatesArray = [];
 
+      const [bowX, bowY]: Coordinates = validPosition.bow;
+      const [sternX, sternY]: Coordinates = validPosition.stern;
+
       const primary: number = isHorizontal
-        ? validPosition.bow[0]
-        : validPosition.bow[1];
+        ? bowX
+        : bowY;
       const axisStart: number = isHorizontal
-        ? validPosition.bow[1]
-        : validPosition.bow[0];
+        ? bowY
+        : bowX;
       const axisEnd: number = isHorizontal
-        ? validPosition.stern[1]
-        : validPosition.stern[0];
+        ? sternY
+        : sternX;
 
       for (let i = axisStart; i <= axisEnd; i++) {
         placementCoordinates.push(isHorizontal ? [primary, i] : [i, primary]);
@@ -105,7 +108,7 @@ export function placeShip({
       const shipSymbol: ShipSymbolValue = ship.symbol;
 
       shipPlacementCoordinates.forEach((coordinates) => {
-        const [x, y] = coordinates;
+        const [x, y]: Coordinates = coordinates;
         gameboard[x][y] = shipSymbol;
       });
     };
@@ -120,7 +123,7 @@ export function placeShip({
       const shipCoordinatesSet: CoordinatesSet = fleetCoordinates[shipType];
 
       placementCoordinates.forEach((coordinates: Coordinates) => {
-        const [x, y] = coordinates;
+        const [x, y]: Coordinates = coordinates;
         const setMemberTemplate: CoordinatesSetMember = `[${x}, ${y}]`;
         shipCoordinatesSet.add(setMemberTemplate);
       });
