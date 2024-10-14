@@ -53,7 +53,7 @@ interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
   placePiece(options: IPlacePieceWrapperParams): void;
-  removePiece(endpoint: IPosition): void;
+  removePiece?(endpoint: IPosition): void;
   resetBoard(): void;
 }
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {

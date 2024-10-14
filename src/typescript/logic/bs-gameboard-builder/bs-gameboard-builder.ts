@@ -14,7 +14,7 @@ import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-va
 import { placeShip } from './helpers/place-ship/place-ship';
 
 export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
-  private static readonly vacant = Symbol('VC');
+  private static readonly vacant: symbol = Symbol('VC');
 
   private readonly _board: Gameboard;
   private readonly _boardSize: number = 10;
@@ -60,8 +60,6 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
 
     placeShip(placeShipArg);
   }
-
-  removePiece(bowCoordinates: IPosition) {}
 
   public prettyPrint() {
     return this._board.map((row) =>
