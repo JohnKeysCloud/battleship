@@ -14,14 +14,8 @@ export function getValidShipPositions({
   gameboardInstance,
 }: IValidPlacementCallbackParams): IValidPositionsResult {
   const validateArguments = (
-    orientation: Orientation,
     shipLength: number,
   ): void => {
-    // Validate orientation
-    if (!['horizontal', 'vertical'].includes(orientation)) {
-      throw new Error(`Invalid orientation. Must be 'horizontal' or 'vertical'.`);
-    }
-
     // Validate piece length
     if (shipLength < 2 || shipLength > 5) {
       throw new Error(
@@ -30,14 +24,14 @@ export function getValidShipPositions({
     }
   };
 
-  // TODO: Consider wrapping this function in a try-catch block when integrating with event handlers
-  validateArguments(orientation, shipLength);
+  // TODO: creating a shipLength type will remove the need for this helper
+  validateArguments(shipLength);
 
   const extractAxisArray = (
     axisIndex: number,
     orientation: Orientation,
     gameboard: Gameboard
-  ): Array<symbol> => {
+  ): Array<symbol> => { // or symbol[]
     return orientation === 'horizontal'
       ? gameboard[axisIndex] // Returns row
       : gameboard.map(row => row[axisIndex]); // Returns column
@@ -84,11 +78,11 @@ export function getValidShipPositions({
   };
 
   let validPositionsPerAxis: IValidPositionsResult = {}; 
-  const board = gameboardInstance.board;
+  const board: Gameboard = gameboardInstance.board;
 
   for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {
-    const axisArray = extractAxisArray(axisIndex, orientation, board);
-    const validPositions = findValidPositionsInAxis(
+    const axisArray: Array<symbol> = extractAxisArray(axisIndex, orientation, board);
+    const validPositions: IPosition[] = findValidPositionsInAxis(
       axisArray,
       orientation,
       axisIndex,
@@ -96,10 +90,8 @@ export function getValidShipPositions({
     );
 
     const axisTemplate: AxisArrayKey =
-      orientation === 'horizontal'
-        ? `row-${axisIndex}`
-        : `column-${axisIndex}`;
-    
+      orientation === 'horizontal' ? `row-${axisIndex}` : `column-${axisIndex}`;
+
     validPositionsPerAxis[axisTemplate] = validPositions;
   }
 

@@ -19,7 +19,9 @@ describe('`getValidShipPositions`', () => {
   });
 
   // Test function utility
-  const getValidShipPositions = (input: IShipPlacementConfigurations) =>
+  const getValidShipPositions = (
+    input: IShipPlacementConfigurations
+  ): IValidPositionsResult =>
     testBoard.getValidPositions(input);
 
   // Dynamically create expected test result
