@@ -2,7 +2,7 @@ import {
   ITestCaseShipHit,
   ShipType,
   Version,
-} from '../types/logic-types';
+} from '../../types/logic-types';
 import { BattleshipBuilder } from './bs-ship-builder';
 
 // Helper function to create a new instance of a ship

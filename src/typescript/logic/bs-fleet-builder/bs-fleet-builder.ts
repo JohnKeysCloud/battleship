@@ -3,7 +3,7 @@ import {
   FleetConfigs,
   ShipType,
   Version
-} from '../types/logic-types';
+} from '../../types/logic-types';
 import {
   BattleshipBuilder,
 } from '../bs-ship-builder/bs-ship-builder';

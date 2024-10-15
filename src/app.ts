@@ -1,9 +1,17 @@
-const content = document.getElementById('content');
+import { randomizeGameboard } from './typescript/setup/randomize-gameboard';
+import { players } from './typescript/state/player-state';
 
-content?.appendChild(document.createTextNode('Cyclone Studios Project Initialized: Hello World!'));
+function init() {
+  const randomizeGameboards = () => {
+    randomizeGameboard(players.playerOne);
+    randomizeGameboard(players.playerTwo);
+  };
 
-// * The use of ?. ensures that the code does not throw an error if content is null or undefined. If it is null, the code gracefully stops without attempting to call appendChild, thus avoiding a runtime error.
+  randomizeGameboards();
+}
 
-// * The optional chaining operator is useful when working with nested properties or methods that may not exist. It helps to avoid unnecessary null checks and makes the code more concise and readable. // If the current node is null, create and return a new node
+console.time('init');
+init();
+console.timeEnd('init');
 
-// 💭💭💭
+

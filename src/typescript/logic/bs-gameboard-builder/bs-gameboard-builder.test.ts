@@ -1,4 +1,4 @@
-import { Gameboard } from '../types/logic-types';
+import { Gameboard } from '../../types/logic-types';
 import { BattleshipBoardBuilder } from './bs-gameboard-builder';
 
 describe('`BattleshipBoardBuilder` Instance Board Creation', () => {

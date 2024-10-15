@@ -12,7 +12,7 @@ import {
   IValidPositionsResult,
   ShipSymbolValue,
   ShipType,
-} from '../../../types/logic-types';
+} from '../../../../types/logic-types';
 import { areArraysEqual } from '../../../../utilities/random-utilities'; 
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 

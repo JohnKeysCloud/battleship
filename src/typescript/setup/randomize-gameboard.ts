@@ -1,5 +1,4 @@
-
-import { PlayerState } from './types/setup-types';
+import { PlayerState } from '../types/state-types';
 import {
   AxisArrayKey,
   Coordinates,
@@ -11,7 +10,7 @@ import {
   IShipPlacementConfigurations,
   IValidPositionsResult,
   Orientation
-} from '../logic/types/logic-types';
+} from '../types/logic-types';
 import {
   areArraysEqual,
   getRandomInt,

@@ -1,8 +1,8 @@
-import { BattleshipBoardBuilder } from '../bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardBuilder } from '../logic/bs-gameboard-builder/bs-gameboard-builder';
 import {
   BattleshipBuilder,
   SHIP_SYMBOLS
-} from '../bs-ship-builder/bs-ship-builder';
+} from '../logic/bs-ship-builder/bs-ship-builder';
 
 // 💭 --------------------------------------------------------------
 // 💭 Enumerations

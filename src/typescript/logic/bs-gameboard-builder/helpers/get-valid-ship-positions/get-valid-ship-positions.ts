@@ -6,7 +6,7 @@ import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
-} from '../../../types/logic-types';
+} from '../../../../types/logic-types';
 
 export function getValidShipPositions({
   shipLength,

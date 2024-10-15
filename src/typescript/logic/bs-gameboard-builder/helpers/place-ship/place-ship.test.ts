@@ -7,7 +7,7 @@ import {
   Orientation,
   ShipSymbolValue,
   ShipType
-} from '../../../types/logic-types';
+} from '../../../../types/logic-types';
 import {
   BattleshipBoardBuilder,
 } from '../../bs-gameboard-builder';

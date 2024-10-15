@@ -9,7 +9,7 @@ import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
-} from '../types/logic-types';
+} from '../../types/logic-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
 
