@@ -4,11 +4,12 @@ import {
   IGridGameboardSquare,
   IPlacePieceWrapperParams,
   IPlacePieceCallbackParams,
-  IPosition,
   IShipPlacementConfigurations,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
+  Coordinates,
+  CoordinatesSetMember,
 } from '../../types/logic-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
@@ -59,6 +60,25 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     };
 
     placeShip(placeShipArg);
+  }
+
+  public getShipCoordinatesAt(coordinates: Coordinates) {
+    const [x, y] = coordinates;
+    
+    if (this.board[x][y] === this.fillValue) return `There is no ship at coordinates: [${coordinates}] `;
+
+    const formattedInputCoordinates: CoordinatesSetMember = `[${x}, ${y}]`;
+
+    for (const shipType in this.fleetCoordinates) {
+      const shipCoordinateSet = this.fleetCoordinates[shipType];
+
+      if (shipCoordinateSet.has(formattedInputCoordinates)) {
+        return {
+          type: shipType,
+          shipCoordinateSet
+        };
+      }
+    }
   }
 
   public prettyPrint() {
