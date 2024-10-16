@@ -1,4 +1,4 @@
-import { ShipType } from '../types/logic-types';
+import { ShipType } from '../../types/logic-types';
 import { BattleshipFleetBuilder } from './bs-fleet-builder';
 import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 
