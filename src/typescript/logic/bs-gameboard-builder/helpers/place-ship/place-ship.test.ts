@@ -43,11 +43,11 @@ describe('`placeShip`', () => {
 
     if (orientation === 'horizontal') {
       for (let i = coordinates[1]; i < coordinates[1] + shipLength; i++) {
-        expectedBoard[coordinates[0]][i] = shipSymbol;
+        expectedBoard[i][coordinates[0]] = shipSymbol;
       }
     } else {
       for (let i = coordinates[0]; i < coordinates[0] + shipLength; i++) {
-        expectedBoard[i][coordinates[1]] = shipSymbol;
+        expectedBoard[coordinates[1]][i] = shipSymbol;
       }
     }
 

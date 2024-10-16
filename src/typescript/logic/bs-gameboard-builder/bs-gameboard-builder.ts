@@ -65,7 +65,7 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
   public getShipCoordinatesAt(coordinates: Coordinates) {
     const [x, y] = coordinates;
     
-    if (this.board[x][y] === this.fillValue) return `There is no ship at coordinates: [${coordinates}] `;
+    if (this.board[y][x] === this.fillValue) return `There is no ship at coordinates: [${coordinates}] `;
 
     const formattedInputCoordinates: CoordinatesSetMember = `[${x}, ${y}]`;
 

@@ -109,7 +109,7 @@ export function placeShip({
 
       shipPlacementCoordinates.forEach((coordinates) => {
         const [x, y]: Coordinates = coordinates;
-        gameboard[x][y] = shipSymbol;
+        gameboard[y][x] = shipSymbol;
       });
     };
     const updateOccupiedCoordinatesSet = (

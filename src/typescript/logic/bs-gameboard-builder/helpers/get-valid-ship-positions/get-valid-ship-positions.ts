@@ -33,8 +33,8 @@ export function getValidShipPositions({
     gameboard: Gameboard
   ): Array<symbol> => { // or symbol[]
     return orientation === 'horizontal'
-      ? gameboard[axisIndex] // Returns row
-      : gameboard.map(row => row[axisIndex]); // Returns column
+    ? gameboard.map(row => row[axisIndex]) // Returns column
+    : gameboard[axisIndex] // Returns row
   };
 
   const findValidPositionsInAxis = (
