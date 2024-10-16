@@ -6,6 +6,7 @@ import {
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
+  ShipLength,
 } from '../../../../types/logic-types';
 
 export function getValidShipPositions({
@@ -13,20 +14,6 @@ export function getValidShipPositions({
   orientation,
   gameboardInstance,
 }: IValidPlacementCallbackParams): IValidPositionsResult {
-  const validateArguments = (
-    shipLength: number,
-  ): void => {
-    // Validate piece length
-    if (shipLength < 2 || shipLength > 5) {
-      throw new Error(
-        'Invalid piece length. Ship length must be between 2 and 5 units.'
-      );
-    }
-  };
-
-  // TODO: creating a shipLength type will remove the need for this helper
-  validateArguments(shipLength);
-
   const extractAxisArray = (
     axisIndex: number,
     orientation: Orientation,
@@ -41,7 +28,7 @@ export function getValidShipPositions({
     axisArray: Array<symbol>, // or symbol[]
     orientation: Orientation,
     axisIndex: number,
-    shipLength: number
+    shipLength: ShipLength
   ): IPosition[] => {
     // Edge case check for ship length greater than row length
     if (shipLength > axisArray.length) {

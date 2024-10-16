@@ -1,5 +1,6 @@
 import {
   IShipOptions,
+  ShipLength,
   ShipSymbols,
   ShipSymbolValue,
   ShipType,
@@ -16,7 +17,7 @@ export const SHIP_SYMBOLS: ShipSymbols = {
   [ShipType.PatrolBoat]: Symbol('PB')
 } as const;
 
-const sizeLookup: Record<SizeLookupKey, number | undefined> = {
+const sizeLookup: Record<SizeLookupKey, ShipLength | undefined> = {
   'battleship-1990': 4,
   'battleship-2002': 4,
   'carrier-1990': 5,
@@ -32,7 +33,7 @@ const sizeLookup: Record<SizeLookupKey, number | undefined> = {
 };
 
 export class BattleshipBuilder implements IShipOptions {
-  public readonly length: number;
+  public readonly length: ShipLength;
   public readonly seaworthy: boolean = true;
   public readonly symbol: ShipSymbolValue;
   private _hitCounter: number = 0;
@@ -41,7 +42,7 @@ export class BattleshipBuilder implements IShipOptions {
     this.symbol = SHIP_SYMBOLS[type];
 
     const key: SizeLookupKey = `${type}-${version}`;
-    const length: number | undefined = sizeLookup[key]; // Access using the typed key
+    const length: ShipLength | undefined = sizeLookup[key]; // Access using the typed key
     if (length === undefined) {
       throw new Error(`Invalid ship type/version combination: ${key}`);
     }

@@ -10,6 +10,7 @@ import {
   IPosition,
   IShipPlacementConfigurations,
   IValidPositionsResult,
+  ShipLength,
   ShipSymbolValue,
   ShipType,
 } from '../../../../types/logic-types';
@@ -24,14 +25,14 @@ export function placeShip({
 }: IPlacePieceCallbackParams): void {
   const checkIfCoordinatesInBounds = (
     axisStart: number,
-    shipLength: number
+    shipLength: ShipLength
   ): void => {
     const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
     if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
       throw new Error(errorMessage);
   };
 
-  const shipLength: number = ship.length;
+  const shipLength: ShipLength = ship.length;
   const [bowX, bowY]: Coordinates = coordinates;
   const isHorizontal: boolean = orientation === 'horizontal';
   const axisStart: number = isHorizontal ? bowY : bowX;

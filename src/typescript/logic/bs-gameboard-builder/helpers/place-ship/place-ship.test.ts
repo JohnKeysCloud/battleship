@@ -5,6 +5,7 @@ import {
   IPosition,
   IShipPlacementConfigurations,
   Orientation,
+  ShipLength,
   ShipSymbolValue,
   ShipType
 } from '../../../../types/logic-types';
@@ -38,7 +39,7 @@ describe('`placeShip`', () => {
 
     const shipSymbol: ShipSymbolValue = input.ship.symbol;
     const coordinates: Coordinates = input.coordinates;
-    const shipLength: number = input.ship.length;
+    const shipLength: ShipLength = input.ship.length;
     const orientation: Orientation = input.orientation;
 
     if (orientation === 'horizontal') {
@@ -68,7 +69,7 @@ describe('`placeShip`', () => {
       orientation: input.orientation
     };
     const isHorizontal: boolean = configurations.orientation === 'horizontal';
-    const shipLength: number = input.ship.length;
+    const shipLength: ShipLength = input.ship.length;
 
     return {
       bow: coordinates,

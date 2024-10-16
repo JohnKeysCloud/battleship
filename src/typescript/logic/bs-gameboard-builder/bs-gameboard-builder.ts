@@ -10,6 +10,7 @@ import {
   Orientation,
   Coordinates,
   CoordinatesSetMember,
+  ShipLength,
 } from '../../types/logic-types';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
@@ -107,7 +108,7 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
 }
 
 export function createShipConfigurations(
-  shipLength: number,
+  shipLength: ShipLength,
   orientation: Orientation,
 ): IShipPlacementConfigurations {
   return {

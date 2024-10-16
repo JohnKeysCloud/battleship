@@ -6,6 +6,7 @@ import {
   ITestCaseValidPositions,
   IValidPositionsResult,
   Orientation,
+  ShipLength,
 } from '../../../../types/logic-types';
 import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 
@@ -26,7 +27,7 @@ describe('`getValidShipPositions`', () => {
 
   // Dynamically create expected test result
   function createTestCaseResult(
-    gamePieceSize: number,
+    shipLength: ShipLength,
     orientation: Orientation,
   ): IValidPositionsResult {
     const createPosition = (
@@ -48,11 +49,11 @@ describe('`getValidShipPositions`', () => {
       validPositions[axisTemplate] = [];
 
       // Populates each array
-      for (let j = 0; j + (gamePieceSize - 1) < testBoard.boardSize; j++) {
+      for (let j = 0; j + (shipLength - 1) < testBoard.boardSize; j++) {
         let position: IPosition =
           orientation === 'horizontal'
-            ? createPosition([i, j], [i, j + gamePieceSize - 1])
-            : createPosition([j, i], [j + gamePieceSize - 1, i]);
+            ? createPosition([i, j], [i, j + shipLength - 1])
+            : createPosition([j, i], [j + shipLength - 1, i]);
 
         validPositions[axisTemplate].push(position);
       }

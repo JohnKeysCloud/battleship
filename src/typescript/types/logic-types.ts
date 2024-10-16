@@ -39,6 +39,7 @@ export type ShipConfig = {
   type: ShipType;
   version?: Version;
 };
+export type ShipLength = 2 | 3 | 4 | 5;
 export type ShipSymbols = {
   [key in ShipType]: symbol; // Each key in ShipType maps to a symbol
 };
@@ -74,13 +75,13 @@ export interface IPosition {
 }
 export interface IShipOptions {
   hitCounter: number;
-  length: number;
+  length: ShipLength;
   type: ShipType;
   version: Version;
 }
 export interface IShipPlacementConfigurations {
   orientation: Orientation;
-  shipLength: number;
+  shipLength: ShipLength;
 }
 export interface ITestCaseShipHit {
   expected: string; // Expected output
