@@ -6,7 +6,7 @@ import {
   ITestCaseValidPositions,
   IValidPositionsResult,
   Orientation,
-} from '../../../types/logic-types';
+} from '../../../../types/logic-types';
 import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 
 describe('`getValidShipPositions`', () => {
