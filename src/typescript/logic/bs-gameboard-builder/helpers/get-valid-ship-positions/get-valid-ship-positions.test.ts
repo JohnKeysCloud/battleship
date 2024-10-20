@@ -46,14 +46,14 @@ describe('`getValidShipPositions`', () => {
         orientation === 'horizontal' ? `row-${i}` : `column-${i}`;
 
       // Initializes array for row/column
-      validPositions[axisTemplate] = [];
+      if(!validPositions[axisTemplate]) validPositions[axisTemplate] = [];
 
       // Populates each array
       for (let j = 0; j + (shipLength - 1) < testBoard.boardSize; j++) {
         let position: IPosition =
           orientation === 'horizontal'
-            ? createPosition([i, j], [i, j + shipLength - 1])
-            : createPosition([j, i], [j + shipLength - 1, i]);
+            ? createPosition([j, i], [j + shipLength - 1, i])
+            : createPosition([i, j], [i, j + shipLength - 1]);
 
         validPositions[axisTemplate].push(position);
       }

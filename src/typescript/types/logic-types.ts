@@ -54,13 +54,18 @@ interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
   placePiece(options: IPlacePieceWrapperParams): void;
-  removePiece?(endpoint: IPosition): void;
+  removePiece?(coordinates: Coordinates): void;
   resetBoard(): void;
 }
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 }
-export interface IFleetCoordinates extends OccupiedPositionsMap {}
+export interface IFleetCoordinates extends OccupiedPositionsMap { }
+
+export interface IPlacementConfigurations {
+  coordinatesArray: CoordinatesArray | null;
+  orientation: Orientation | null;
+}
 export interface IPlacePieceWrapperParams {
   coordinates: Coordinates;
   orientation: Orientation;

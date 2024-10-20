@@ -19,37 +19,34 @@ export function getValidShipPositions({
     orientation: Orientation,
     gameboard: Gameboard
   ): Array<symbol> => { // or symbol[]
+    
     return orientation === 'horizontal'
-    ? gameboard.map(row => row[axisIndex]) // Returns column
-    : gameboard[axisIndex] // Returns row
+      ? gameboard[axisIndex] // Returns row #<axisIndex>
+      : gameboard.map(row => row[axisIndex]) // `y` values at column-<axisIndex>
   };
-
   const findValidPositionsInAxis = (
     axisArray: Array<symbol>, // or symbol[]
-    orientation: Orientation,
+    isHorizontal: boolean,
     axisIndex: number,
     shipLength: ShipLength
   ): IPosition[] => {
-    // Edge case check for ship length greater than row length
-    if (shipLength > axisArray.length) {
-      throw new Error('Ship length cannot be greater than axisArray length.');
-    }
-
     let streak: number = 0;
     let validAxisPositions: IPosition[] = [];
-
+    
     for (let i = 0; i < axisArray.length; i++) {
       if (axisArray[i] === gameboardInstance.fillValue) {
         streak++;
-
+        
         if (streak >= shipLength) {
           const bowPosition: Coordinates =
-            orientation === 'horizontal'
-              ? [axisIndex, i - (shipLength - 1)]
-              : [i - (shipLength - 1), axisIndex];
+            isHorizontal
+            ? [i - (shipLength - 1), axisIndex]
+            : [axisIndex, i - (shipLength - 1)];
           
           const sternPosition: Coordinates =
-            orientation === 'horizontal' ? [axisIndex, i] : [i, axisIndex];
+            isHorizontal
+              ? [i, axisIndex]
+              : [axisIndex, i];
 
           validAxisPositions.push({
             bow: bowPosition,
@@ -64,21 +61,24 @@ export function getValidShipPositions({
     return validAxisPositions;
   };
 
-  let validPositionsPerAxis: IValidPositionsResult = {}; 
+  const validPositionsPerAxis: IValidPositionsResult = {}; 
   const board: Gameboard = gameboardInstance.board;
+  const isHorizontal = orientation === 'horizontal';
 
   for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {
     const axisArray: Array<symbol> = extractAxisArray(axisIndex, orientation, board);
     const validPositions: IPosition[] = findValidPositionsInAxis(
       axisArray,
-      orientation,
+      isHorizontal,
       axisIndex,
       shipLength
     );
-
+    
     const axisTemplate: AxisArrayKey =
-      orientation === 'horizontal' ? `row-${axisIndex}` : `column-${axisIndex}`;
-
+      isHorizontal
+        ? `row-${axisIndex}`
+        : `column-${axisIndex}`;
+    
     validPositionsPerAxis[axisTemplate] = validPositions;
   }
 

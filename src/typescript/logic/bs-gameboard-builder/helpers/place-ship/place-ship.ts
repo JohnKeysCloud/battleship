@@ -10,6 +10,7 @@ import {
   IPosition,
   IShipPlacementConfigurations,
   IValidPositionsResult,
+  Orientation,
   ShipLength,
   ShipSymbolValue,
   ShipType,
@@ -43,6 +44,7 @@ export function placeShip({
     testPosition: IPosition,
     validPosition: IPosition
   ): boolean => {
+
     return (
       areArraysEqual(testPosition.bow, validPosition.bow) &&
       areArraysEqual(testPosition.stern, validPosition.stern)
@@ -55,7 +57,7 @@ export function placeShip({
   ): boolean => {
     const validPositions: IValidPositionsResult =
       gameboardInstance.getValidPositions(shipConfigurations);
-
+            
     return validPositions[axisArrayKey].some((validPosition: IPosition) =>
       arePositionsEqual(position, validPosition)
     );
@@ -64,17 +66,18 @@ export function placeShip({
   const position: IPosition = {
     bow: coordinates,
     stern: isHorizontal
-      ? [bowX, bowY + shipLength - 1]
-      : [bowX + shipLength - 1, bowY],
+      ? [bowX + shipLength - 1, bowY]
+      : [bowX, bowY + shipLength - 1],
   };
+
   const shipConfigurations: IShipPlacementConfigurations = {
     shipLength,
     orientation
   };
   const axisArrayKey: AxisArrayKey = isHorizontal
-    ? `row-${bowX}`
-    : `column-${bowY}`; 
-
+    ? `row-${bowY}`
+    : `column-${bowX}`; 
+    
   if (isPositionValid(position, shipConfigurations, axisArrayKey)) {
     const getPlacementCoordinates = (
       validPosition: IPosition,
@@ -86,17 +89,17 @@ export function placeShip({
       const [sternX, sternY]: Coordinates = validPosition.stern;
 
       const primary: number = isHorizontal
-        ? bowX
-        : bowY;
-      const axisStart: number = isHorizontal
         ? bowY
         : bowX;
+      const axisStart: number = isHorizontal
+        ? bowX
+        : bowY;
       const axisEnd: number = isHorizontal
-        ? sternY
-        : sternX;
+        ? sternX
+        : sternY;
 
       for (let i = axisStart; i <= axisEnd; i++) {
-        placementCoordinates.push(isHorizontal ? [primary, i] : [i, primary]);
+        placementCoordinates.push(isHorizontal ? [i, primary] : [primary, i]);
       }
 
       return placementCoordinates;
@@ -112,6 +115,16 @@ export function placeShip({
         const [x, y]: Coordinates = coordinates;
         gameboard[y][x] = shipSymbol;
       });
+    };
+    const setShipPlacementConfigurations = (
+      ship: BattleshipBuilder,
+      coordinatesArray: CoordinatesArray,
+      orientation: Orientation
+    ): void => {
+      ship.placementConfigurations = {
+        coordinatesArray,
+        orientation,
+      };
     };
     const updateOccupiedCoordinatesSet = (
       shipType: ShipType,
@@ -136,11 +149,17 @@ export function placeShip({
     );
 
     placeOnBoard(ship, placementCoordinates);
+    setShipPlacementConfigurations(
+      ship,
+      placementCoordinates,
+      orientation
+    );
     updateOccupiedCoordinatesSet(ship.type, placementCoordinates);
   } else {
     const errorMessage: string = `"${JSON.stringify(
       position
     )}" is unavailable for ship with Size: ${shipLength} and Orientation: ${orientation}.`;
+
     throw new Error(errorMessage);
   }
 }

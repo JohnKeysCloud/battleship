@@ -29,7 +29,7 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     );
   }
 
-  getValidPositions({
+  public getValidPositions({
     orientation,
     shipLength,
   }: IShipPlacementConfigurations): IValidPositionsResult {
@@ -48,7 +48,7 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     }
   }
 
-  placePiece({
+  public placePiece({
     ship,
     coordinates,
     orientation,
@@ -63,11 +63,15 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     placeShip(placeShipArg);
   }
 
-  public getShipCoordinatesAt(coordinates: Coordinates) {
+  private areCoordinatesVacant(coordinates: Coordinates) {
     const [x, y] = coordinates;
-    
-    if (this.board[y][x] === this.fillValue) return `There is no ship at coordinates: [${coordinates}] `;
+    return this.board[y][x] === this.fillValue;
+  }
 
+  private getShipCoordinatesAt(coordinates: Coordinates) {
+    if (this.areCoordinatesVacant(coordinates)) return;
+    
+    const [x, y] = coordinates;
     const formattedInputCoordinates: CoordinatesSetMember = `[${x}, ${y}]`;
 
     for (const shipType in this.fleetCoordinates) {
@@ -82,12 +86,47 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     }
   }
 
+  removePiece(coordinates: Coordinates): void {
+    if (this.areCoordinatesVacant(coordinates))
+      return console.log(
+        `There is no ship at coordinates [${coordinates}]`
+      );
+
+    const shipToRemove = this.getShipCoordinatesAt(coordinates);
+    const [x, y] = coordinates;
+
+    console.log(shipToRemove);
+
+    // TODO: ⬇️
+    // loop through fleetCoordinates
+    // if the set contains the input coordinates:
+    // take all coordinates from that set
+    // replace those coordinates on the gameboard with the gameboard fill value
+    // ? accept ship parameter to adjust configurations on ship
+
+    // return void
+  }
+
+  movePiece(currentCoordinates: Coordinates, newBowCoordinates: Coordinates) {
+    const shipToMove = this.getShipCoordinatesAt(currentCoordinates);
+
+    // removePiece(shipToMove)
+    // ...
+  }
+
+  rotatePiece(currentCoordinates: Coordinates) {
+    const shipToRotate = this.getShipCoordinatesAt(currentCoordinates);
+
+    // removePiece(shipToRotate)
+    // ...
+  }
+
   public prettyPrint() {
-    return this._board.map((row) =>
+    console.table(this._board.map((row) =>
       row.map((symbol) =>
         symbol.description === 'VC' ? null : symbol.description
       )
-    );
+    ));
   }
 
   public get board(): Gameboard {

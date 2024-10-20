@@ -1,4 +1,5 @@
 import {
+  IPlacementConfigurations,
   IShipOptions,
   ShipLength,
   ShipSymbols,
@@ -36,6 +37,10 @@ export class BattleshipBuilder implements IShipOptions {
   public readonly length: ShipLength;
   public readonly seaworthy: boolean = true;
   public readonly symbol: ShipSymbolValue;
+  public placementConfigurations: IPlacementConfigurations = {
+    coordinatesArray: null,
+    orientation: null
+  };
   private _hitCounter: number = 0;
 
   constructor(public readonly type: ShipType, public readonly version: Version = 2002) {

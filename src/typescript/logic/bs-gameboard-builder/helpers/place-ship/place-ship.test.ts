@@ -39,16 +39,17 @@ describe('`placeShip`', () => {
 
     const shipSymbol: ShipSymbolValue = input.ship.symbol;
     const coordinates: Coordinates = input.coordinates;
+    const [x, y]: Coordinates = coordinates;
     const shipLength: ShipLength = input.ship.length;
     const orientation: Orientation = input.orientation;
 
     if (orientation === 'horizontal') {
-      for (let i = coordinates[1]; i < coordinates[1] + shipLength; i++) {
-        expectedBoard[i][coordinates[0]] = shipSymbol;
+      for (let i = x; i < x + shipLength; i++) {
+        expectedBoard[y][i] = shipSymbol;
       }
     } else {
-      for (let i = coordinates[0]; i < coordinates[0] + shipLength; i++) {
-        expectedBoard[coordinates[1]][i] = shipSymbol;
+      for (let i = y; i < y + shipLength; i++) {
+        expectedBoard[i][x] = shipSymbol;
       }
     }
 
@@ -62,8 +63,8 @@ describe('`placeShip`', () => {
   }
   
   const generatePosition = (input: IPlacePieceWrapperParams): IPosition => {
-
     const coordinates: Coordinates = generateCoordinates(input.coordinates[0], input.coordinates[1]);
+    const [x, y]: Coordinates = coordinates;
     const configurations: IShipPlacementConfigurations = {
       shipLength: input.ship.length,
       orientation: input.orientation
@@ -73,10 +74,9 @@ describe('`placeShip`', () => {
 
     return {
       bow: coordinates,
-      stern:
-        isHorizontal
-          ? [coordinates[0], coordinates[1] + shipLength - 1]
-          : [coordinates[0] + shipLength - 1, coordinates[1]],
+      stern: isHorizontal
+        ? [x + shipLength - 1, y]
+        : [x, y + shipLength - 1],
     };
   }
 
@@ -128,24 +128,24 @@ describe('`placeShip`', () => {
     {
       input: {
         ship: testShip,
-        coordinates: generateCoordinates(0, 3),
+        coordinates: generateCoordinates(3, 0),
         orientation: generateOrientation('horizontal')
       },
       expectedError: generateOverlapErrorMessage({
         ship: testShip,
-        coordinates: [0, 3],
+        coordinates: [3, 0],
         orientation: 'horizontal',
       }),
     },
     {
       input: {
         ship: testShip,
-        coordinates: generateCoordinates(0, 3),
+        coordinates: generateCoordinates(3, 0),
         orientation: generateOrientation('vertical'),
       },
       expectedError: generateOverlapErrorMessage({
         ship: testShip,
-        coordinates: [0, 3],
+        coordinates: [3, 0],
         orientation: 'vertical',
       }),
     },
@@ -153,14 +153,13 @@ describe('`placeShip`', () => {
   test.each(overlapTestCases)(
     'ship placement overlap throws error',
     ({ input, expectedError }) => {
+      placeShip({
+        ship: testShip,
+        coordinates: [0, 0],
+        orientation: 'horizontal',
+      });
       
-    placeShip({
-      ship: testShip,
-      coordinates: [0, 0],
-      orientation: 'horizontal',
-    });
-      
-    expect(() => placeShip(input)).toThrow(expectedError);
+      expect(() => placeShip(input)).toThrow(expectedError);
   });
 
   const outOfBoundsTestCases = [

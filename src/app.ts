@@ -7,7 +7,14 @@ function init() {
     randomizeGameboard(players.playerTwo);
   };
 
+  console.time('randomizeGameboards');
   randomizeGameboards();
+  console.timeEnd('randomizeGameboards');
+
+  const computerBoardInstance = players.playerTwo.gameboardInstance;
+
+  computerBoardInstance.prettyPrint();
+  computerBoardInstance.removePiece([3, 4]);
 }
 
 console.time('init');
