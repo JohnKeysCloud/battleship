@@ -1,21 +1,22 @@
 import {
+  Coordinates,
+  CoordinatesSetMember,
   Gameboard,
+  IBattleshipGameboard,
   IFleetCoordinates,
-  IGridGameboardSquare,
   IPlacePieceWrapperParams,
   IPlacePieceCallbackParams,
   IShipPlacementConfigurations,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
-  Coordinates,
-  CoordinatesSetMember,
   ShipLength,
 } from '../../types/logic-types';
+import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
 
-export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
+export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
   private static readonly vacant: symbol = Symbol('VC');
 
   private readonly _board: Gameboard;
@@ -86,23 +87,16 @@ export class BattleshipBoardBuilder implements IGridGameboardSquare<symbol> {
     }
   }
 
-  removePiece(coordinates: Coordinates): void {
-    if (this.areCoordinatesVacant(coordinates))
-      return console.log(
-        `There is no ship at coordinates [${coordinates}]`
-      );
+  removePiece(ship: BattleshipBuilder): void {
+    let shipCoordinates = ship.placementConfigurations.coordinatesArray;
 
-    const shipToRemove = this.getShipCoordinatesAt(coordinates);
-    const [x, y] = coordinates;
+    console.log(shipCoordinates);
+    shipCoordinates?.forEach(coordinates => {
+      const [x, y] = coordinates;
+      this.board[y][x] = this.fillValue;
+    });
 
-    console.log(shipToRemove);
 
-    // TODO: ⬇️
-    // loop through fleetCoordinates
-    // if the set contains the input coordinates:
-    // take all coordinates from that set
-    // replace those coordinates on the gameboard with the gameboard fill value
-    // ? accept ship parameter to adjust configurations on ship
 
     // return void
   }

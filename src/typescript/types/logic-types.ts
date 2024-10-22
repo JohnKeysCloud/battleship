@@ -25,7 +25,7 @@ export type CoordinatesArray = Coordinates[];
 export type CoordinatesSet = Set<CoordinatesSetMember>;
 export type CoordinatesSetMember = `[${number}, ${number}]`;
 export type Fleet = {
-  [key in ShipType]?: BattleshipBuilder;
+  [key in ShipType]: BattleshipBuilder;
 };
 export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
@@ -53,13 +53,20 @@ export type Version = 1990 | 2002;
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
-  placePiece(options: IPlacePieceWrapperParams): void;
-  removePiece?(coordinates: Coordinates): void;
+  placePiece(...args: any): void;
+  removePiece(...args: any): void;
   resetBoard(): void;
 }
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 }
+
+export interface IBattleshipGameboard<T> extends IGridGameboardSquare<T> {
+  placePiece(options: IPlacePieceWrapperParams): void;
+  removePiece(ship: BattleshipBuilder): void;
+  resetBoard(): void;
+}
+
 export interface IFleetCoordinates extends OccupiedPositionsMap { }
 
 export interface IPlacementConfigurations {
