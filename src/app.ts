@@ -17,7 +17,7 @@ function init() {
   const computerBoardInstance = players.playerTwo.gameboardInstance;
   const computerCarrier: BattleshipBuilder = players.playerTwo.fleet.carrier!;
   computerBoardInstance.prettyPrint();
-  computerBoardInstance.movePiece(computerCarrier, [0,0]);
+  computerBoardInstance.rotatePiece(computerCarrier);
   computerBoardInstance.prettyPrint();
 }
 

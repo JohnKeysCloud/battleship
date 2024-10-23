@@ -167,13 +167,63 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
     }
   }
 
-  public rotatePiece(ship: BattleshipBuilder, currentCoordinates: Coordinates) {
+  public rotatePiece(ship: BattleshipBuilder) {
     if (!this.isShipValidForRemoval(ship)) return;
 
-    const shipToRotate = this.getShipCoordinatesAt(currentCoordinates);
+    // 💭 Requires bound & coordinate occupation checks
 
-    // removePiece(shipToRotate)
-    // ...
+    // > 90 degree rotation from og position - horizontal
+    // ! Same coordinates, different orientation 🚬
+
+    // > 180 rotation from og position - horizontal
+    // ! Shift bow placement of `x - shipLength - 1`
+    // ! Old bow coordinates becomes new stern coordinates
+
+    // 🟢 ship.length === 3 | [x,y] => [4,0], [5,0], [6,0]
+    // ? before:
+    // [x,x,x,x,o,o,o,x,x,x]
+    // ? after:
+    // [x,x,o,o,o,x,x,x,x,x]
+    // * New x value (left shift) 2 units for bow coordinates (ship length - 1)
+    // * old bow becomes new stern
+
+    // 🟢 ship length === 5 | [x,y] => [2,0], [3,0], [4,0], [5,0], [6,0]
+    // ? before:
+    // [x,x,o,o,o,o,o,x,x,x]
+    // * Out of bounds
+
+    // 🟢 ship length === 5 | [x,y] => [5,0], [6,0], [7,0], [8,0], [9,0]
+    // ? before:
+    // [x,x,x,x,x,o,o,o,o,o]
+    // ? after:
+    // [x,o,o,o,o,o,x,x,x,x]
+    // * New x value (left shift) 4 units for bow coordinates (ship length - 1)
+
+    // > 270 rotation from og position - horizontal
+    // ! New bow coordinates requires old bow/new stern `y - shipLength - 1`
+    // ! New stern coordinates becomes old stern coordinates
+    // ! New bow coo
+
+
+    // 🟢 ship.length === 4
+    // ? before: (bow at [4,5] represented by "+" | stern at [7,5] represented by "~" )
+    // row-5: [x,x,x,+,o,o,~,x,x,x]
+    // ? after:
+    // column-4: [
+    //            x,
+    //            x,
+    //            +,  // [4,2] new stern (new stern/old bow Y value - ship length - 1) 
+    //            o,  
+    //            o,  
+    //            ~,  // [4,5] (Old bow coordinates)
+    //            x,
+    //            o,
+    //            o,
+    //            o,  
+    //           ]
+    // * New stern becomes old bow, and new bow coordinates are old bow/new stern Y-value - ship length -1
+
+    console.log(ship.placementConfigurations.coordinatesArray);
   }
 
   public prettyPrint() {
