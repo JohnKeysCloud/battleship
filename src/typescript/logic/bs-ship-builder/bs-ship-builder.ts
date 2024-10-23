@@ -55,7 +55,7 @@ export class BattleshipBuilder implements IShipOptions {
     this.length = length;
   }
 
-  hit = (): string => {
+  public hit = (): string => {
     if (!this.isSeaworthy()) return 'This ship has already perished.';
     
     this._hitCounter++;
@@ -63,6 +63,13 @@ export class BattleshipBuilder implements IShipOptions {
   };
 
   isSeaworthy = (): boolean => this.hitCounter < this.length;
+
+  public remove = () => {
+    this.placementConfigurations = {
+      coordinatesArray: null,
+      orientation: null
+    }
+  };
 
   public get hitCounter(): number {
     return this._hitCounter;

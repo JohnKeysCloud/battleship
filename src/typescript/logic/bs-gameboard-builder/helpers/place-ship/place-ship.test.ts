@@ -2,8 +2,6 @@ import {
   Coordinates,
   Gameboard,
   IPlacePieceWrapperParams,
-  IPosition,
-  IShipPlacementConfigurations,
   Orientation,
   ShipLength,
   ShipSymbolValue,
@@ -14,6 +12,7 @@ import {
 } from '../../bs-gameboard-builder';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
+import { createTestPosition } from '../../../../utilities/logic-utilities';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
@@ -61,27 +60,9 @@ describe('`placeShip`', () => {
   const generateOrientation = (orientation: Orientation): Orientation => {
     return orientation;
   }
-  
-  const generatePosition = (input: IPlacePieceWrapperParams): IPosition => {
-    const coordinates: Coordinates = generateCoordinates(input.coordinates[0], input.coordinates[1]);
-    const [x, y]: Coordinates = coordinates;
-    const configurations: IShipPlacementConfigurations = {
-      shipLength: input.ship.length,
-      orientation: input.orientation
-    };
-    const isHorizontal: boolean = configurations.orientation === 'horizontal';
-    const shipLength: ShipLength = input.ship.length;
-
-    return {
-      bow: coordinates,
-      stern: isHorizontal
-        ? [x + shipLength - 1, y]
-        : [x, y + shipLength - 1],
-    };
-  }
 
   const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string =>
-    `"${JSON.stringify(generatePosition({ ship, coordinates, orientation }))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
+    `"${JSON.stringify(createTestPosition(coordinates, orientation, testShip.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
 
   const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string => {
     return `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;

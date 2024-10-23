@@ -1,6 +1,6 @@
 import { PlayerState } from "../types/state-types";
-import { createBattleshipBoardSet } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
-import { createBattleshipFleets } from "../logic/bs-fleet-builder/bs-fleet-builder";
+import { createBattleshipBoardSet } from "../utilities/logic-utilities";
+import { createBattleshipFleets } from "../utilities/logic-utilities";
 
 const battleShipGameboards = createBattleshipBoardSet();
 const battleShipFleets = createBattleshipFleets();

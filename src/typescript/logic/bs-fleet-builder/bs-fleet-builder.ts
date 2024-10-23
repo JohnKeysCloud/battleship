@@ -2,7 +2,6 @@ import {
   Fleet,
   FleetConfigs,
   ShipType,
-  Version
 } from '../../types/logic-types';
 import {
   BattleshipBuilder,
@@ -63,16 +62,4 @@ export class BattleshipFleetBuilder {
 
     return ship;
   }
-}
-
-export function createBattleshipFleets(version: Version = 2002) {
-  const fleet =
-    version === 2002
-      ? BattleshipFleetBuilder.createHasbroFleet
-      : BattleshipFleetBuilder.createMBFleet;
-
-  return {
-    playerOne: fleet(),
-    playerTwo: fleet(),
-  };
 }

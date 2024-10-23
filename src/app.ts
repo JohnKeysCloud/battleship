@@ -8,14 +8,16 @@ function init() {
     randomizeGameboard(players.playerTwo);
   };
 
+  // benchmark board set randomization
   console.time('randomizeGameboards');
   randomizeGameboards();
   console.timeEnd('randomizeGameboards');
 
+  // `movePiece` Test
   const computerBoardInstance = players.playerTwo.gameboardInstance;
-  const computerCarrier: BattleshipBuilder = players.playerTwo.fleet.carrier;
+  const computerCarrier: BattleshipBuilder = players.playerTwo.fleet.carrier!;
   computerBoardInstance.prettyPrint();
-  computerBoardInstance.removePiece(computerCarrier);
+  computerBoardInstance.movePiece(computerCarrier, [0,0]);
   computerBoardInstance.prettyPrint();
 }
 

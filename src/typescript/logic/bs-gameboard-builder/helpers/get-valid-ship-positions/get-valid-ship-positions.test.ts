@@ -8,7 +8,8 @@ import {
   Orientation,
   ShipLength,
 } from '../../../../types/logic-types';
-import { createShipConfigurations, BattleshipBoardBuilder } from '../../bs-gameboard-builder';
+import { createAxisArrayKey, createShipConfigurations } from '../../../../utilities/logic-utilities';
+import { BattleshipBoardBuilder } from '../../bs-gameboard-builder';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
@@ -39,23 +40,23 @@ describe('`getValidShipPositions`', () => {
 
     // Initalizes return object to contain all valid positions
     const validPositions: IValidPositionsResult = {};
+    const isHorizontal = orientation === 'horizontal';
 
     // Creates row/column objects
     for (let i = 0; i < testBoard.boardSize; i++) {
-      const axisTemplate: AxisArrayKey =
-        orientation === 'horizontal' ? `row-${i}` : `column-${i}`;
+      const axisArrayKey: AxisArrayKey = createAxisArrayKey(i, isHorizontal);
 
       // Initializes array for row/column
-      if(!validPositions[axisTemplate]) validPositions[axisTemplate] = [];
+      if(!validPositions[axisArrayKey]) validPositions[axisArrayKey] = [];
 
       // Populates each array
       for (let j = 0; j + (shipLength - 1) < testBoard.boardSize; j++) {
         let position: IPosition =
-          orientation === 'horizontal'
+          isHorizontal
             ? createPosition([j, i], [j + shipLength - 1, i])
             : createPosition([i, j], [i, j + shipLength - 1]);
 
-        validPositions[axisTemplate].push(position);
+        validPositions[axisArrayKey].push(position);
       }
     }
 

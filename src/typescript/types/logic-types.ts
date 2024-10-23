@@ -22,17 +22,17 @@ export enum ShipType {
 export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type CoordinatesArray = Coordinates[];
-export type CoordinatesSet = Set<CoordinatesSetMember>;
+export type CoordinatesSet = Set<CoordinatesSetMember> | null;
 export type CoordinatesSetMember = `[${number}, ${number}]`;
 export type Fleet = {
-  [key in ShipType]: BattleshipBuilder;
+  [key in ShipType]?: BattleshipBuilder;
 };
 export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
 };
 export type Gameboard = symbol[][];
 export type OccupiedPositionsMap = {
-  [key in ShipType]?: CoordinatesSet;
+  [key in ShipType]?: CoordinatesSet | null;
 };
 export type Orientation = 'horizontal' | 'vertical';
 export type ShipConfig = {
