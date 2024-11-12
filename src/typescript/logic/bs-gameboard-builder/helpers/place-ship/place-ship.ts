@@ -33,7 +33,7 @@ export function placeShip({
   const axisEnd = axisStart + shipLength - 1;
 
   if (!isCoordinateInBounds(axisEnd, gameboardInstance.boardSize)) {
-    const errorMessage: string = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
+    const errorMessage: string = `Invalid Command: The ship placement attempt with the following configurations is out of bounds - Coordinates: ${coordinates}, Length: ${ship.length}, Orientation: ${orientation}.`;
     throw new Error(errorMessage);
   };
 
@@ -41,7 +41,7 @@ export function placeShip({
     console.warn(`Invalid Command: The ${ship.type} has already been placed.`);
     return;
   };
-  
+
   const isPositionValid = (
     position: IPosition,
     shipConfigurations: IShipPlacementConfigurations,
@@ -159,7 +159,7 @@ export function placeShip({
     );
     updateOccupiedCoordinatesSet(ship.type, placementCoordinates);
   } else {
-    const errorMessage: string = `"${JSON.stringify(
+    const errorMessage: string = `Invalid Command: "${JSON.stringify(
       position
     )}" is unavailable for ship with Size: ${shipLength} and Orientation: ${orientation}.`;
 

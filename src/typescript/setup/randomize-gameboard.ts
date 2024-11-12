@@ -61,7 +61,7 @@ export function randomizeGameboard(player: PlayerState) {
     attempts: number = 0
   ): Coordinates => {
     if (attempts > 100)
-      throw new Error(`Too many attempts to place ship: ${ship.type}`);
+      throw new Error(`Max recursion depth exceeded when placing the ${ship.type}.`);
 
     const coordinates: Coordinates = generateRandomCoordinates(
       ship.length,

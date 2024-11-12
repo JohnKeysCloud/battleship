@@ -57,7 +57,7 @@ export class BattleshipFleetBuilder {
     const ship = this.fleet[shipType];
 
     if (!ship) {
-      throw new Error(`Ship of type ${shipType} not found in fleet.`);
+      throw new Error(`Invalid Command: Ship of type ${shipType} not found in fleet.`);
     }
 
     return ship;

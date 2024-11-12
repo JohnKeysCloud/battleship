@@ -17,12 +17,11 @@ import { createPositionObject } from '../../../../utilities/logic-utilities';
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
   // 💭 Setup
+  const getNewCarrierTestShip = (): BattleshipBuilder => BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
   let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
-  let testShip: BattleshipBuilder = BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
 
   beforeEach(() => {
     testBoard = new BattleshipBoardBuilder();
-    testShip = BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>
@@ -62,117 +61,130 @@ describe('`placeShip`', () => {
   }
 
   const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string =>
-    `"${JSON.stringify(createPositionObject(coordinates, orientation, testShip.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
+    `"${JSON.stringify(createPositionObject(coordinates, orientation, ship.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
 
   const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string => {
-    return `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
+    return `Invalid Command: The ship placement attempt with the following configurations is out of bounds - Coordinates: ${coordinates}, Length: ${ship.length}, Orientation: ${orientation}.`;
   };
 
   // 💭 --------------------------------------------------------------
   // 💭 Tests
 
-  const validPlacementTestCases = [
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(0, 3),
-        orientation: generateOrientation('horizontal'),
+  describe('ship placement', () => {
+    const validPlacementTestCases = [
+      {
+        input: {
+          ship: getNewCarrierTestShip(),
+          coordinates: generateCoordinates(0, 3),
+          orientation: generateOrientation('horizontal'),
+        },
+        expected: generateExpectedBoard({
+          ship: getNewCarrierTestShip(),
+          coordinates: [0, 3],
+          orientation: 'horizontal'
+        }),
       },
-      expected: generateExpectedBoard({
-        ship: testShip,
-        coordinates: [0, 3],
-        orientation: 'horizontal'
-      }),
-    },
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(4, 5),
-        orientation: generateOrientation('vertical'),
+      {
+        input: {
+          ship: getNewCarrierTestShip(),
+          coordinates: generateCoordinates(4, 5),
+          orientation: generateOrientation('vertical'),
+        },
+        expected: generateExpectedBoard({
+          ship: getNewCarrierTestShip(),
+          coordinates: [4, 5],
+          orientation: 'vertical'
+        }),
       },
-      expected: generateExpectedBoard({
-        ship: testShip,
-        coordinates: [4, 5],
-        orientation: 'vertical'
-      }),
-    },
-  ];
-  test.each(validPlacementTestCases)(
-    'ship is placed correctly on the gameboard',
-    ({ input, expected }) => {
-      placeShip(input);
-      expect(testBoard.board).toEqual(expected);
-    }
-  );  
+    ];
 
-  const overlapTestCases = [
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(3, 0),
-        orientation: generateOrientation('horizontal')
-      },
-      expectedError: generateOverlapErrorMessage({
-        ship: testShip,
-        coordinates: [3, 0],
-        orientation: 'horizontal',
-      }),
-    },
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(3, 0),
-        orientation: generateOrientation('vertical'),
-      },
-      expectedError: generateOverlapErrorMessage({
-        ship: testShip,
-        coordinates: [3, 0],
-        orientation: 'vertical',
-      }),
-    },
-  ];
-  test.each(overlapTestCases)(
-    'ship placement overlap throws error',
-    ({ input, expectedError }) => {
-      placeShip({
-        ship: testShip,
-        coordinates: [0, 0],
-        orientation: 'horizontal',
-      });
-      
-      expect(() => placeShip(input)).toThrow(expectedError);
+    test.each(validPlacementTestCases)(
+      'ship is placed correctly on the gameboard',
+      ({ input, expected }) => {
+        placeShip(input);
+        expect(testBoard.board).toEqual(expected);
+      }
+    );
   });
 
-  const outOfBoundsTestCases = [
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(0, 7),
-        orientation: generateOrientation('horizontal'),
+
+  describe('ship overlap', () => {
+    const getNewSubmarineTestShip = (): BattleshipBuilder =>
+      BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Submarine);
+
+    const overlapTestCases = [
+      {
+        input: {
+          ship: getNewSubmarineTestShip(),
+          coordinates: generateCoordinates(3, 0),
+          orientation: generateOrientation('horizontal'),
+        },
+        expectedError: generateOverlapErrorMessage({
+          ship: getNewSubmarineTestShip(),
+          coordinates: [3, 0],
+          orientation: 'horizontal',
+        }),
       },
-      expectedError: generateOutOfBoundsErrorMessage({
-        ship: testShip,
-        coordinates: [0, 7],
-        orientation: 'horizontal'
-      }),
-    },
-    {
-      input: {
-        ship: testShip,
-        coordinates: generateCoordinates(8, 0),
-        orientation: generateOrientation('vertical'),
+      {
+        input: {
+          ship: getNewSubmarineTestShip(),
+          coordinates: generateCoordinates(3, 0),
+          orientation: generateOrientation('vertical'),
+        },
+        expectedError: generateOverlapErrorMessage({
+          ship: getNewSubmarineTestShip(),
+          coordinates: [3, 0],
+          orientation: 'vertical',
+        }),
       },
-      expectedError: generateOutOfBoundsErrorMessage({
-        ship: testShip,
-        coordinates: [8, 0],
-        orientation: 'vertical'
-      }),
-    },
-  ]; 
-  test.each(outOfBoundsTestCases)(
-    'ship placement out of bounds throws error',
-    ({ input, expectedError }) => {
-      expect(() => placeShip(input)).toThrow(expectedError)
-    }
-  );
+    ];
+
+    test.each(overlapTestCases)(
+      'ship placement overlap throws error',
+      ({ input, expectedError }) => {
+        placeShip({
+          ship: getNewCarrierTestShip(),
+          coordinates: [0, 0],
+          orientation: 'horizontal',
+        });
+        expect(() => placeShip(input)).toThrow(expectedError);
+      }
+    );
+  });
+
+  describe('ship boundary', () => {
+    const outOfBoundsTestCases = [
+      {
+        input: {
+          ship: getNewCarrierTestShip(),
+          coordinates: generateCoordinates(7, 0),
+          orientation: generateOrientation('horizontal'),
+        },
+        expectedError: generateOutOfBoundsErrorMessage({
+          ship: getNewCarrierTestShip(),
+          coordinates: [7, 0],
+          orientation: 'horizontal'
+        }),
+      },
+      {
+        input: {
+          ship: getNewCarrierTestShip(),
+          coordinates: generateCoordinates(0, 8),
+          orientation: generateOrientation('vertical'),
+        },
+        expectedError: generateOutOfBoundsErrorMessage({
+          ship: getNewCarrierTestShip(),
+          coordinates: [0, 8],
+          orientation: 'vertical'
+        }),
+      },
+    ];
+
+    test.each(outOfBoundsTestCases)(
+      'ship placement out of bounds throws error',
+      ({ input, expectedError }) => {
+        expect(() => placeShip(input)).toThrow(expectedError)
+      }
+    );
+  });
 });

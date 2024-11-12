@@ -56,7 +56,7 @@ export class BattleshipBuilder implements IShipOptions {
     const key: SizeLookupKey = `${type}-${version}`;
     const length: ShipLength | undefined = sizeLookup[key]; // Access using the typed key
     if (length === undefined) {
-      throw new Error(`Invalid ship type/version combination: ${key}`);
+      throw new Error(`Invalid Command: ship type/version combination: ${key}.`);
     }
 
     this.length = length;
