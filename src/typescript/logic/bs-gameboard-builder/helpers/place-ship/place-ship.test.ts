@@ -12,7 +12,7 @@ import {
 } from '../../bs-gameboard-builder';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
-import { createTestPosition } from '../../../../utilities/logic-utilities';
+import { createPositionObject } from '../../../../utilities/logic-utilities';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
@@ -62,7 +62,7 @@ describe('`placeShip`', () => {
   }
 
   const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string =>
-    `"${JSON.stringify(createTestPosition(coordinates, orientation, testShip.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
+    `"${JSON.stringify(createPositionObject(coordinates, orientation, testShip.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
 
   const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string => {
     return `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;

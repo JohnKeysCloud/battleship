@@ -1,5 +1,6 @@
 import {
   IPlacementConfigurations,
+  IRotationalPivotConfigurations,
   IShipOptions,
   ShipLength,
   ShipSymbols,
@@ -37,10 +38,16 @@ export class BattleshipBuilder implements IShipOptions {
   public readonly length: ShipLength;
   public readonly seaworthy: boolean = true;
   public readonly symbol: ShipSymbolValue;
-  public placementConfigurations: IPlacementConfigurations = {
+  public rotationalPivotConfigurations: IRotationalPivotConfigurations = {
+    currentAngleOfRotation: null,
     coordinatesArray: null,
     orientation: null
   };
+  public currentplacementConfigurations: IPlacementConfigurations = {
+    coordinatesArray: null,
+    orientation: null
+  };
+  public isPlaced = (): boolean => this.currentplacementConfigurations.coordinatesArray !== null;
   private _hitCounter: number = 0;
 
   constructor(public readonly type: ShipType, public readonly version: Version = 2002) {
@@ -64,10 +71,16 @@ export class BattleshipBuilder implements IShipOptions {
 
   isSeaworthy = (): boolean => this.hitCounter < this.length;
 
-  public remove = () => {
-    this.placementConfigurations = {
-      coordinatesArray: null,
-      orientation: null
+  public resetConfigurations = (shouldResetShipRotationalData: boolean) => {
+    const placementConfigurations = { coordinatesArray: null, orientation: null };
+
+    this.currentplacementConfigurations = placementConfigurations;
+
+    if (shouldResetShipRotationalData === true) {
+      this.rotationalPivotConfigurations = {
+        ...placementConfigurations,
+        currentAngleOfRotation: null
+      };
     }
   };
 

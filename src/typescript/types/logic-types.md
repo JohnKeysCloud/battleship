@@ -254,10 +254,6 @@ In TypeScript, an `enum` (short for "enumeration") is a way to define a set of n
   * `enum`: `enum`'s can have default values (e.g., incrementing numbers or explicit strings).
   * `type`: Types do not have "default values" in the same sense; they define the structure of possible values.
 
-
-
-
-
 #### Types of `emum`'s
 
 1. **Numeric Enumerations:** Numeric enumerations are the most common type. By default, the first value is `0`, and subsequent values increment by `1`. You can also explicitly set values for any `enum` member.

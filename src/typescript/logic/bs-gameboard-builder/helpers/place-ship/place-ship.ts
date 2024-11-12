@@ -1,4 +1,5 @@
 import {
+  AnglesOfRotation,
   AxisArrayKey,
   Coordinates,
   CoordinatesArray,
@@ -6,6 +7,7 @@ import {
   CoordinatesSetMember,
   Gameboard,
   IFleetCoordinates,
+  IPlacementConfigurations,
   IPlacePieceCallbackParams,
   IPosition,
   IShipPlacementConfigurations,
@@ -15,7 +17,7 @@ import {
   ShipSymbolValue,
   ShipType,
 } from '../../../../types/logic-types';
-import { areArraysEqual } from '../../../../utilities/random-utilities'; 
+import { arePositionsEqual, createPositionObject, isCoordinateInBounds } from '../../../../utilities/logic-utilities';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 
 export function placeShip({
@@ -23,33 +25,23 @@ export function placeShip({
   ship,
   coordinates,
   orientation
-}: IPlacePieceCallbackParams): void {
-  const checkIfCoordinatesInBounds = (
-    axisStart: number,
-    shipLength: ShipLength
-  ): void => {
-    const errorMessage = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
-    if (axisStart + shipLength - 1 >= gameboardInstance.boardSize)
-      throw new Error(errorMessage);
-  };
-
+}: IPlacePieceCallbackParams): void {  
   const shipLength: ShipLength = ship.length;
   const [bowX, bowY]: Coordinates = coordinates;
   const isHorizontal: boolean = orientation === 'horizontal';
-  const axisStart: number = isHorizontal ? bowY : bowX;
+  const axisStart: number = isHorizontal ? bowX : bowY;
+  const axisEnd = axisStart + shipLength - 1;
 
-  checkIfCoordinatesInBounds(axisStart, shipLength);
-  
-  const arePositionsEqual = (
-    testPosition: IPosition,
-    validPosition: IPosition
-  ): boolean => {
-
-    return (
-      areArraysEqual(testPosition.bow, validPosition.bow) &&
-      areArraysEqual(testPosition.stern, validPosition.stern)
-    );
+  if (!isCoordinateInBounds(axisEnd, gameboardInstance.boardSize)) {
+    const errorMessage: string = `The ship placement attempt with the following configurations is out of bounds: Coordinates: ${coordinates}, Length: ${ship.length}, Orientation ${orientation}.`;
+    throw new Error(errorMessage);
   };
+
+  if (ship.isPlaced()) {
+    console.warn(`Invalid Command: The ${ship.type} has already been placed.`);
+    return;
+  };
+  
   const isPositionValid = (
     position: IPosition,
     shipConfigurations: IShipPlacementConfigurations,
@@ -62,13 +54,12 @@ export function placeShip({
       arePositionsEqual(position, validPosition)
     );
   };
-  
-  const position: IPosition = {
-    bow: coordinates,
-    stern: isHorizontal
-      ? [bowX + shipLength - 1, bowY]
-      : [bowX, bowY + shipLength - 1],
-  };
+
+  const position: IPosition = createPositionObject(
+    coordinates,
+    orientation,
+    shipLength,
+  );
 
   const shipConfigurations: IShipPlacementConfigurations = {
     shipLength,
@@ -116,31 +107,43 @@ export function placeShip({
         gameboard[y][x] = shipSymbol;
       });
     };
-    const setShipPlacementConfigurations = (
+    const setShipConfigurations = (
       ship: BattleshipBuilder,
       coordinatesArray: CoordinatesArray,
       orientation: Orientation
     ): void => {
-      ship.placementConfigurations = {
-        coordinatesArray,
-        orientation,
-      };
+      const placementConfigurations: IPlacementConfigurations = { coordinatesArray, orientation };
+      
+      ship.currentplacementConfigurations = placementConfigurations;
+
+      if (Object.values(ship.rotationalPivotConfigurations).every(value => value === null)) {
+        ship.rotationalPivotConfigurations = {
+          ...placementConfigurations,
+          currentAngleOfRotation: AnglesOfRotation.Degrees0,
+        }
+      }      
     };
     const updateOccupiedCoordinatesSet = (
       shipType: ShipType,
       placementCoordinates: CoordinatesArray
     ): void => {
+      const addShipSetToFleetCoordinates = (
+        placementCoordinates: CoordinatesArray,
+        shipCoordinatesSet: CoordinatesSet
+      ) => {
+          placementCoordinates.forEach((coordinates: Coordinates) => {
+            const [x, y]: Coordinates = coordinates;
+            const setMemberTemplate: CoordinatesSetMember = `[${x}, ${y}]`;
+            shipCoordinatesSet!.add(setMemberTemplate);
+          });
+      };
       const fleetCoordinates: IFleetCoordinates = gameboardInstance.fleetCoordinates;
 
       if (!fleetCoordinates[shipType]) fleetCoordinates[shipType] = new Set();
 
       const shipCoordinatesSet: CoordinatesSet = fleetCoordinates[shipType];
 
-      placementCoordinates.forEach((coordinates: Coordinates) => {
-        const [x, y]: Coordinates = coordinates;
-        const setMemberTemplate: CoordinatesSetMember = `[${x}, ${y}]`;
-        shipCoordinatesSet.add(setMemberTemplate);
-      });
+      addShipSetToFleetCoordinates(placementCoordinates, shipCoordinatesSet);
     };
 
     const placementCoordinates: CoordinatesArray = getPlacementCoordinates(
@@ -149,7 +152,7 @@ export function placeShip({
     );
 
     placeOnBoard(ship, placementCoordinates);
-    setShipPlacementConfigurations(
+    setShipConfigurations(
       ship,
       placementCoordinates,
       orientation

@@ -1,24 +1,40 @@
 import {
+  AngleOfRotation,
+  AnglesOfRotation,
+  AxisArrayKey,
   Coordinates,
   CoordinatesArray,
+  CoordinatesSet,
   CoordinatesSetMember,
+  FleetValidRotationalParams,
   Gameboard,
   IBattleshipGameboard,
   IFleetCoordinates,
-  IPlacePieceWrapperParams,
   IPlacePieceCallbackParams,
+  IPlacePieceParams,
+  IPlacePieceWrapperParams,
   IPosition,
   IShipPlacementConfigurations,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
+  RotatedCoordinatesValue,
+  RotatedPlacePieceConfigurations,
+  RotatedPlacePieceParams,
+  ShipLength,
   ShipType,
+  ValidRotationalPositionMap,
 } from '../../types/logic-types';
 import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
+import {
+  areCoordinatesInBounds,
+  arePositionsEqual,
+  createAxisArrayKey,
+  createPositionObject,
+  isPositionInBounds,
+} from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
-import { createAxisArrayKey, createTestPosition } from '../../utilities/logic-utilities';
-import { areArraysEqual } from '../../utilities/random-utilities';
 
 export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
   private static readonly vacant: symbol = Symbol('VC');
@@ -27,6 +43,7 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
   private readonly _boardSize: number = 10;
   private readonly _fillValue: symbol = BattleshipBoardBuilder.vacant;
   private readonly _fleetCoordinates: IFleetCoordinates = {};
+  private readonly _fleetValidRotationalParams: FleetValidRotationalParams = {};
 
   constructor() {
     this._board = Array.from({ length: this._boardSize }, () =>
@@ -63,9 +80,67 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
     return getValidShipPositions(validPlacementArg);
   }
 
-  public resetBoard(): void {
-    for (let i = 0; i < this._board.length; i++) {
-      this._board[i].fill(this._fillValue);
+  public movePiece(
+    ship: BattleshipBuilder,
+    newBowCoordinates: Coordinates
+  ): void {
+    if (!ship.isPlaced()) {
+      console.warn(`Invalid Command: The ${ship.type} has not been placed.`);
+      return;
+    }
+
+    const currentOrientation: Orientation =
+      ship.currentplacementConfigurations.orientation!;
+
+    const newPosition: IPosition = createPositionObject(
+      newBowCoordinates,
+      currentOrientation,
+      ship.length
+    );
+
+    if (!isPositionInBounds(newPosition, this.boardSize)) {
+      console.warn(
+        `Invalid Command: Position - Bow: [${newPosition.bow}] & Stern: [${newPosition.stern}] is out of bounds for the ${ship.type}.`
+      );
+
+      return;
+    }
+
+    const validPositions: IValidPositionsResult = this.getValidPositions({
+      orientation: currentOrientation,
+      shipLength: ship.length,
+    });
+
+    const isHorizontal: boolean = currentOrientation === 'horizontal';
+    const [x, y]: Coordinates = newBowCoordinates;
+    const axisArrayKey: AxisArrayKey = createAxisArrayKey(
+      isHorizontal ? y : x,
+      isHorizontal
+    );
+
+    const axisArray: IPosition[] = validPositions[axisArrayKey];
+
+    const isNewPositionValid: boolean = axisArray.some(
+      (position: IPosition): boolean => arePositionsEqual(position, newPosition)
+    );
+
+    if (isNewPositionValid) {
+      const placementParameters: IPlacePieceWrapperParams = {
+        ship,
+        coordinates: newBowCoordinates,
+        orientation: currentOrientation,
+      };
+      const shouldResetShipRotationalData: boolean = true;
+
+      this.relocateShip(
+        ship,
+        placementParameters,
+        shouldResetShipRotationalData
+      );
+    } else {
+      console.warn(
+        `Invalid Command: Position - Bow: [${newPosition.bow}] & Stern: [${newPosition.stern}] is unavailable for the ${ship.type}.`
+      );
     }
   }
 
@@ -84,7 +159,20 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
     placeShip(placeShipArg);
   }
 
-  public removePiece(ship: BattleshipBuilder): void {
+  public prettyPrint(): void {
+    console.table(
+      this._board.map((row) =>
+        row.map((symbol) =>
+          symbol.description === 'VC' ? null : symbol.description
+        )
+      )
+    );
+  }
+
+  public removePiece(
+    ship: BattleshipBuilder,
+    shouldResetShipRotationalData: boolean = true
+  ): void {
     if (!this.isShipValidForRemoval(ship)) return;
 
     const removeShipFromBoard = (shipCoordinates: CoordinatesArray): void => {
@@ -95,162 +183,155 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
     const nullifyShipCoordinateSetValue = (shipType: ShipType): void => {
       this.fleetCoordinates[shipType] = null;
     };
-    const resetShipConfigurationsProperty = (ship: BattleshipBuilder): void => {
-      ship.remove();
+    const resetShipConfigurations = (
+      ship: BattleshipBuilder,
+      shouldResetShipRotationalData: boolean
+    ): void => {
+      if (shouldResetShipRotationalData) {
+        this._fleetValidRotationalParams[ship.type] = null;
+      }
+
+      ship.resetConfigurations(shouldResetShipRotationalData);
     };
 
     const shipCoordinates: CoordinatesArray =
-      ship.placementConfigurations.coordinatesArray!;
+      ship.currentplacementConfigurations.coordinatesArray!;
     const shipType: ShipType = ship.type;
 
     removeShipFromBoard(shipCoordinates);
     nullifyShipCoordinateSetValue(shipType);
-    resetShipConfigurationsProperty(ship);
+    resetShipConfigurations(ship, shouldResetShipRotationalData);
   }
 
-  public movePiece(ship: BattleshipBuilder, newBowCoordinates: Coordinates) {
-    // new bow coordinates destructured
-    const [x, y]: Coordinates = newBowCoordinates;
-
-    // preserved orientation of ship being moved
-    const orientation: Orientation = ship.placementConfigurations.orientation!;
-
-    // all current valid positions
-    const validPositions: IValidPositionsResult = this.getValidPositions({
-      orientation,
-      shipLength: ship.length,
-    });
-
-    // to enhance readability in `axisArrayKey` generation
-    const isHorizontal: boolean = orientation === 'horizontal';
-
-    // targets specific array in `validPositions` object
-    const axisArrayKey = createAxisArrayKey(isHorizontal ? y : x, isHorizontal);
-
-    // targeted row/column where new position might exist
-    const axisArray: IPosition[] = validPositions[axisArrayKey];
-
-    // new position to compare with valid positions in `axisArray`
-    const newPosition: IPosition = createTestPosition(
-      newBowCoordinates,
-      orientation,
-      ship.length
-    );
-
-    // comparing new position to `axisArray` positions
-    if (
-      axisArray.some(
-        (position: IPosition) =>
-          // compares position bow and stern coordinates
-          areArraysEqual(position.bow, newPosition.bow) &&
-          areArraysEqual(position.stern, newPosition.stern)
-      )
-    ) {
-      // removes ship because the new ship is valid
-      this.removePiece(ship);
-
-      // object used as parameter to place ship at new position
-      const placeShipArg: IPlacePieceWrapperParams = {
-        ship,
-        coordinates: newBowCoordinates,
-        orientation,
-      };
-
-      // places the ship at the new position
-      this.placePiece(placeShipArg);
-    } else {
-      // new position is invalid
-
-      console.error(
-        `Invalid ${ship.type} position - Bow: [${newPosition.bow}] Stern: [${newPosition.stern}]is unavailable.`
-      );
+  public resetBoard(): void {
+    for (let i = 0; i < this._board.length; i++) {
+      this._board[i].fill(this._fillValue);
     }
   }
 
-  public rotatePiece(ship: BattleshipBuilder) {
-    if (!this.isShipValidForRemoval(ship)) return;
+  public rotatePiece(ship: BattleshipBuilder): void {
+    const setValidRotatedPlacePieceParams = (ship: BattleshipBuilder): void => {
+      if (!this._fleetValidRotationalParams[ship.type])
+        this._fleetValidRotationalParams[ship.type] =
+          this.getValidRotatedPlacePieceParams(ship);
+    };
 
-    // 💭 Requires bound & coordinate occupation checks
+    setValidRotatedPlacePieceParams(ship);
 
-    // > 90 degree rotation from og position - horizontal
-    // ! Same coordinates, different orientation 🚬
+    const canShipBeRotated = (
+      validRotationalPositionMap: ValidRotationalPositionMap
+    ): boolean => validRotationalPositionMap.size > 1;
 
-    // > 180 rotation from og position - horizontal
-    // ! Shift bow placement of `x - shipLength - 1`
-    // ! Old bow coordinates becomes new stern coordinates
+    const validRotationalPositionMap: ValidRotationalPositionMap =
+      this._fleetValidRotationalParams[ship.type]!;
 
-    // 🟢 ship.length === 3 | [x,y] => [4,0], [5,0], [6,0]
-    // ? before:
-    // [x,x,x,x,o,o,o,x,x,x]
-    // ? after:
-    // [x,x,o,o,o,x,x,x,x,x]
-    // * New x value (left shift) 2 units for bow coordinates (ship length - 1)
-    // * old bow becomes new stern
+    if (!canShipBeRotated(validRotationalPositionMap)) {
+      console.warn(
+        `Invalid Command: The ${ship.type} cannot be rotated.`
+      );
+      return;
+    }
 
-    // 🟢 ship length === 5 | [x,y] => [2,0], [3,0], [4,0], [5,0], [6,0]
-    // ? before:
-    // [x,x,o,o,o,o,o,x,x,x]
-    // * Out of bounds
+    const getNextGreatestAngleOfRotation = (
+      validRotationalPositionMap: ValidRotationalPositionMap
+    ): AngleOfRotation => {
+      const validAnglesOfRotation: AnglesOfRotation[] = Array.from(
+        validRotationalPositionMap.keys()
+      );
 
-    // 🟢 ship length === 5 | [x,y] => [5,0], [6,0], [7,0], [8,0], [9,0]
-    // ? before:
-    // [x,x,x,x,x,o,o,o,o,o]
-    // ? after:
-    // [x,o,o,o,o,o,x,x,x,x]
-    // * New x value (left shift) 4 units for bow coordinates (ship length - 1)
+      const greatestValidAngleOfRotation: AngleOfRotation =
+        validAnglesOfRotation.filter(
+          (angleOfRotation) => angleOfRotation > shipCurrentAngleOfRotation!
+        )[0];
 
-    // > 270 rotation from og position - horizontal
-    // ! New bow coordinates requires old bow/new stern `y - shipLength - 1`
-    // ! New stern coordinates becomes old stern coordinates
-    // ! New bow coo
+      return greatestValidAngleOfRotation;
+    };
+    const getGreatestValidAngleOfRotation = (
+      validRotationalPositionMap: ValidRotationalPositionMap
+    ): AngleOfRotation => {
+      let greatestValidAngleOfRotation: AngleOfRotation =
+        AnglesOfRotation.Degrees0;
 
+      for (const [angleOfRotation, _] of validRotationalPositionMap) {
+        greatestValidAngleOfRotation = angleOfRotation;
+      }
 
-    // 🟢 ship.length === 4
-    // ? before: (bow at [4,5] represented by "+" | stern at [7,5] represented by "~" )
-    // row-5: [x,x,x,+,o,o,~,x,x,x]
-    // ? after:
-    // column-4: [
-    //            x,
-    //            x,
-    //            +,  // [4,2] new stern (new stern/old bow Y value - ship length - 1) 
-    //            o,  
-    //            o,  
-    //            ~,  // [4,5] (Old bow coordinates)
-    //            x,
-    //            o,
-    //            o,
-    //            o,  
-    //           ]
-    // * New stern becomes old bow, and new bow coordinates are old bow/new stern Y-value - ship length -1
+      return greatestValidAngleOfRotation;
+    };
+    const getNextValidPiecePlacementParams = (
+      ship: BattleshipBuilder
+    ): IPlacePieceWrapperParams => {
+      const shipCurrentAngleOfRotation: AngleOfRotation =
+        ship.rotationalPivotConfigurations.currentAngleOfRotation;
+      const greatestValidAngleOfRotation: AngleOfRotation =
+        getGreatestValidAngleOfRotation(validRotationalPositionMap);
 
-    console.log(ship.placementConfigurations.coordinatesArray);
-  }
+      if (shipCurrentAngleOfRotation === greatestValidAngleOfRotation) {
+        const originalBowCoordinates: Coordinates =
+          ship.rotationalPivotConfigurations.coordinatesArray![0];
+        const originalOrientation: Orientation =
+          ship.rotationalPivotConfigurations.orientation!;
 
-  public prettyPrint() {
-    console.table(
-      this._board.map((row) =>
-        row.map((symbol) =>
-          symbol.description === 'VC' ? null : symbol.description
-        )
-      )
+        ship.rotationalPivotConfigurations.currentAngleOfRotation =
+          AnglesOfRotation.Degrees0;
+
+        return {
+          ship,
+          coordinates: originalBowCoordinates,
+          orientation: originalOrientation,
+        };
+      } else {
+        const validRotationalPositionMap: ValidRotationalPositionMap =
+          this._fleetValidRotationalParams[ship.type]!;
+
+        const nextValidAngleOfRotation: AngleOfRotation =
+          getNextGreatestAngleOfRotation(validRotationalPositionMap);
+
+        const nextValidRotatedPlacePieceParams = validRotationalPositionMap.get(
+          nextValidAngleOfRotation!
+        );
+
+        ship.rotationalPivotConfigurations.currentAngleOfRotation =
+          nextValidAngleOfRotation;
+
+        return {
+          ship,
+          coordinates: nextValidRotatedPlacePieceParams!.coordinates,
+          orientation: nextValidRotatedPlacePieceParams!.orientation,
+        };
+      }
+    };
+
+    const shipCurrentAngleOfRotation: AngleOfRotation =
+      ship.rotationalPivotConfigurations.currentAngleOfRotation;
+    const nextValidPiecePlacementParams: IPlacePieceWrapperParams =
+      getNextValidPiecePlacementParams(ship);
+
+    const shouldResetShipRotationalData: boolean = false;
+
+    this.relocateShip(
+      ship,
+      nextValidPiecePlacementParams,
+      shouldResetShipRotationalData
     );
   }
 
-  private areCoordinatesVacant(coordinates: Coordinates) {
+  private areCoordinatesVacant(coordinates: Coordinates): boolean {
     const [x, y] = coordinates;
     return this.board[y][x] === this.fillValue;
   }
 
+  // ? maybe use this with UI? (TODO: create return value type)
   private getShipCoordinatesAt(coordinates: Coordinates) {
     if (this.areCoordinatesVacant(coordinates)) return;
 
-    const [x, y] = coordinates;
+    const [x, y]: Coordinates = coordinates;
     const formattedInputCoordinates: CoordinatesSetMember = `[${x}, ${y}]`;
 
     for (const shipType in this.fleetCoordinates) {
-      const shipCoordinateSet = this.fleetCoordinates[shipType];
+      const shipCoordinateSet: CoordinatesSet = this.fleetCoordinates[shipType];
 
-      if (shipCoordinateSet.has(formattedInputCoordinates)) {
+      if (shipCoordinateSet!.has(formattedInputCoordinates)) {
         return {
           type: shipType,
           shipCoordinateSet,
@@ -259,9 +340,178 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
     }
   }
 
+  private getValidRotatedPlacePieceParams(ship: BattleshipBuilder) {
+    const applyOffsetToCoordinate = (
+      coordinate: number,
+      shipLength: ShipLength
+    ): number => {
+      const offset: number = shipLength - 1;
+      return coordinate - offset;
+    };
+    const determineRotatedOrientation = (
+      angleOfRotation: AngleOfRotation,
+      isHorizontal: boolean
+    ): Orientation => {
+      return isHorizontal
+        ? angleOfRotation === AnglesOfRotation.Degrees180
+          ? 'horizontal'
+          : 'vertical'
+        : angleOfRotation === AnglesOfRotation.Degrees180
+          ? 'vertical'
+          : 'horizontal';
+    };
+    const getRotatedBowCoordinates = (
+      angleOfRotation: AngleOfRotation,
+      isHorizontal: boolean,
+      [x, y]: Coordinates
+    ): RotatedCoordinatesValue => {
+      if (
+        angleOfRotation === AnglesOfRotation.Degrees0 ||
+        (angleOfRotation === AnglesOfRotation.Degrees90 && isHorizontal) ||
+        (angleOfRotation === AnglesOfRotation.Degrees270 && !isHorizontal)
+      ) {
+        return rotationalPivotBowCoordinates;
+      }
+
+      const rotatedBowCoordinates: Coordinates = isHorizontal
+        ? angleOfRotation === AnglesOfRotation.Degrees180
+          ? [applyOffsetToCoordinate(x, ship.length), y]
+          : [x, applyOffsetToCoordinate(y, ship.length)] // angleOfRotation === 270
+        : angleOfRotation === AnglesOfRotation.Degrees180
+          ? [x, applyOffsetToCoordinate(y, ship.length)]
+          : [applyOffsetToCoordinate(x, ship.length), y]; // angleOfRotation === 90
+
+      return areCoordinatesInBounds(rotatedBowCoordinates, this.boardSize)
+        ? rotatedBowCoordinates
+        : 'outOfBounds';
+    };
+    const createRotatedPiecePlacementParams = (
+      rotationalPivotBowCoordinates: Coordinates,
+      rotationalPivotOrientation: Orientation
+    ): RotatedPlacePieceParams => {
+      const isHorizontal = rotationalPivotOrientation === 'horizontal';
+
+      const rotatedPiecePlacementParams: RotatedPlacePieceParams = {};
+
+      const anglesOfRotation: AnglesOfRotation[] = [
+        AnglesOfRotation.Degrees0,
+        AnglesOfRotation.Degrees90,
+        AnglesOfRotation.Degrees180,
+        AnglesOfRotation.Degrees270,
+      ];
+
+      anglesOfRotation.forEach((angleOfRotation) => {
+        const coordinates: RotatedCoordinatesValue =
+          angleOfRotation === AnglesOfRotation.Degrees0
+            ? rotationalPivotBowCoordinates
+            : getRotatedBowCoordinates(
+                angleOfRotation,
+                isHorizontal,
+                rotationalPivotBowCoordinates
+              );
+        
+        if (coordinates === 'outOfBounds') {
+          rotatedPiecePlacementParams[angleOfRotation] = 'outOfBounds';
+        } else {
+          rotatedPiecePlacementParams[angleOfRotation] = {
+            coordinates,
+            orientation:
+              angleOfRotation === AnglesOfRotation.Degrees0
+                ? rotationalPivotOrientation
+                : determineRotatedOrientation(angleOfRotation, isHorizontal),
+          };
+        }
+      });
+
+      return rotatedPiecePlacementParams;
+    };
+    const validatePosition = (
+      [x, y]: Coordinates,
+      orientation: Orientation,
+      angleOfRotation: AngleOfRotation,
+      shipLength: ShipLength
+    ): boolean => {
+      if (angleOfRotation === AnglesOfRotation.Degrees0) return true;
+
+      const isHorizontal = orientation === 'horizontal';
+      let i: number;
+      let axisIndexEnd: number;
+
+      if (
+        (!isHorizontal && angleOfRotation === AnglesOfRotation.Degrees90) ||
+        (isHorizontal && angleOfRotation === AnglesOfRotation.Degrees270)
+      ) {
+        i = 1;
+        axisIndexEnd = shipLength;
+      } else {
+        i = 0;
+        axisIndexEnd = shipLength - 1;
+      }
+
+      for (i; i < axisIndexEnd; i++) {
+        if (isHorizontal) {
+          if (this.board[y][x + i] !== this.fillValue) return false;
+        } else {
+          if (this.board[y + i][x] !== this.fillValue) return false;
+        }
+      }
+      return true;
+    };
+    const generateValidRotatedPlacePieceParams = (
+      rotatedPiecePlacementParams: RotatedPlacePieceParams
+    ): ValidRotationalPositionMap => {
+      const validRotatedPlacePieceParams: ValidRotationalPositionMap =
+        new Map();
+
+      for (const angleOfRotation in rotatedPiecePlacementParams) {
+        const rotatedPiecePlacementConfigurations: RotatedPlacePieceConfigurations =
+          rotatedPiecePlacementParams[angleOfRotation];
+
+        if (rotatedPiecePlacementConfigurations === 'outOfBounds') continue;
+
+        const { coordinates: bowCoordinates, orientation }: IPlacePieceParams =
+          rotatedPiecePlacementConfigurations;
+
+        const isPositionValid: boolean = validatePosition(
+          bowCoordinates,
+          orientation,
+          +angleOfRotation,
+          ship.length
+        );
+
+        if (isPositionValid) {
+          const placePieceParams: IPlacePieceParams = {
+            coordinates: bowCoordinates,
+            orientation,
+          };
+
+          validRotatedPlacePieceParams.set(+angleOfRotation, placePieceParams);
+        }
+      }
+
+      return validRotatedPlacePieceParams;
+    };
+
+    const rotationalPivotBowCoordinates: Coordinates =
+      ship.rotationalPivotConfigurations.coordinatesArray![0];
+    const rotationalPivotOrientation: Orientation =
+      ship.rotationalPivotConfigurations.orientation!;
+    const rotatedPiecePlacementParams: RotatedPlacePieceParams =
+      createRotatedPiecePlacementParams(
+        rotationalPivotBowCoordinates,
+        rotationalPivotOrientation
+      );
+
+    const validRotatedPlacePieceParams: ValidRotationalPositionMap = generateValidRotatedPlacePieceParams(
+      rotatedPiecePlacementParams
+    );
+
+    return validRotatedPlacePieceParams;
+  }
+
   private isShipValidForRemoval(ship: BattleshipBuilder): boolean {
     if (
-      !ship.placementConfigurations.coordinatesArray ||
+      !ship.currentplacementConfigurations.coordinatesArray ||
       this.fleetCoordinates[ship.type] === null
     ) {
       console.error(
@@ -272,6 +522,13 @@ export class BattleshipBoardBuilder implements IBattleshipGameboard<symbol> {
 
     return true;
   }
+
+  private relocateShip(
+    ship: BattleshipBuilder,
+    placementParameters: IPlacePieceWrapperParams,
+    shouldResetShipRotationalData: boolean,
+  ): void {
+    this.removePiece(ship, shouldResetShipRotationalData);
+    this.placePiece(placementParameters);
+  }
 }
-
-
