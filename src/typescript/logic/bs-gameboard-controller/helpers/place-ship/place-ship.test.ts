@@ -9,7 +9,8 @@ import {
 } from '../../../../types/logic-types';
 import {
   BattleshipBoardBuilder,
-} from '../../bs-gameboard-builder';
+} from '../../../bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardController } from '../../bs-gameboard-controller';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 import { createPositionObject } from '../../../../utilities/logic-utilities';
@@ -18,21 +19,23 @@ describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
   // 💭 Setup
   const getNewCarrierTestShip = (): BattleshipBuilder => BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
-  let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
+  let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder);
 
   beforeEach(() => {
-    testBoard = new BattleshipBoardBuilder();
+    testBoardBuilder = new BattleshipBoardBuilder();
+    testBoardController = new BattleshipBoardController(testBoardBuilder);
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>
-    testBoard.placePiece(input);
+    testBoardController.placePiece(input);
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
   const generateExpectedBoard = (input: IPlacePieceWrapperParams) => {
     const expectedBoard: Gameboard = Array.from({ length: 10 }, () =>
-      Array(10).fill(testBoard.fillValue)
+      Array(10).fill(testBoardBuilder.fillValue)
     );
 
     const shipSymbol: ShipSymbolValue = input.ship.symbol;
@@ -102,7 +105,7 @@ describe('`placeShip`', () => {
       'ship is placed correctly on the gameboard',
       ({ input, expected }) => {
         placeShip(input);
-        expect(testBoard.board).toEqual(expected);
+        expect(testBoardBuilder.board).toEqual(expected);
       }
     );
   });

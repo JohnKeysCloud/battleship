@@ -8,6 +8,7 @@ import {
   Version
 } from "../types/logic-types";
 import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
+import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
 import { BattleshipFleetBuilder } from "../logic/bs-fleet-builder/bs-fleet-builder";
 import { areArraysEqual } from "./random-utilities";
 
@@ -48,6 +49,18 @@ export function createBattleshipFleets(version: Version = 2002) {
   return {
     playerOne: fleet(),
     playerTwo: fleet(),
+  };
+}
+export function createBattleshipBoardController(gameboardBuilder: BattleshipBoardBuilder) {
+  return new BattleshipBoardController(gameboardBuilder);
+};
+
+export function createBattleshipControllerSet(
+  playerOneBoardBuilder: BattleshipBoardBuilder,
+  playerTwoBoardBuilder: BattleshipBoardBuilder) {
+  return {
+    playerOneBoardController: createBattleshipBoardController(playerOneBoardBuilder),
+    playerTwoBoardController: createBattleshipBoardController(playerTwoBoardBuilder),
   };
 }
 export function createBattleshipBoardSet() {

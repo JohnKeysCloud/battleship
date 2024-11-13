@@ -14,6 +14,7 @@ import {
 } from '../utilities/random-utilities';
 import { BattleshipBoardBuilder } from '../logic/bs-gameboard-builder/bs-gameboard-builder';
 import { BattleshipBuilder } from '../logic/bs-ship-builder/bs-ship-builder';
+import { BattleshipBoardController } from '../logic/bs-gameboard-controller/bs-gameboard-controller';
 
 export function randomizeGameboard(player: PlayerState) {
   const generateRandomCoordinates = (
@@ -40,7 +41,7 @@ export function randomizeGameboard(player: PlayerState) {
     };
 
     const validPositions =
-      playerBoardInstance.getValidPositions(validPositionsParams);
+      playerBoardController.getValidPositions(validPositionsParams);
     const [bowX, bowY]: Coordinates = coordinates;
     const isHorizontal: boolean = orientation === 'horizontal';
     const axisIndex: number = isHorizontal ? bowY : bowX;
@@ -78,8 +79,9 @@ export function randomizeGameboard(player: PlayerState) {
         )
   };
 
-  const playerBoardInstance: BattleshipBoardBuilder = player.gameboardInstance;
-  const boardSize: number = playerBoardInstance.boardSize;
+  const playerBoardBuilder: BattleshipBoardBuilder = player.gameboardBuilder;
+  const playerBoardController: BattleshipBoardController = player.gameboardController;
+  const boardSize: number = playerBoardBuilder.boardSize;
   const playerFleet: Fleet = player.fleet;
 
   for (const shipName in playerFleet) {
@@ -98,6 +100,6 @@ export function randomizeGameboard(player: PlayerState) {
       orientation: randomOrientation,
     };
     
-    playerBoardInstance.placePiece(placePieceParams);
+    playerBoardController.placePiece(placePieceParams);
   }
 }

@@ -9,22 +9,24 @@ import {
   ShipLength,
 } from '../../../../types/logic-types';
 import { createAxisArrayKey, createShipConfigurations } from '../../../../utilities/logic-utilities';
-import { BattleshipBoardBuilder } from '../../bs-gameboard-builder';
+import { BattleshipBoardBuilder } from '../../../bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardController } from '../../bs-gameboard-controller';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
-  let testBoard: BattleshipBoardBuilder = new BattleshipBoardBuilder();
+  let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder);
 
   // Creates a new instance for each test run
   beforeEach(() => {
-    testBoard = new BattleshipBoardBuilder();
+    testBoardBuilder = new BattleshipBoardBuilder();
+    testBoardController = new BattleshipBoardController(testBoardBuilder);
   });
 
   // Test function utility
   const getValidShipPositions = (
     input: IShipPlacementConfigurations
-  ): IValidPositionsResult =>
-    testBoard.getValidPositions(input);
+  ): IValidPositionsResult => testBoardController.getValidPositions(input);
 
   // Dynamically create expected test result
   function createTestCaseResult(
@@ -43,14 +45,14 @@ describe('`getValidShipPositions`', () => {
     const isHorizontal = orientation === 'horizontal';
 
     // Creates row/column objects
-    for (let i = 0; i < testBoard.boardSize; i++) {
+    for (let i = 0; i < testBoardBuilder.boardSize; i++) {
       const axisArrayKey: AxisArrayKey = createAxisArrayKey(i, isHorizontal);
 
       // Initializes array for row/column
       if(!validPositions[axisArrayKey]) validPositions[axisArrayKey] = [];
 
       // Populates each array
-      for (let j = 0; j + (shipLength - 1) < testBoard.boardSize; j++) {
+      for (let j = 0; j + (shipLength - 1) < testBoardBuilder.boardSize; j++) {
         let position: IPosition =
           isHorizontal
             ? createPosition([j, i], [j + shipLength - 1, i])

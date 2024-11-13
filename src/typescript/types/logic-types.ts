@@ -70,18 +70,24 @@ export type Version = 1990 | 2002;
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
+
+};
+export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
+  boardSize: number;
+};
+
+interface IGridGameboardController {
   placePiece(...args: any): void;
   removePiece(...args: any): void;
   resetBoard(): void;
-};
-interface IGridGameboardSquare<T> extends IGridGameboard<T> {
-  boardSize: number;
-};
-export interface IBattleshipGameboard<T> extends IGridGameboardSquare<T> {
+}
+export interface IBattleshipGameboardController extends IGridGameboardController {
+  fleetCoordinates: IFleetCoordinates;
   placePiece(options: IPlacePieceWrapperParams): void;
   removePiece(ship: BattleshipBuilder, resetInitialConfigs: boolean): void;
   resetBoard(): void;
-};
+  getValidPositions(shipPlacementConfigs: IShipPlacementConfigurations): IValidPositionsResult;
+}
 export interface IFleetCoordinates extends OccupiedPositionsMap { };
 export interface IPlacementConfigurations {
   coordinatesArray: CoordinatesArray | null;
@@ -98,7 +104,8 @@ export interface IPlacePieceWrapperParams extends IPlacePieceParams {
   ship: BattleshipBuilder;
 };
 export interface IPlacePieceCallbackParams extends IPlacePieceWrapperParams {
-  gameboardInstance: BattleshipBoardBuilder
+  battleshipBoardBuilder: BattleshipBoardBuilder
+  battleshipBoardController: IBattleshipGameboardController;
 };
 export interface IPosition {
   bow: Coordinates; // [rowIndex, colIndex]
@@ -123,7 +130,8 @@ export interface ITestCaseValidPositions {
   validPositions: IValidPositionsResult;
 };
 export interface IValidPlacementCallbackParams extends IShipPlacementConfigurations {
-  gameboardInstance: BattleshipBoardBuilder;
+  battleshipBoardBuilder: BattleshipBoardBuilder;
+  battleshipBoardController: IBattleshipGameboardController;
 };
 export interface IValidPositionsResult {
   [key: AxisArrayKey]: IPosition[];

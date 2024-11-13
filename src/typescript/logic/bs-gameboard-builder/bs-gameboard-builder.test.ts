@@ -12,7 +12,7 @@ describe('`BattleshipBoardBuilder` Instance Board Creation', () => {
 
     // Inline serialization logic
     const serializeBoard = (board: Gameboard): string =>
-      JSON.stringify(board, (key, value) => // {1}
+      JSON.stringify(board, (_, value) => // {1}
         (typeof value === 'symbol' ? value.toString() : value)
     );
 

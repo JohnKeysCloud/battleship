@@ -12,7 +12,8 @@ import {
 export function getValidShipPositions({
   shipLength,
   orientation,
-  gameboardInstance,
+  battleshipBoardBuilder,
+  battleshipBoardController
 }: IValidPlacementCallbackParams): IValidPositionsResult {
   const extractAxisArray = (
     axisIndex: number,
@@ -34,7 +35,7 @@ export function getValidShipPositions({
     let validAxisPositions: IPosition[] = [];
     
     for (let i = 0; i < axisArray.length; i++) {
-      if (axisArray[i] === gameboardInstance.fillValue) {
+      if (axisArray[i] === battleshipBoardBuilder.fillValue) {
         streak++;
         
         if (streak >= shipLength) {
@@ -62,7 +63,7 @@ export function getValidShipPositions({
   };
 
   const validPositionsPerAxis: IValidPositionsResult = {}; 
-  const board: Gameboard = gameboardInstance.board;
+  const board: Gameboard = battleshipBoardBuilder.board;
   const isHorizontal = orientation === 'horizontal';
 
   for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {

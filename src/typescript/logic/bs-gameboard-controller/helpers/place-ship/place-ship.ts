@@ -19,12 +19,14 @@ import {
 } from '../../../../types/logic-types';
 import { arePositionsEqual, createPositionObject, isCoordinateInBounds } from '../../../../utilities/logic-utilities';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
+import { BattleshipBoardController } from '../../bs-gameboard-controller';
 
 export function placeShip({
-  gameboardInstance,
   ship,
   coordinates,
-  orientation
+  orientation,
+  battleshipBoardBuilder,
+  battleshipBoardController,
 }: IPlacePieceCallbackParams): void {  
   const shipLength: ShipLength = ship.length;
   const [bowX, bowY]: Coordinates = coordinates;
@@ -32,7 +34,7 @@ export function placeShip({
   const axisStart: number = isHorizontal ? bowX : bowY;
   const axisEnd = axisStart + shipLength - 1;
 
-  if (!isCoordinateInBounds(axisEnd, gameboardInstance.boardSize)) {
+  if (!isCoordinateInBounds(axisEnd, battleshipBoardBuilder.boardSize)) {
     const errorMessage: string = `Invalid Command: The ship placement attempt with the following configurations is out of bounds - Coordinates: ${coordinates}, Length: ${ship.length}, Orientation: ${orientation}.`;
     throw new Error(errorMessage);
   };
@@ -48,7 +50,7 @@ export function placeShip({
     axisArrayKey: AxisArrayKey
   ): boolean => {
     const validPositions: IValidPositionsResult =
-      gameboardInstance.getValidPositions(shipConfigurations);
+      battleshipBoardController.getValidPositions(shipConfigurations);
             
     return validPositions[axisArrayKey].some((validPosition: IPosition) =>
       arePositionsEqual(position, validPosition)
@@ -99,7 +101,7 @@ export function placeShip({
       ship: BattleshipBuilder,
       shipPlacementCoordinates: CoordinatesArray
     ): void => {
-      const gameboard: Gameboard = gameboardInstance.board;
+      const gameboard: Gameboard = battleshipBoardBuilder.board;
       const shipSymbol: ShipSymbolValue = ship.symbol;
 
       shipPlacementCoordinates.forEach((coordinates) => {
@@ -137,7 +139,7 @@ export function placeShip({
             shipCoordinatesSet!.add(setMemberTemplate);
           });
       };
-      const fleetCoordinates: IFleetCoordinates = gameboardInstance.fleetCoordinates;
+      const fleetCoordinates: IFleetCoordinates = battleshipBoardController.fleetCoordinates;
 
       if (!fleetCoordinates[shipType]) fleetCoordinates[shipType] = new Set();
 
