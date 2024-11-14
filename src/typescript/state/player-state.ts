@@ -1,22 +1,40 @@
 import { PlayerState } from "../types/state-types";
-import { createBattleshipBoardSet } from "../utilities/logic-utilities";
-import { createBattleshipFleets } from "../utilities/logic-utilities";
-import { createBattleshipControllerSet } from "../utilities/logic-utilities";
+import {
+  createBattleshipBoardBuilderSet,
+  createBattleshipControllerSet,
+  createBattleshipFleets
+} from "../utilities/logic-utilities";
 
-const battleShipGameboards = createBattleshipBoardSet();
-const battleShipFleets = createBattleshipFleets();
-const { playerOneBoardController, playerTwoBoardController } = createBattleshipControllerSet(battleShipGameboards.playerOne, battleShipGameboards.playerTwo);
+const {
+  playerOne: playerOneGameboardBuilder,
+  playerTwo: playerTwoGameboardBuilder
+} = createBattleshipBoardBuilderSet();
+
+
+const { 
+  playerOne: playerOneFleetBuilder,
+  playerTwo: playerTwoFleetBuilder
+} = createBattleshipFleets();
+
+const {
+  playerOneBoardController,
+  playerTwoBoardController
+} =
+  createBattleshipControllerSet(
+    playerOneGameboardBuilder,
+    playerTwoGameboardBuilder
+  );
 
 const playerOne: PlayerState = {
-  gameboardBuilder: battleShipGameboards.playerOne,
-  gameboardController: playerOneBoardController, 
-  fleet: battleShipFleets.playerOne.fleet,
+  gameboardBuilder: playerOneGameboardBuilder,
+  gameboardController: playerOneBoardController,
+  fleetBuilder: playerOneFleetBuilder,
 };
 
 const playerTwo: PlayerState = {
-  gameboardBuilder: battleShipGameboards.playerTwo,
+  gameboardBuilder: playerTwoGameboardBuilder,
   gameboardController: playerTwoBoardController,
-  fleet: battleShipFleets.playerTwo.fleet,
+  fleetBuilder: playerTwoFleetBuilder,
 };
 
 export const players = {

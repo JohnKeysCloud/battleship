@@ -63,7 +63,7 @@ export function createBattleshipControllerSet(
     playerTwoBoardController: createBattleshipBoardController(playerTwoBoardBuilder),
   };
 }
-export function createBattleshipBoardSet() {
+export function createBattleshipBoardBuilderSet() {
   return {
     playerOne: new BattleshipBoardBuilder(),
     playerTwo: new BattleshipBoardBuilder(),

@@ -181,9 +181,9 @@ See [here](./helpers/place-ship/place-ship.md).
 
 This factory function returns an object that complies with the `IShipPlacementConfigurations` interface. It is a common and _recommended_ way to create an object that adheres to an interface in TypeScript. Such functions remove the need for explicit type assertions (which can bypass some of TypeScript's safeguards.), leveraging the full power of TypeScripts type safety, catching potential mismatches at compile time. Another added benefit is _encapsulation_. Encapsulating the object creation logic makes it easier to modify or extend in the future. Lastly, it also enhances readability, clearly showing that the function returns a specific shape of data that adheres to the `IShipPlacementConfigurations` interface.
 
-### `createBattleshipBoardSet` Factory Function
+### `createBattleshipBoardBuilderSet` Factory Function
 
-This factory function simplifies the initialization of game boards for both players in the Battleship game. Instead of creating new instances of `BattleshipBoardBuilder` in multiple modules, the `createBattleshipBoardSet` function handles the creation of two game board instances:
+This factory function simplifies the initialization of game boards for both players in the Battleship game. Instead of creating new instances of `BattleshipBoardBuilder` in multiple modules, the `createBattleshipBoardBuilderSet` function handles the creation of two game board instances:
 
 - `playerOne`: Represents the game board for Player One.
 - `playerTwo`: Represents the game board for Player Two.

@@ -19,7 +19,6 @@ import {
 } from '../../../../types/logic-types';
 import { arePositionsEqual, createPositionObject, isCoordinateInBounds } from '../../../../utilities/logic-utilities';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
-import { BattleshipBoardController } from '../../bs-gameboard-controller';
 
 export function placeShip({
   ship,

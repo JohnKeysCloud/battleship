@@ -82,7 +82,7 @@ export function randomizeGameboard(player: PlayerState) {
   const playerBoardBuilder: BattleshipBoardBuilder = player.gameboardBuilder;
   const playerBoardController: BattleshipBoardController = player.gameboardController;
   const boardSize: number = playerBoardBuilder.boardSize;
-  const playerFleet: Fleet = player.fleet;
+  const playerFleet: Fleet = player.fleetBuilder.fleet;
 
   for (const shipName in playerFleet) {
     const ship: BattleshipBuilder = playerFleet[shipName];
