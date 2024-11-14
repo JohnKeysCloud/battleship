@@ -6,7 +6,7 @@ import {
   Coordinates,
   CoordinatesArray,
   CoordinatesSet,
-  CoordinatesSetMember,
+  CoordinatesSetMemberKey,
   FleetValidRotationalParams,
   IBattleshipGameboardController,
   IFleetCoordinates,
@@ -125,6 +125,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       );
     }
   }
+
   public placePiece({
     ship,
     coordinates,
@@ -302,11 +303,11 @@ export class BattleshipBoardController implements IBattleshipGameboardController
   }
 
   // ? maybe use this with UI? (TODO: create return value type)
-  private getShipCoordinatesAt(coordinates: Coordinates) {
+  private getShipAt(coordinates: Coordinates) {
     if (this.areCoordinatesVacant(coordinates)) return;
 
     const [x, y]: Coordinates = coordinates;
-    const formattedInputCoordinates: CoordinatesSetMember = `[${x}, ${y}]`;
+    const formattedInputCoordinates: CoordinatesSetMemberKey = `[${x}, ${y}]`;
 
     for (const shipType in this.fleetCoordinates) {
       const shipCoordinateSet: CoordinatesSet = this.fleetCoordinates[shipType];

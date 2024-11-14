@@ -4,7 +4,7 @@ import {
   Coordinates,
   CoordinatesArray,
   CoordinatesSet,
-  CoordinatesSetMember,
+  CoordinatesSetMemberKey,
   Gameboard,
   IFleetCoordinates,
   IPlacementConfigurations,
@@ -134,7 +134,7 @@ export function placeShip({
       ) => {
           placementCoordinates.forEach((coordinates: Coordinates) => {
             const [x, y]: Coordinates = coordinates;
-            const setMemberTemplate: CoordinatesSetMember = `[${x}, ${y}]`;
+            const setMemberTemplate: CoordinatesSetMemberKey = `[${x}, ${y}]`;
             shipCoordinatesSet!.add(setMemberTemplate);
           });
       };

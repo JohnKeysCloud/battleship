@@ -29,8 +29,8 @@ export type AngleOfRotation = null | AnglesOfRotation;
 export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type CoordinatesArray = Coordinates[];
-export type CoordinatesSet = Set<CoordinatesSetMember> | null;
-export type CoordinatesSetMember = `[${number}, ${number}]`;
+export type CoordinatesSet = Set<CoordinatesSetMemberKey> | null;
+export type CoordinatesSetMemberKey = `[${number}, ${number}]`;
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;
 };
