@@ -22,6 +22,7 @@ function init() {
   // 💭 ----------------- TESTING GAMEBOARD METHODS ------------------
 
   const computerBoardController: BattleshipBoardController = players.playerTwo.gameboardController;
+  const computerBoardRepository = players.playerTwo.gameboardRepository;
   const computerCarrier: BattleshipBuilder = players.playerTwo.fleetBuilder.fleet.carrier!;
 
   // * Should log warning because ship is already placed
@@ -29,69 +30,69 @@ function init() {
   // computerBoardController.placePiece({ ship: computerCarrier, coordinates: [0, 0], orientation: 'horizontal' });
   
   console.log('Initial fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
 
   // * initial board print
   console.log('Initial randomized board');
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship once
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship again
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship another time
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship penultimately
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship once more
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * move da ship
   console.log(`Move ${computerCarrier.type}:`);
   computerBoardController.movePiece(computerCarrier, [9, 0]);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship in new position
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship penultimately, again
   console.log(`Rotate ${computerCarrier.type}:`);
   computerBoardController.rotatePiece(computerCarrier);
   computerBoardController.prettyPrint();
   console.log('Fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
   
   // * rotate ship once more, again
   console.log(`Rotate ${computerCarrier.type}:`);
@@ -100,7 +101,7 @@ function init() {
   
   // * check all coordinates the ship occupies
   console.log('Final fleet coordinates:');
-  console.log(computerBoardController.fleetCoordinates);
+  console.log(computerBoardRepository.fleetCoordinates);
 }
 
 // time all the above stuff

@@ -3,10 +3,7 @@ import {
   AxisArrayKey,
   Coordinates,
   CoordinatesArray,
-  CoordinatesSet,
-  CoordinatesSetMemberKey,
   Gameboard,
-  IFleetCoordinates,
   IPlacementConfigurations,
   IPlacePieceCallbackParams,
   IPosition,
@@ -24,8 +21,9 @@ export function placeShip({
   ship,
   coordinates,
   orientation,
-  battleshipBoardBuilder,
   battleshipBoardController,
+  battleshipBoardBuilder,
+  battleshipBoardRepository
 }: IPlacePieceCallbackParams): void {  
   const shipLength: ShipLength = ship.length;
   const [bowX, bowY]: Coordinates = coordinates;
@@ -50,7 +48,7 @@ export function placeShip({
   ): boolean => {
     const validPositions: IValidPositionsResult =
       battleshipBoardController.getValidPositions(shipConfigurations);
-            
+
     return validPositions[axisArrayKey].some((validPosition: IPosition) =>
       arePositionsEqual(position, validPosition)
     );
@@ -128,23 +126,10 @@ export function placeShip({
       shipType: ShipType,
       placementCoordinates: CoordinatesArray
     ): void => {
-      const addShipSetToFleetCoordinates = (
-        placementCoordinates: CoordinatesArray,
-        shipCoordinatesSet: CoordinatesSet
-      ) => {
-          placementCoordinates.forEach((coordinates: Coordinates) => {
-            const [x, y]: Coordinates = coordinates;
-            const setMemberTemplate: CoordinatesSetMemberKey = `[${x}, ${y}]`;
-            shipCoordinatesSet!.add(setMemberTemplate);
-          });
-      };
-      const fleetCoordinates: IFleetCoordinates = battleshipBoardController.fleetCoordinates;
-
-      if (!fleetCoordinates[shipType]) fleetCoordinates[shipType] = new Set();
-
-      const shipCoordinatesSet: CoordinatesSet = fleetCoordinates[shipType];
-
-      addShipSetToFleetCoordinates(placementCoordinates, shipCoordinatesSet);
+      battleshipBoardRepository.addShipToFleetCoordinates(
+        shipType,
+        placementCoordinates
+      );
     };
 
     const placementCoordinates: CoordinatesArray = getPlacementCoordinates(

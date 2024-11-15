@@ -96,6 +96,6 @@ This method simply retrieves one of the ships of a fleet. It's parameter accepts
 
 Since the method must return an instance of the `BattleshipBuilder`, it must ensure that the ship is defined, hence the conditional check. TypeScript's typing system would throw an error otherwise.
 
-### `createBattleshipFleets` Factory Function
+### `createBattleshipFleetBuilderSet` Factory Function
 
 This factory function creates an object containing player one's and player two's fleets depending on the version (i.e, Hasbro - 2002 and Milton Bradley - 1990). It accepts the version _year_ in its parameters.

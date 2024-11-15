@@ -10,17 +10,19 @@ import {
 } from '../../../../types/logic-types';
 import { createAxisArrayKey, createShipConfigurations } from '../../../../utilities/logic-utilities';
 import { BattleshipBoardBuilder } from '../../../bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardRepository } from '../../../bs-gameboard-repository/bs-gameboard-repository';
 import { BattleshipBoardController } from '../../bs-gameboard-controller';
 
 describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder);
+  let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
 
   // Creates a new instance for each test run
   beforeEach(() => {
     testBoardBuilder = new BattleshipBoardBuilder();
-    testBoardController = new BattleshipBoardController(testBoardBuilder);
+    testBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
   });
 
   // Test function utility

@@ -14,17 +14,19 @@ import { BattleshipBoardController } from '../../bs-gameboard-controller';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 import { createPositionObject } from '../../../../utilities/logic-utilities';
+import { BattleshipBoardRepository } from '../../../bs-gameboard-repository/bs-gameboard-repository';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
   // 💭 Setup
   const getNewCarrierTestShip = (): BattleshipBuilder => BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder);
+  let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
 
   beforeEach(() => {
     testBoardBuilder = new BattleshipBoardBuilder();
-    testBoardController = new BattleshipBoardController(testBoardBuilder);
+    testBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>

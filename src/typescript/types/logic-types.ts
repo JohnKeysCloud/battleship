@@ -1,4 +1,7 @@
+import { BattleshipFleetBuilder } from '../logic/bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBoardBuilder } from '../logic/bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardController } from '../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { BattleshipBoardRepository } from '../logic/bs-gameboard-repository/bs-gameboard-repository';
 import {
   BattleshipBuilder,
   SHIP_SYMBOLS
@@ -75,18 +78,40 @@ interface IGridGameboard<T> {
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 };
-
 interface IGridGameboardController {
   placePiece(...args: any): void;
   removePiece(...args: any): void;
   resetBoard(): void;
 }
+export interface IBattlehipFleetBuilderSet {
+  playerOneFleetBuilder: BattleshipFleetBuilder;
+  playerTwoFleetBuilder: BattleshipFleetBuilder;
+};
+export interface IBattleshipGameboardBuilderSet {
+  playerOneBoardBuilder: BattleshipBoardBuilder;
+  playerTwoBoardBuilder: BattleshipBoardBuilder;
+};
+export interface IBattleshipFleetBuilderSet {
+  playerOneFleetBuilder: BattleshipFleetBuilder;
+  playerTwoFleetBuilder: BattleshipFleetBuilder;
+};
 export interface IBattleshipGameboardController extends IGridGameboardController {
-  fleetCoordinates: IFleetCoordinates;
+  battleshipBoardBuilder: BattleshipBoardBuilder;
+  getValidPositions(shipPlacementConfigs: IShipPlacementConfigurations): IValidPositionsResult;
+  movePiece(ship: BattleshipBuilder, newBowCoordinates: Coordinates): void;
   placePiece(options: IPlacePieceWrapperParams): void;
+  prettyPrint(): void;
   removePiece(ship: BattleshipBuilder, resetInitialConfigs: boolean): void;
   resetBoard(): void;
-  getValidPositions(shipPlacementConfigs: IShipPlacementConfigurations): IValidPositionsResult;
+  rotatePiece(ship: BattleshipBuilder): void;
+};
+export interface IBattleshipGameboardControllerSet {
+  playerOneBoardController: BattleshipBoardController;
+  playerTwoBoardController: BattleshipBoardController;
+};
+export interface IBattleshipGameboardRepositorySet {
+  playerOneBoardRepository: BattleshipBoardRepository;
+  playerTwoBoardRepository: BattleshipBoardRepository;
 }
 export interface IFleetCoordinates extends OccupiedPositionsMap { };
 export interface IPlacementConfigurations {
@@ -105,7 +130,8 @@ export interface IPlacePieceWrapperParams extends IPlacePieceParams {
 };
 export interface IPlacePieceCallbackParams extends IPlacePieceWrapperParams {
   battleshipBoardBuilder: BattleshipBoardBuilder
-  battleshipBoardController: IBattleshipGameboardController;
+  battleshipBoardController: BattleshipBoardController;
+  battleshipBoardRepository: BattleshipBoardRepository;
 };
 export interface IPosition {
   bow: Coordinates; // [rowIndex, colIndex]
@@ -131,7 +157,7 @@ export interface ITestCaseValidPositions {
 };
 export interface IValidPlacementCallbackParams extends IShipPlacementConfigurations {
   battleshipBoardBuilder: BattleshipBoardBuilder;
-  battleshipBoardController: IBattleshipGameboardController;
+  battleshipBoardController: BattleshipBoardController;
 };
 export interface IValidPositionsResult {
   [key: AxisArrayKey]: IPosition[];
