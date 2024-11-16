@@ -31,7 +31,9 @@ import {
   arePositionsEqual,
   createAxisArrayKey,
   createPositionObject,
+  isAngleOfRotation,
   isPositionInBounds,
+  isPlacePieceParams
 } from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
@@ -431,13 +433,13 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         new Map();
 
       for (const angleOfRotation in rotatedPiecePlacementParams) {
-        const rotatedPiecePlacementConfigurations: RotatedPlacePieceConfigurations =
-          rotatedPiecePlacementParams[angleOfRotation];
-
-        if (rotatedPiecePlacementConfigurations === 'outOfBounds') continue;
+        if (
+          !isAngleOfRotation(angleOfRotation) ||
+          !isPlacePieceParams(rotatedPiecePlacementParams[angleOfRotation])
+        ) continue;
 
         const { coordinates: bowCoordinates, orientation }: IPlacePieceParams =
-          rotatedPiecePlacementConfigurations;
+          rotatedPiecePlacementParams[angleOfRotation];
 
         const isPositionValid: boolean = validatePosition(
           bowCoordinates,

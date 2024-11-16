@@ -1,13 +1,16 @@
 import {
+  AnglesOfRotation,
   AxisArrayKey,
   Coordinates,
   IBattlehipFleetBuilderSet,
   IBattleshipGameboardBuilderSet,
   IBattleshipGameboardControllerSet,
   IBattleshipGameboardRepositorySet,
+  IPlacePieceParams,
   IPosition,
   IShipPlacementConfigurations,
   Orientation,
+  RotatedPlacePieceConfigurations,
   ShipLength,
   Version
 } from "../types/logic-types";
@@ -125,4 +128,16 @@ export const arePositionsEqual = (
     areArraysEqual(positionOne.bow, positionTwo.bow) &&
     areArraysEqual(positionOne.stern, positionTwo.stern)
   );
+};
+
+// 💭 --------------------------------------------------------------
+
+// * TYPE GUARDS
+export function isAngleOfRotation(value: any): value is AnglesOfRotation {
+  return Object.values(AnglesOfRotation).includes(value);
+}
+export const isPlacePieceParams = (
+  value: RotatedPlacePieceConfigurations
+): value is IPlacePieceParams => {
+  return (value as IPlacePieceParams).coordinates !== undefined;
 };
