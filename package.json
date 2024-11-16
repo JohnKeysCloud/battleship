@@ -12,6 +12,7 @@
     "gitpush": "./_shells/gitpush.sh",
     "gitpushnode": "node ./_shells/gitpush.js",
     "minifyhtml": "./_shells/minifyhtml.sh",
+    "nodetsc": "tsc -p config/tsconfig.json",
     "serve": "webpack serve --progress --config config/webpack/webpack.dev.js",
     "test": "jest --config=config/jest.config.js",
     "watchjest": "jest --watch --config=config/jest.config.js"
@@ -54,6 +55,7 @@
     "style-loader": "^4.0.0",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "webpack": "^5.93.0",
     "webpack-cli": "^5.1.4",
