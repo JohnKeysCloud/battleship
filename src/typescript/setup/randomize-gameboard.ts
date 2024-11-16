@@ -6,7 +6,7 @@ import {
   IShipPlacementConfigurations,
   Orientation,
   IPosition,
-  AxisArrayKey
+  AxisArrayKey,
 } from '../types/logic-types';
 import {
   areArraysEqual,
@@ -15,6 +15,7 @@ import {
 import { BattleshipBoardBuilder } from '../logic/bs-gameboard-builder/bs-gameboard-builder';
 import { BattleshipBuilder } from '../logic/bs-ship-builder/bs-ship-builder';
 import { BattleshipBoardController } from '../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { isShipType } from '../utilities/logic-utilities';
 
 export function randomizeGameboard(player: PlayerState) {
   const generateRandomCoordinates = (
@@ -84,8 +85,10 @@ export function randomizeGameboard(player: PlayerState) {
   const boardSize: number = playerBoardBuilder.boardSize;
   const playerFleet: Fleet = player.fleetBuilder.fleet;
 
-  for (const shipName in playerFleet) {
-    const ship: BattleshipBuilder = playerFleet[shipName];
+  for (const shipType in playerFleet) {
+    if (!isShipType(shipType)) throw new Error(`Invalid Type: "${shipType}" doesn't conform to "ShipType".`);
+
+    const ship: BattleshipBuilder = playerFleet[shipType]!;
     const randomOrientation: Orientation = generateRandomOrientation();
 
     const coordinates: Coordinates = getValidCoordinatesRecursively(

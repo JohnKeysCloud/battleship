@@ -9,6 +9,7 @@ import {
   ShipType,
   ValidRotationalPositionMap
 } from "../../types/logic-types";
+import { isCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
 
 export class BattleshipBoardRepository {
   private readonly _fleetCoordinates: IFleetCoordinates = {};
@@ -38,9 +39,16 @@ export class BattleshipBoardRepository {
     const [x, y]: Coordinates = coordinates;
     const coordinateSetMemberKey: CoordinatesSetMemberKey = `[${x}, ${y}]`;
 
-    for (const shipType in this.fleetCoordinates) {
-      if (!this.fleetCoordinates[shipType]) continue;
+    if (!isFleetCoordinates(this.fleetCoordinates)) {
+      throw new Error(`Invalid Type: "${this.fleetCoordinates}" doesn't conform to "IFleetCoordinates".`);
+    }
 
+    for (const shipType in this.fleetCoordinates) {
+      if (!isShipType(shipType))
+        throw new Error(`Invalid Type: "${shipType}" doesn't conform to "ShipType".`);
+      if (!isCoordinatesSet(this.fleetCoordinates[shipType]))
+        throw new Error(`Invalid Type: "${this.fleetCoordinates[shipType]}" doesn't conform to "CoordinatesSet".`);
+      
       const shipCoordinateSet: CoordinatesSet = this.fleetCoordinates[shipType];
 
       if (shipCoordinateSet!.has(coordinateSetMemberKey)) {

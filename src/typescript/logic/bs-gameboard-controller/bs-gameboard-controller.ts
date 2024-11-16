@@ -5,11 +5,7 @@ import {
   AxisArrayKey,
   Coordinates,
   CoordinatesArray,
-  CoordinatesSet,
-  CoordinatesSetMemberKey,
-  FleetValidRotationalParams,
   IBattleshipGameboardController,
-  IFleetCoordinates,
   IPlacePieceCallbackParams,
   IPlacePieceParams,
   IPlacePieceWrapperParams,
@@ -19,7 +15,6 @@ import {
   IValidPositionsResult,
   Orientation,
   RotatedCoordinatesValue,
-  RotatedPlacePieceConfigurations,
   RotatedPlacePieceParams,
   ShipLength,
   ShipType,
@@ -433,10 +428,13 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         new Map();
 
       for (const angleOfRotation in rotatedPiecePlacementParams) {
-        if (
-          !isAngleOfRotation(angleOfRotation) ||
-          !isPlacePieceParams(rotatedPiecePlacementParams[angleOfRotation])
-        ) continue;
+        if (!isAngleOfRotation(+angleOfRotation))
+          throw new Error(`Invalid Type: "${angleOfRotation}" doesn't conform to "AngleOfRotation".`);
+
+        if (!isPlacePieceParams(rotatedPiecePlacementParams[angleOfRotation]))
+          throw new Error(
+            `Invalid Type: "${rotatedPiecePlacementParams[angleOfRotation]}" doesn't conform to "IPlacePieceParams".`
+          );
 
         const { coordinates: bowCoordinates, orientation }: IPlacePieceParams =
           rotatedPiecePlacementParams[angleOfRotation];

@@ -6,6 +6,7 @@ import {
 import {
   BattleshipBuilder,
 } from '../bs-ship-builder/bs-ship-builder';
+import { isShipType } from '../../utilities/logic-utilities';
 
 export class BattleshipFleetBuilder {
   private constructor(public readonly fleet: Fleet) {
@@ -14,9 +15,6 @@ export class BattleshipFleetBuilder {
 
   private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};
-    const isShipType = (key: string): key is ShipType => {
-      return Object.values(ShipType).includes(key as ShipType);
-    };
 
     for (const [shipType, config] of Object.entries(fleetConfigs)) {
       if (config && isShipType(shipType)) {

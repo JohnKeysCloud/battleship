@@ -2,10 +2,6 @@ import { BattleshipBuilder } from './typescript/logic/bs-ship-builder/bs-ship-bu
 import { BattleshipBoardController } from './typescript/logic/bs-gameboard-controller/bs-gameboard-controller';
 import { randomizeGameboard } from './typescript/setup/randomize-gameboard';
 import { players } from './typescript/state/player-state';
-import { BattleshipBoardBuilder } from './typescript/logic/bs-gameboard-builder/bs-gameboard-builder';
-
-// expose players object to global scope for console fun
-window['playerObj'] = players;
 
 function init() {
   const randomizeGameboards = () => {

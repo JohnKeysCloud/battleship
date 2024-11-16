@@ -2,16 +2,20 @@ import {
   AnglesOfRotation,
   AxisArrayKey,
   Coordinates,
+  CoordinatesSet,
+  CoordinatesSetMemberKey,
   IBattlehipFleetBuilderSet,
   IBattleshipGameboardBuilderSet,
   IBattleshipGameboardControllerSet,
   IBattleshipGameboardRepositorySet,
+  IFleetCoordinates,
   IPlacePieceParams,
   IPosition,
   IShipPlacementConfigurations,
+  OccupiedPositionsMap,
   Orientation,
-  RotatedPlacePieceConfigurations,
   ShipLength,
+  ShipType,
   Version
 } from "../types/logic-types";
 import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
@@ -133,11 +137,56 @@ export const arePositionsEqual = (
 // 💭 --------------------------------------------------------------
 
 // * TYPE GUARDS
-export function isAngleOfRotation(value: any): value is AnglesOfRotation {
-  return Object.values(AnglesOfRotation).includes(value);
+export function isAngleOfRotation(
+  value: unknown
+): value is AnglesOfRotation {
+  return Object.values(AnglesOfRotation).includes(value as ShipType);
+}
+export const isCoordinatesSet = (value: unknown): value is CoordinatesSet => {
+  if (value === null) return true;
+  if (!(value instanceof Set)) return false;
+
+  for (const member of value) {
+    if (!isCoordinatesSetMemberKey(member)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+export const isFleetCoordinates = (
+  value: unknown
+): value is IFleetCoordinates => {
+  if (typeof value !== 'object' || value === null) return false;
+
+  for (const key in value) {
+    if (!Object.values(ShipType).includes(key as ShipType)) {
+      return false
+    }
+
+    const coordinatesSetOrNull = (value as OccupiedPositionsMap)[
+      key as ShipType
+    ];
+
+    if (coordinatesSetOrNull !== null && !isCoordinatesSet(coordinatesSetOrNull)) {
+      return false;
+    }
+  }
+  return true;
 }
 export const isPlacePieceParams = (
-  value: RotatedPlacePieceConfigurations
+  value: unknown
 ): value is IPlacePieceParams => {
   return (value as IPlacePieceParams).coordinates !== undefined;
-};
+}
+export const isCoordinatesSetMemberKey = (value: unknown): value is CoordinatesSetMemberKey => {
+  if (typeof value !== 'string') return false;
+
+  const match = value.match(/^\[\d{1}, \d{1}\]$/);
+  return match !== null;
+}
+export const isShipType = (
+  value: unknown
+): value is ShipType => {
+  return Object.values(ShipType).includes(value as ShipType);
+}
