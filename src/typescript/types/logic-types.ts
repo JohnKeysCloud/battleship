@@ -51,8 +51,9 @@ export type OutOfBounds = 'outOfBounds';
 export type Orientation = 'horizontal' | 'vertical';
 export type RotatedCoordinatesValue = Coordinates | OutOfBounds;
 export type RotatedPlacePieceParams = {
-  [Key in AnglesOfRotation]?: IPlacePieceParams | OutOfBounds;
+  [Key in AnglesOfRotation]?: RotatedPlacePieceParamsValue;
 };
+export type RotatedPlacePieceParamsValue = IPlacePieceParams | OutOfBounds;
 export type RotatedPlacePieceConfigurations = IPlacePieceParams | OutOfBounds;
 export type ShipConfig = {
   type: ShipType;

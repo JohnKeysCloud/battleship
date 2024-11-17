@@ -1,4 +1,6 @@
 import { BattleshipBoardBuilder } from '../bs-gameboard-builder/bs-gameboard-builder';
+import { BattleshipBoardRepository } from '../bs-gameboard-repository/bs-gameboard-repository';
+import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 import {
   AngleOfRotation,
   AnglesOfRotation,
@@ -16,23 +18,23 @@ import {
   Orientation,
   RotatedCoordinatesValue,
   RotatedPlacePieceParams,
+  RotatedPlacePieceParamsValue,
   ShipLength,
   ShipType,
   ValidRotationalPositionMap,
 } from '../../types/logic-types';
-import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 import {
   areCoordinatesInBounds,
   arePositionsEqual,
   createAxisArrayKey,
   createPositionObject,
   isAngleOfRotation,
+  isOutOfBounds,
+  isPlacePieceParams,
   isPositionInBounds,
-  isPlacePieceParams
 } from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
-import { BattleshipBoardRepository } from '../bs-gameboard-repository/bs-gameboard-repository';
 
 export class BattleshipBoardController implements IBattleshipGameboardController { 
   constructor(
@@ -427,32 +429,43 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       const validRotatedPlacePieceParams: ValidRotationalPositionMap =
         new Map();
 
-      for (const angleOfRotation in rotatedPiecePlacementParams) {
-        if (!isAngleOfRotation(+angleOfRotation))
-          throw new Error(`Invalid Type: "${angleOfRotation}" doesn't conform to "AngleOfRotation".`);
+      for (const angleOfRotationString of Object.keys(rotatedPiecePlacementParams)) {
+        const angleOfRotationToNum = +angleOfRotationString as AngleOfRotation;
 
-        if (!isPlacePieceParams(rotatedPiecePlacementParams[angleOfRotation]))
+        if (!isAngleOfRotation(angleOfRotationToNum)) {
+          throw new Error(`Invalid Type: "${angleOfRotationString}" doesn't conform to "AngleOfRotation".`);
+        }
+      
+        const rotatedPlacePieceParamsValue: RotatedPlacePieceParamsValue =
+          rotatedPiecePlacementParams[angleOfRotationToNum]!;
+      
+        if (
+          !(isPlacePieceParams(rotatedPlacePieceParamsValue) ||
+          isOutOfBounds(rotatedPlacePieceParamsValue))
+        ) {
           throw new Error(
-            `Invalid Type: "${rotatedPiecePlacementParams[angleOfRotation]}" doesn't conform to "IPlacePieceParams".`
+            `Invalid Type: "${rotatedPlacePieceParamsValue}" doesn't conform to "RotatedPlacePieceParams".`
           );
-
-        const { coordinates: bowCoordinates, orientation }: IPlacePieceParams =
-          rotatedPiecePlacementParams[angleOfRotation];
-
+        }
+      
+        if (!isPlacePieceParams(rotatedPlacePieceParamsValue)) continue;
+      
+        const { coordinates: bowCoordinates, orientation }: IPlacePieceParams = rotatedPlacePieceParamsValue;
+      
         const isPositionValid: boolean = validatePosition(
           bowCoordinates,
           orientation,
-          +angleOfRotation,
+          angleOfRotationToNum,
           ship.length
         );
-
+      
         if (isPositionValid) {
           const placePieceParams: IPlacePieceParams = {
             coordinates: bowCoordinates,
             orientation,
           };
-
-          validRotatedPlacePieceParams.set(+angleOfRotation, placePieceParams);
+        
+          validRotatedPlacePieceParams.set(angleOfRotationToNum, placePieceParams);
         }
       }
 

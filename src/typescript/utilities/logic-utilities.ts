@@ -14,15 +14,17 @@ import {
   IShipPlacementConfigurations,
   OccupiedPositionsMap,
   Orientation,
+  OutOfBounds,
+  RotatedCoordinatesValue,
   ShipLength,
   ShipType,
   Version
 } from "../types/logic-types";
 import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
 import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
+import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-gameboard-repository";
 import { BattleshipFleetBuilder } from "../logic/bs-fleet-builder/bs-fleet-builder";
 import { areArraysEqual } from "./random-utilities";
-import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-gameboard-repository";
 
 // 💭 --------------------------------------------------------------
 
@@ -141,7 +143,12 @@ export function isAngleOfRotation(
   value: unknown
 ): value is AnglesOfRotation {
   return Object.values(AnglesOfRotation).includes(value as ShipType);
-}
+};
+export const isCoordinates = (value: unknown): value is Coordinates => {
+  if (!Array.isArray(value) || value.length !== 2) return false;
+
+  return value.every((coordinate) => typeof coordinate === 'number');
+};
 export const isCoordinatesSet = (value: unknown): value is CoordinatesSet => {
   if (value === null) return true;
   if (!(value instanceof Set)) return false;
@@ -153,7 +160,7 @@ export const isCoordinatesSet = (value: unknown): value is CoordinatesSet => {
   }
 
   return true;
-}
+};
 export const isFleetCoordinates = (
   value: unknown
 ): value is IFleetCoordinates => {
@@ -173,20 +180,32 @@ export const isFleetCoordinates = (
     }
   }
   return true;
-}
+};
+export const isOutOfBounds = (value: unknown): value is OutOfBounds => {
+  return (value) === 'outOfBounds';
+};
 export const isPlacePieceParams = (
   value: unknown
 ): value is IPlacePieceParams => {
-  return (value as IPlacePieceParams).coordinates !== undefined;
-}
+  if (typeof value !== 'object' || value === null) return false;
+
+  if (!isCoordinates((value as IPlacePieceParams).coordinates)) return false;
+
+  return true;
+};
 export const isCoordinatesSetMemberKey = (value: unknown): value is CoordinatesSetMemberKey => {
   if (typeof value !== 'string') return false;
 
   const match = value.match(/^\[\d{1}, \d{1}\]$/);
   return match !== null;
-}
+};
+export const isRotatedCoordinatesValue = (
+  value: unknown
+): value is RotatedCoordinatesValue => {
+  return isCoordinates(value) || isOutOfBounds(value);
+};
 export const isShipType = (
   value: unknown
 ): value is ShipType => {
   return Object.values(ShipType).includes(value as ShipType);
-}
+};
