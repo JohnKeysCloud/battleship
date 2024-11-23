@@ -9,6 +9,7 @@ import {
   ShipLength,
 } from '../../../../types/logic-types';
 import { createAxisArrayKey, createShipConfigurations } from '../../../../utilities/logic-utilities';
+import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBoardBuilder } from '../../../bs-gameboard-builder/bs-gameboard-builder';
 import { BattleshipBoardRepository } from '../../../bs-gameboard-repository/bs-gameboard-repository';
 import { BattleshipBoardController } from '../../bs-gameboard-controller';
@@ -17,12 +18,23 @@ describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
   let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
+  let testFleetBuilder: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController({
+    gameboardBuilder: testBoardBuilder,
+    gameboardRepository: testBoardRepository,
+    fleetBuilder: testFleetBuilder
+  });
 
   // Creates a new instance for each test run
   beforeEach(() => {
     testBoardBuilder = new BattleshipBoardBuilder();
-    testBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
+    testBoardRepository = new BattleshipBoardRepository();
+    testFleetBuilder = BattleshipFleetBuilder.createHasbroFleet(); 
+    testBoardController = new BattleshipBoardController({
+      gameboardBuilder: testBoardBuilder,
+      gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
+    });
   });
 
   // Test function utility

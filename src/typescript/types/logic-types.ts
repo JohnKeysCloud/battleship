@@ -6,6 +6,7 @@ import {
   BattleshipBuilder,
   SHIP_SYMBOLS
 } from '../logic/bs-ship-builder/bs-ship-builder';
+import { PlayerState } from './state-types';
 
 // 💭 --------------------------------------------------------------
 // 💭 Enumerations
@@ -40,13 +41,14 @@ export type Fleet = {
 export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
 };
+export type FleetCoordinates = {
+  [key in ShipType]?: CoordinatesSet | null;
+};
+
 export type FleetValidRotationalParams = {
   [key in ShipType]?: ValidRotationalPositionMap | null;
 };
 export type Gameboard = symbol[][];
-export type OccupiedPositionsMap = {
-  [key in ShipType]?: CoordinatesSet | null;
-};
 export type OutOfBounds = 'outOfBounds';
 export type Orientation = 'horizontal' | 'vertical';
 export type RotatedCoordinatesValue = Coordinates | OutOfBounds;
@@ -79,42 +81,43 @@ interface IGridGameboard<T> {
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
 };
-interface IGridGameboardController {
-  placePiece(...args: any): void;
-  removePiece(...args: any): void;
-  resetBoard(): void;
-}
 export interface IBattlehipFleetBuilderSet {
   playerOneFleetBuilder: BattleshipFleetBuilder;
   playerTwoFleetBuilder: BattleshipFleetBuilder;
-};
+}
 export interface IBattleshipGameboardBuilderSet {
   playerOneBoardBuilder: BattleshipBoardBuilder;
   playerTwoBoardBuilder: BattleshipBoardBuilder;
-};
+}
 export interface IBattleshipFleetBuilderSet {
   playerOneFleetBuilder: BattleshipFleetBuilder;
   playerTwoFleetBuilder: BattleshipFleetBuilder;
-};
+}
 export interface IBattleshipGameboardController extends IGridGameboardController {
-  battleshipBoardBuilder: BattleshipBoardBuilder;
-  getValidPositions(shipPlacementConfigs: IShipPlacementConfigurations): IValidPositionsResult;
+  playerState: Omit<PlayerState, 'gameboardController'>;
+  getValidPositions(
+    shipPlacementConfigs: IShipPlacementConfigurations
+  ): IValidPositionsResult;
   movePiece(ship: BattleshipBuilder, newBowCoordinates: Coordinates): void;
   placePiece(options: IPlacePieceWrapperParams): void;
   prettyPrint(): void;
   removePiece(ship: BattleshipBuilder, resetInitialConfigs: boolean): void;
-  resetBoard(): void;
+  removeAllPieces(): void;
   rotatePiece(ship: BattleshipBuilder): void;
-};
+}
 export interface IBattleshipGameboardControllerSet {
   playerOneBoardController: BattleshipBoardController;
   playerTwoBoardController: BattleshipBoardController;
-};
+}
 export interface IBattleshipGameboardRepositorySet {
   playerOneBoardRepository: BattleshipBoardRepository;
   playerTwoBoardRepository: BattleshipBoardRepository;
 }
-export interface IFleetCoordinates extends OccupiedPositionsMap { };
+interface IGridGameboardController {
+  placePiece(...args: any): void;
+  removePiece(...args: any): void;
+  removeAllPieces(): void;
+}
 export interface IPlacementConfigurations {
   coordinatesArray: CoordinatesArray | null;
   orientation: Orientation | null;

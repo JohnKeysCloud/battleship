@@ -19,14 +19,27 @@ import { BattleshipBoardRepository } from '../../../bs-gameboard-repository/bs-g
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
   // 💭 Setup
-  const getNewCarrierTestShip = (): BattleshipBuilder => BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
+  const getNewCarrierTestShip = (): BattleshipBuilder =>
+    BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
+
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
   let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
+  let testFleetBuilder: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+  let testBoardController: BattleshipBoardController = new BattleshipBoardController({
+    gameboardBuilder: testBoardBuilder,
+    gameboardRepository: testBoardRepository,
+    fleetBuilder: testFleetBuilder,
+  });
 
   beforeEach(() => {
     testBoardBuilder = new BattleshipBoardBuilder();
-    testBoardController = new BattleshipBoardController(testBoardBuilder, testBoardRepository);
+    testBoardRepository = new BattleshipBoardRepository();
+    testFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+    testBoardController = new BattleshipBoardController({
+      gameboardBuilder: testBoardBuilder,
+      gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
+    });
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>
@@ -59,16 +72,31 @@ describe('`placeShip`', () => {
     return expectedBoard;
   };
 
-  const generateCoordinates = (bowX: number, bowY: number): Coordinates => [bowX, bowY];
+  const generateCoordinates = (bowX: number, bowY: number): Coordinates => [
+    bowX,
+    bowY,
+  ];
 
   const generateOrientation = (orientation: Orientation): Orientation => {
     return orientation;
-  }
+  };
 
-  const generateOverlapErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string =>
-    `"${JSON.stringify(createPositionObject(coordinates, orientation, ship.length))}" is unavailable for ship with Size: ${ship.length} and Orientation: ${orientation}.`;
+  const generateOverlapErrorMessage = ({
+    ship,
+    coordinates,
+    orientation,
+  }: IPlacePieceWrapperParams): string =>
+    `"${JSON.stringify(
+      createPositionObject(coordinates, orientation, ship.length)
+    )}" is unavailable for ship with Size: ${
+      ship.length
+    } and Orientation: ${orientation}.`;
 
-  const generateOutOfBoundsErrorMessage = ({ ship, coordinates, orientation }: IPlacePieceWrapperParams): string => {
+  const generateOutOfBoundsErrorMessage = ({
+    ship,
+    coordinates,
+    orientation,
+  }: IPlacePieceWrapperParams): string => {
     return `Invalid Command: The ship placement attempt with the following configurations is out of bounds - Coordinates: ${coordinates}, Length: ${ship.length}, Orientation: ${orientation}.`;
   };
 
@@ -86,7 +114,7 @@ describe('`placeShip`', () => {
         expected: generateExpectedBoard({
           ship: getNewCarrierTestShip(),
           coordinates: [0, 3],
-          orientation: 'horizontal'
+          orientation: 'horizontal',
         }),
       },
       {
@@ -98,7 +126,7 @@ describe('`placeShip`', () => {
         expected: generateExpectedBoard({
           ship: getNewCarrierTestShip(),
           coordinates: [4, 5],
-          orientation: 'vertical'
+          orientation: 'vertical',
         }),
       },
     ];
@@ -111,7 +139,6 @@ describe('`placeShip`', () => {
       }
     );
   });
-
 
   describe('ship overlap', () => {
     const getNewSubmarineTestShip = (): BattleshipBuilder =>
@@ -168,7 +195,7 @@ describe('`placeShip`', () => {
         expectedError: generateOutOfBoundsErrorMessage({
           ship: getNewCarrierTestShip(),
           coordinates: [7, 0],
-          orientation: 'horizontal'
+          orientation: 'horizontal',
         }),
       },
       {
@@ -180,7 +207,7 @@ describe('`placeShip`', () => {
         expectedError: generateOutOfBoundsErrorMessage({
           ship: getNewCarrierTestShip(),
           coordinates: [0, 8],
-          orientation: 'vertical'
+          orientation: 'vertical',
         }),
       },
     ];
@@ -188,7 +215,7 @@ describe('`placeShip`', () => {
     test.each(outOfBoundsTestCases)(
       'ship placement out of bounds throws error',
       ({ input, expectedError }) => {
-        expect(() => placeShip(input)).toThrow(expectedError)
+        expect(() => placeShip(input)).toThrow(expectedError);
       }
     );
   });

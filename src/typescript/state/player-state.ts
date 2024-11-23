@@ -12,13 +12,15 @@ const { playerOneBoardBuilder, playerTwoBoardBuilder } =
 const { playerOneBoardRepository, playerTwoBoardRepository } =
   createBattleshipBoardRepositorySet();
 
+const { playerOneFleetBuilder, playerTwoFleetBuilder } =
+    createBattleshipFleetBuilderSet();
+
 const { playerOneBoardController, playerTwoBoardController } =
   createBattleshipControllerSet(
     { playerOneBoardBuilder, playerTwoBoardBuilder },
-    { playerOneBoardRepository, playerTwoBoardRepository }
+    { playerOneBoardRepository, playerTwoBoardRepository },
+    { playerOneFleetBuilder, playerTwoFleetBuilder }
   );
-
-const { playerOneFleetBuilder, playerTwoFleetBuilder } = createBattleshipFleetBuilderSet();
 
 const playerOne: PlayerState = {
   gameboardBuilder: playerOneBoardBuilder,

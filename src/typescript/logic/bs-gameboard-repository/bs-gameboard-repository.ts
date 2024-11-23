@@ -4,23 +4,26 @@ import {
   CoordinatesArray,
   CoordinatesSet,
   CoordinatesSetMemberKey,
+  FleetCoordinates,
   FleetValidRotationalParams,
-  IFleetCoordinates,
   ShipType,
   ValidRotationalPositionMap
 } from "../../types/logic-types";
 import { isCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
 
 export class BattleshipBoardRepository {
-  private readonly _fleetCoordinates: IFleetCoordinates = {};
+  private readonly _fleetCoordinates: FleetCoordinates = {};
   private readonly _fleetValidRotationalParams: FleetValidRotationalParams = {};
 
-  public get fleetCoordinates(): IFleetCoordinates {
+  // 💭 --------------------------------------------------------------
+
+  public get fleetCoordinates(): FleetCoordinates {
     return this._fleetCoordinates;
   }
   public get fleetValidRotationalParams(): FleetValidRotationalParams {
     return this._fleetValidRotationalParams;
   }
+
   public addShipToFleetCoordinates(
     shipType: ShipType,
     placementCoordinates: CoordinatesArray
@@ -36,19 +39,29 @@ export class BattleshipBoardRepository {
     });
   }
   public getShipDataAt(coordinates: Coordinates) {
+    if (!isFleetCoordinates(this.fleetCoordinates)) {
+      throw new Error(
+        `Invalid Type: "${this.fleetCoordinates}" doesn't conform to "FleetCoordinates".`
+      );
+    }
+
+    const validateTypes = (shipType: unknown, coordinatesSet: unknown) => {
+      if (!isShipType(shipType))
+        throw new Error(
+          `Invalid Type: "${shipType}" doesn't conform to "ShipType".`
+        );
+      if (!isCoordinatesSet(coordinatesSet))
+        throw new Error(
+          `Invalid Type: "${coordinatesSet}" doesn't conform to "CoordinatesSet".`
+        );
+    };
+
     const [x, y]: Coordinates = coordinates;
     const coordinateSetMemberKey: CoordinatesSetMemberKey = `[${x}, ${y}]`;
 
-    if (!isFleetCoordinates(this.fleetCoordinates)) {
-      throw new Error(`Invalid Type: "${this.fleetCoordinates}" doesn't conform to "IFleetCoordinates".`);
-    }
-
     for (const shipType in this.fleetCoordinates) {
-      if (!isShipType(shipType))
-        throw new Error(`Invalid Type: "${shipType}" doesn't conform to "ShipType".`);
-      if (!isCoordinatesSet(this.fleetCoordinates[shipType]))
-        throw new Error(`Invalid Type: "${this.fleetCoordinates[shipType]}" doesn't conform to "CoordinatesSet".`);
-      
+      validateTypes(shipType, this.fleetCoordinates[shipType]);
+
       const shipCoordinateSet: CoordinatesSet = this.fleetCoordinates[shipType];
 
       if (shipCoordinateSet!.has(coordinateSetMemberKey)) {

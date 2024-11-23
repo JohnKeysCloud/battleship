@@ -1,0 +1,62 @@
+
+.gameboard-container {
+  border: 1px solid black;
+  height: 33vw;
+  position: relative;
+  width: 33vw;
+
+    .gameboard,
+    .gameboard-background {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-size), 1fr);
+      grid-template-rows: repeat(var(--grid-size), 1fr);
+    }
+
+    .gameboard {
+      height: 100%;
+      width: 100%;
+    }
+
+    .gameboard-background {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+
+      .grid-cell-container {
+        border: 1px solid black;
+
+        .grid-cell {
+          background-color: rgb(165, 205, 213);
+          height: 100%;
+          width: 100%;
+        }
+
+        .player-two-ca-cell {
+          background-color: red;
+          opacity: 0.3;
+        }
+        .player-two-bs-cell {
+          background-color: blue;
+          opacity: 0.3;
+        }
+        .player-two-dd-cell {
+          background-color: green;
+          opacity: 0.3;
+        }
+        .player-two-pb-cell {
+          background-color: yellow;
+          opacity: 0.3;
+        }
+        .player-two-sb-cell {
+          background-color: purple;
+          opacity: 0.3;
+        }
+      }
+    }
+}
+
+.ship-container {
+  background-color: #fef8f15f;
+  border: 2px solid black;
+  cursor: grab;
+}

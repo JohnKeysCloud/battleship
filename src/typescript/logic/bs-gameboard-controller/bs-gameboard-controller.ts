@@ -1,5 +1,3 @@
-import { BattleshipBoardBuilder } from '../bs-gameboard-builder/bs-gameboard-builder';
-import { BattleshipBoardRepository } from '../bs-gameboard-repository/bs-gameboard-repository';
 import { BattleshipBuilder } from '../bs-ship-builder/bs-ship-builder';
 import {
   AngleOfRotation,
@@ -7,6 +5,7 @@ import {
   AxisArrayKey,
   Coordinates,
   CoordinatesArray,
+  Fleet,
   IBattleshipGameboardController,
   IPlacePieceCallbackParams,
   IPlacePieceParams,
@@ -23,6 +22,7 @@ import {
   ShipType,
   ValidRotationalPositionMap,
 } from '../../types/logic-types';
+import { PlayerState } from '../../types/state-types';
 import {
   areCoordinatesInBounds,
   arePositionsEqual,
@@ -38,8 +38,7 @@ import { placeShip } from './helpers/place-ship/place-ship';
 
 export class BattleshipBoardController implements IBattleshipGameboardController { 
   constructor(
-    public battleshipBoardBuilder: BattleshipBoardBuilder, 
-    public battleshipBoardRepository: BattleshipBoardRepository
+    public readonly playerState: Omit<PlayerState, 'gameboardController'>
   ) {}
 
   public getValidPositions({
@@ -49,7 +48,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     const validPlacementArg: IValidPlacementCallbackParams = {
       orientation,
       shipLength,
-      battleshipBoardBuilder: this.battleshipBoardBuilder,
+      battleshipBoardBuilder: this.playerState.gameboardBuilder,
       battleshipBoardController: this,
     };
 
@@ -74,7 +73,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       ship.length
     );
 
-    if (!isPositionInBounds(newPosition, this.battleshipBoardBuilder.boardSize)) {
+    if (!isPositionInBounds(newPosition, this.playerState.gameboardBuilder.boardSize)) {
       console.warn(
         `Invalid Command: Position - Bow: [${newPosition.bow}] & Stern: [${newPosition.stern}] is out of bounds for the ${ship.type}.`
       );
@@ -130,8 +129,8 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       coordinates,
       orientation,
       battleshipBoardController: this,
-      battleshipBoardBuilder: this.battleshipBoardBuilder,
-      battleshipBoardRepository: this.battleshipBoardRepository,
+      battleshipBoardBuilder: this.playerState.gameboardBuilder,
+      battleshipBoardRepository: this.playerState.gameboardRepository,
     };
 
     placeShip(placeShipArg);
@@ -139,7 +138,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
   public prettyPrint(): void {
     console.table(
-      this.battleshipBoardBuilder.board.map((row) =>
+      this.playerState.gameboardBuilder.board.map((row) =>
         row.map((symbol) =>
           symbol.description === 'VC' ? null : symbol.description
         )
@@ -155,18 +154,18 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
     const removeShipFromBoard = (shipCoordinates: CoordinatesArray): void => {
       shipCoordinates.forEach(([x, y]) => {
-        this.battleshipBoardBuilder.board[y][x] = this.battleshipBoardBuilder.fillValue;
+        this.playerState.gameboardBuilder.board[y][x] = this.playerState.gameboardBuilder.fillValue;
       });
     };
     const nullifyShipCoordinateSetValue = (shipType: ShipType): void => {
-      this.battleshipBoardRepository.nullifyShipCoordinatesValue(shipType);
+      this.playerState.gameboardRepository.nullifyShipCoordinatesValue(shipType);
     };
     const resetShipConfigurations = (
       ship: BattleshipBuilder,
       shouldResetShipRotationalData: boolean
     ): void => {
       if (shouldResetShipRotationalData) {
-        this.battleshipBoardRepository.nullifyShipValidRotationalParams(ship.type);
+        this.playerState.gameboardRepository.nullifyShipValidRotationalParams(ship.type);
       }
 
       ship.resetConfigurations(shouldResetShipRotationalData);
@@ -180,9 +179,18 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     resetShipConfigurations(ship, shouldResetShipRotationalData);
   }
 
-  public resetBoard(): void {
-    for (let i = 0; i < this.battleshipBoardBuilder.boardSize; i++) {
-      this.battleshipBoardBuilder.board[i].fill(this.battleshipBoardBuilder.fillValue);
+  public removeAllPieces(): void {
+    const playerFleet: Fleet = this.playerState.fleetBuilder.fleet;
+
+    if (!Object.keys(playerFleet).length) {
+      console.error(
+        'Invalid Command: No ships to remove - Fleet is empty or uninitialized.'
+      );
+      return;
+    }
+
+    for (const ship of Object.values(playerFleet)) {
+      this.removePiece(ship);
     }
   }
 
@@ -190,7 +198,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     const setValidRotatedPlacePieceParams = (ship: BattleshipBuilder): void => {
         const validRotatedPlacePieceParams: ValidRotationalPositionMap = this.getValidRotatedPlacePieceParams(ship);
 
-        this.battleshipBoardRepository.setShipValidRotationalParams(
+        this.playerState.gameboardRepository.setShipValidRotationalParams(
           ship,
           validRotatedPlacePieceParams
         );
@@ -203,7 +211,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     ): boolean => validRotationalPositionMap.size > 1;
 
     const validRotationalPositionMap: ValidRotationalPositionMap =
-      this.battleshipBoardRepository.fleetValidRotationalParams[ship.type]!;
+      this.playerState.gameboardRepository.fleetValidRotationalParams[ship.type]!;
 
     if (!canShipBeRotated(validRotationalPositionMap)) {
       console.warn(`Invalid Command: The ${ship.type} cannot be rotated.`);
@@ -260,7 +268,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         };
       } else {
         const validRotationalPositionMap: ValidRotationalPositionMap =
-          this.battleshipBoardRepository.fleetValidRotationalParams[ship.type]!;
+          this.playerState.gameboardRepository.fleetValidRotationalParams[ship.type]!;
 
         const nextValidAngleOfRotation: AngleOfRotation =
           getNextGreatestAngleOfRotation(validRotationalPositionMap);
@@ -296,14 +304,14 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
   private areCoordinatesVacant(coordinates: Coordinates): boolean {
     const [x, y] = coordinates;
-    return this.battleshipBoardBuilder.board[y][x] === this.battleshipBoardBuilder.fillValue;
+    return this.playerState.gameboardBuilder.board[y][x] === this.playerState.gameboardBuilder.fillValue;
   }
 
   // ? maybe use this with UI? (TODO: create return value type)
   private getShipAt(coordinates: Coordinates) {
     if (this.areCoordinatesVacant(coordinates)) return;
 
-    return this.battleshipBoardRepository.getShipDataAt(coordinates);
+    return this.playerState.gameboardRepository.getShipDataAt(coordinates);
   }
 
   private getValidRotatedPlacePieceParams(ship: BattleshipBuilder) {
@@ -347,7 +355,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         ? [x, applyOffsetToCoordinate(y, ship.length)]
         : [applyOffsetToCoordinate(x, ship.length), y]; // angleOfRotation === 90
 
-      return areCoordinatesInBounds(rotatedBowCoordinates, this.battleshipBoardBuilder.boardSize)
+      return areCoordinatesInBounds(rotatedBowCoordinates, this.playerState.gameboardBuilder.boardSize)
         ? rotatedBowCoordinates
         : 'outOfBounds';
     };
@@ -416,9 +424,9 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
       for (i; i < axisIndexEnd; i++) {
         if (isHorizontal) {
-          if (this.battleshipBoardBuilder.board[y][x + i] !== this.battleshipBoardBuilder.fillValue) return false;
+          if (this.playerState.gameboardBuilder.board[y][x + i] !== this.playerState.gameboardBuilder.fillValue) return false;
         } else {
-          if (this.battleshipBoardBuilder.board[y + i][x] !== this.battleshipBoardBuilder.fillValue) return false;
+          if (this.playerState.gameboardBuilder.board[y + i][x] !== this.playerState.gameboardBuilder.fillValue) return false;
         }
       }
       return true;
@@ -491,7 +499,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
   private isShipValidForRemoval(ship: BattleshipBuilder): boolean {
     if (
       !ship.currentplacementConfigurations.coordinatesArray ||
-      !this.battleshipBoardRepository.isShipPlaced(ship.type)
+      !this.playerState.gameboardRepository.isShipPlaced(ship.type)
     ) {
       console.error(
         `Error removing ship: ${ship.type} is missing coordinates or not in the fleet.`

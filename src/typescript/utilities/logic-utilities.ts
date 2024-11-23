@@ -4,15 +4,15 @@ import {
   Coordinates,
   CoordinatesSet,
   CoordinatesSetMemberKey,
+  FleetCoordinates,
   IBattlehipFleetBuilderSet,
+  IBattleshipFleetBuilderSet,
   IBattleshipGameboardBuilderSet,
   IBattleshipGameboardControllerSet,
   IBattleshipGameboardRepositorySet,
-  IFleetCoordinates,
   IPlacePieceParams,
   IPosition,
   IShipPlacementConfigurations,
-  OccupiedPositionsMap,
   Orientation,
   OutOfBounds,
   RotatedCoordinatesValue,
@@ -31,22 +31,26 @@ import { areArraysEqual } from "./random-utilities";
 // * FACTORY FUNCTIONS
 export function createBattleshipBoardController(
   gameboardBuilder: BattleshipBoardBuilder,
-  gameboardRepository: BattleshipBoardRepository
+  gameboardRepository: BattleshipBoardRepository,
+  fleetBuilder: BattleshipFleetBuilder
 ): BattleshipBoardController {
-  return new BattleshipBoardController(gameboardBuilder, gameboardRepository);
+  return new BattleshipBoardController({gameboardBuilder, gameboardRepository, fleetBuilder});
 }
 export function createBattleshipControllerSet(
   { playerOneBoardBuilder, playerTwoBoardBuilder}: IBattleshipGameboardBuilderSet,
-  { playerOneBoardRepository, playerTwoBoardRepository}: IBattleshipGameboardRepositorySet,
+  { playerOneBoardRepository, playerTwoBoardRepository }: IBattleshipGameboardRepositorySet,
+  { playerOneFleetBuilder, playerTwoFleetBuilder }: IBattleshipFleetBuilderSet
 ): IBattleshipGameboardControllerSet {
   return {
     playerOneBoardController: createBattleshipBoardController(
       playerOneBoardBuilder,
-      playerOneBoardRepository
+      playerOneBoardRepository,
+      playerOneFleetBuilder
     ),
     playerTwoBoardController: createBattleshipBoardController(
       playerTwoBoardBuilder,
-      playerTwoBoardRepository
+      playerTwoBoardRepository,
+      playerTwoFleetBuilder
     ),
   };
 }
@@ -163,7 +167,7 @@ export const isCoordinatesSet = (value: unknown): value is CoordinatesSet => {
 };
 export const isFleetCoordinates = (
   value: unknown
-): value is IFleetCoordinates => {
+): value is FleetCoordinates => {
   if (typeof value !== 'object' || value === null) return false;
 
   for (const key in value) {
@@ -171,7 +175,7 @@ export const isFleetCoordinates = (
       return false
     }
 
-    const coordinatesSetOrNull = (value as OccupiedPositionsMap)[
+    const coordinatesSetOrNull = (value as FleetCoordinates)[
       key as ShipType
     ];
 

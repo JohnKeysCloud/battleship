@@ -17,3 +17,17 @@ export type Range<N extends number, Acc extends number[] = []> =
   Acc['length'] extends N
     ? Acc[number]
     : Range<N, [...Acc, Acc['length']]>;
+    
+
+export const createElement = (
+  tag: string,
+  classes: string[] = [],
+  attributes: Record<string, string> = {}
+): HTMLElement => {
+  const element: HTMLElement = document.createElement(tag);
+  classes.forEach((cls) => element.classList.add(cls));
+  Object.entries(attributes).forEach(([key, value]) =>
+    element.setAttribute(key, value)
+  );
+  return element;
+}

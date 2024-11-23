@@ -2,6 +2,7 @@ import {
   Fleet,
   FleetConfigs,
   ShipType,
+  Version,
 } from '../../types/logic-types';
 import {
   BattleshipBuilder,
@@ -9,9 +10,7 @@ import {
 import { isShipType } from '../../utilities/logic-utilities';
 
 export class BattleshipFleetBuilder {
-  private constructor(public readonly fleet: Fleet) {
-    this.fleet = fleet;
-  }
+  private constructor(public readonly fleet: Fleet, public readonly version: Version) {}
 
   private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};
@@ -29,12 +28,13 @@ export class BattleshipFleetBuilder {
     // 2002
     return new BattleshipFleetBuilder(
       BattleshipFleetBuilder.createFleet({
-        carrier: { type: ShipType.Carrier },
-        battleship: { type: ShipType.Battleship },
-        destroyer: { type: ShipType.Destroyer },
-        submarine: { type: ShipType.Submarine },
-        patrolBoat: { type: ShipType.PatrolBoat },
-      })
+        carrier: { type: ShipType.Carrier, version: 2002 },
+        battleship: { type: ShipType.Battleship, version: 2002 },
+        destroyer: { type: ShipType.Destroyer, version: 2002 },
+        submarine: { type: ShipType.Submarine, version: 2002 },
+        patrolBoat: { type: ShipType.PatrolBoat, version: 2002 },
+      }),
+      2002
     );
   }
 
@@ -47,7 +47,8 @@ export class BattleshipFleetBuilder {
         cruiser: { type: ShipType.Cruiser, version: 1990 },
         submarine: { type: ShipType.Submarine, version: 1990 },
         destroyer: { type: ShipType.Destroyer, version: 1990 },
-      })
+      }),
+      1990
     );
   }
 
@@ -55,7 +56,9 @@ export class BattleshipFleetBuilder {
     const ship = this.fleet[shipType];
 
     if (!ship) {
-      throw new Error(`Invalid Command: Ship of type ${shipType} not found in fleet.`);
+      throw new Error(
+        `Invalid Command: Ship of type ${shipType} not found in fleet.`
+      );
     }
 
     return ship;
