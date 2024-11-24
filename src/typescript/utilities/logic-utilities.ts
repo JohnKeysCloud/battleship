@@ -32,9 +32,8 @@ import { areArraysEqual } from "./random-utilities";
 export function createBattleshipBoardController(
   gameboardBuilder: BattleshipBoardBuilder,
   gameboardRepository: BattleshipBoardRepository,
-  fleetBuilder: BattleshipFleetBuilder
 ): BattleshipBoardController {
-  return new BattleshipBoardController({gameboardBuilder, gameboardRepository, fleetBuilder});
+  return new BattleshipBoardController({gameboardBuilder, gameboardRepository});
 }
 export function createBattleshipControllerSet(
   { playerOneBoardBuilder, playerTwoBoardBuilder}: IBattleshipGameboardBuilderSet,
@@ -45,12 +44,10 @@ export function createBattleshipControllerSet(
     playerOneBoardController: createBattleshipBoardController(
       playerOneBoardBuilder,
       playerOneBoardRepository,
-      playerOneFleetBuilder
     ),
     playerTwoBoardController: createBattleshipBoardController(
       playerTwoBoardBuilder,
       playerTwoBoardRepository,
-      playerTwoFleetBuilder
     ),
   };
 }

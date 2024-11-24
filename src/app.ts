@@ -31,7 +31,7 @@ function init() {
   content?.appendChild(randomizeBoardButton);
 
   randomizeBoardButton.addEventListener('click', () => {
-    players.playerTwo.gameboardController.removeAllPieces();
+    players.playerTwo.gameboardController.removeAllPieces(players.playerTwo.fleetBuilder.fleet);
     randomizeGameboard(players.playerTwo);
     gameboardComponent.render('#content');
   });

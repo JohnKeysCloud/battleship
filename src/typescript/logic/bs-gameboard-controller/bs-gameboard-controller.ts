@@ -38,7 +38,7 @@ import { placeShip } from './helpers/place-ship/place-ship';
 
 export class BattleshipBoardController implements IBattleshipGameboardController { 
   constructor(
-    public readonly playerState: Omit<PlayerState, 'gameboardController'>
+    public readonly playerState: Omit<PlayerState, 'gameboardController' | 'fleetBuilder'>
   ) {}
 
   public getValidPositions({
@@ -179,17 +179,15 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     resetShipConfigurations(ship, shouldResetShipRotationalData);
   }
 
-  public removeAllPieces(): void {
-    const playerFleet: Fleet = this.playerState.fleetBuilder.fleet;
-
-    if (!Object.keys(playerFleet).length) {
+  public removeAllPieces(fleet: Fleet): void {
+    if (!Object.keys(fleet).length) {
       console.error(
         'Invalid Command: No ships to remove - Fleet is empty or uninitialized.'
       );
       return;
     }
 
-    for (const ship of Object.values(playerFleet)) {
+    for (const ship of Object.values(fleet)) {
       this.removePiece(ship);
     }
   }

@@ -94,7 +94,7 @@ export interface IBattleshipFleetBuilderSet {
   playerTwoFleetBuilder: BattleshipFleetBuilder;
 }
 export interface IBattleshipGameboardController extends IGridGameboardController {
-  playerState: Omit<PlayerState, 'gameboardController'>;
+  playerState: Omit<PlayerState, 'gameboardController' | 'fleetBuilder'>;
   getValidPositions(
     shipPlacementConfigs: IShipPlacementConfigurations
   ): IValidPositionsResult;
@@ -102,7 +102,7 @@ export interface IBattleshipGameboardController extends IGridGameboardController
   placePiece(options: IPlacePieceWrapperParams): void;
   prettyPrint(): void;
   removePiece(ship: BattleshipBuilder, resetInitialConfigs: boolean): void;
-  removeAllPieces(): void;
+  removeAllPieces(fleet: Fleet): void;
   rotatePiece(ship: BattleshipBuilder): void;
 }
 export interface IBattleshipGameboardControllerSet {
@@ -116,7 +116,7 @@ export interface IBattleshipGameboardRepositorySet {
 interface IGridGameboardController {
   placePiece(...args: any): void;
   removePiece(...args: any): void;
-  removeAllPieces(): void;
+  removeAllPieces(...args: any): void;
 }
 export interface IPlacementConfigurations {
   coordinatesArray: CoordinatesArray | null;
