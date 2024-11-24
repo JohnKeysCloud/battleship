@@ -1,4 +1,3 @@
-import { PlayerState } from '../types/state-types';
 import {
   Coordinates,
   Fleet,
@@ -12,12 +11,18 @@ import {
   areArraysEqual,
   getRandomInt,
 } from '../utilities/random-utilities';
-import { BattleshipBoardBuilder } from '../logic/bs-gameboard-builder/bs-gameboard-builder';
 import { BattleshipBuilder } from '../logic/bs-ship-builder/bs-ship-builder';
 import { BattleshipBoardController } from '../logic/bs-gameboard-controller/bs-gameboard-controller';
 import { isShipType } from '../utilities/logic-utilities';
 
-export function randomizeGameboard(player: PlayerState) {
+export function randomizeBSGameboard(
+  gameboardController: BattleshipBoardController, fleet: Fleet
+) {
+  if (!gameboardController)
+    throw new Error('Invalid Command: `gameboardController` is required to randomize the gameboard.');
+  if (!fleet)
+    throw new Error('Invalid Command: `fleet` is required to randomize the gameboard.');
+
   const generateRandomCoordinates = (
     shipLength: number,
     boardSize: number
@@ -42,7 +47,7 @@ export function randomizeGameboard(player: PlayerState) {
     };
 
     const validPositions =
-      playerBoardController.getValidPositions(validPositionsParams);
+      gameboardController.getValidPositions(validPositionsParams);
     const [bowX, bowY]: Coordinates = coordinates;
     const isHorizontal: boolean = orientation === 'horizontal';
     const axisIndex: number = isHorizontal ? bowY : bowX;
@@ -80,15 +85,12 @@ export function randomizeGameboard(player: PlayerState) {
         )
   };
 
-  const playerBoardBuilder: BattleshipBoardBuilder = player.gameboardBuilder;
-  const playerBoardController: BattleshipBoardController = player.gameboardController;
-  const boardSize: number = playerBoardBuilder.boardSize;
-  const playerFleet: Fleet = player.fleetBuilder.fleet;
+  const boardSize: number = 10;
 
-  for (const shipType in playerFleet) {
+  for (const shipType in fleet) {
     if (!isShipType(shipType)) throw new Error(`Invalid Type: "${shipType}" doesn't conform to "ShipType".`);
 
-    const ship: BattleshipBuilder = playerFleet[shipType]!;
+    const ship: BattleshipBuilder = fleet[shipType]!;
     const randomOrientation: Orientation = generateRandomOrientation();
 
     const coordinates: Coordinates = getValidCoordinatesRecursively(
@@ -103,6 +105,6 @@ export function randomizeGameboard(player: PlayerState) {
       orientation: randomOrientation,
     };
     
-    playerBoardController.placePiece(placePieceParams);
+    gameboardController.placePiece(placePieceParams);
   }
 }

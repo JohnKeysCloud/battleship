@@ -1,21 +1,27 @@
 import { BattleshipBuilder } from './typescript/logic/bs-ship-builder/bs-ship-builder';
 import { BattleshipBoardController } from './typescript/logic/bs-gameboard-controller/bs-gameboard-controller';
-import { randomizeGameboard } from './typescript/setup/randomize-gameboard';
+import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
 import { players } from './typescript/state/player-state';
 import { GameboardComponent } from './typescript/components/bs-gameboard-component/bs-gameboard-component';
 import './styles/sass/main.scss'
 import { ShipType } from './typescript/types/logic-types';
 
 function init() {
-  const randomizeGameboards = () => {
-    randomizeGameboard(players.playerOne);
-    randomizeGameboard(players.playerTwo);
+  const randomizeBSGameboards = () => {
+    randomizeBSGameboard(
+      players.playerOne.gameboardController,
+      players.playerOne.fleetBuilder.fleet
+    );
+    randomizeBSGameboard(
+      players.playerTwo.gameboardController,
+      players.playerTwo.fleetBuilder.fleet
+    );
   };
 
   // benchmark board set randomization
-  console.time('randomizeGameboards');
-  randomizeGameboards();
-  console.timeEnd('randomizeGameboards'); 
+  console.time('randomizeBSGameboards');
+  randomizeBSGameboards();
+  console.timeEnd('randomizeBSGameboards'); 
 
   // create and render gameboard component to '#content`
   const gameboardComponent = new GameboardComponent('playerTwo', players.playerTwo);
@@ -32,7 +38,10 @@ function init() {
 
   randomizeBoardButton.addEventListener('click', () => {
     players.playerTwo.gameboardController.removeAllPieces(players.playerTwo.fleetBuilder.fleet);
-    randomizeGameboard(players.playerTwo);
+    randomizeBSGameboard(
+      players.playerTwo.gameboardController,
+      players.playerTwo.fleetBuilder.fleet
+    );
     gameboardComponent.render('#content');
   });
 
