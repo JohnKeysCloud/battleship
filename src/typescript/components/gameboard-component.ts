@@ -1,14 +1,17 @@
-import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
+import { BattleshipFleetBuilder } from '../logic/bs-fleet-builder/bs-fleet-builder';
 import {
   Coordinates,
+  CoordinatesArray,
   Gameboard,
+  Orientation,
   ShipLength,
   ShipSymbolValue,
   ShipType,
-} from '../../types/logic-types';
-import { createElement } from '../../utilities/random-utilities';
-import { GridPlacementValue } from '../../types/css-types';
-import { PlayerState } from '../../types/state-types';
+} from '../types/logic-types';
+import { createElement } from '../utilities/random-utilities';
+import { GridPlacementValue } from '../types/css-types';
+import { PlayerState } from '../types/state-types';
+import GlobalEventBus from '../utilities/event-bus';
 
 export class GameboardComponent {
   private boardContainer: HTMLElement;
@@ -16,7 +19,11 @@ export class GameboardComponent {
   constructor(
     private readonly id: string,
     private readonly playerState: PlayerState
-  ) {}
+  ) {
+    GlobalEventBus.on('renderGameboard', (targetSelector: string) => {
+      this.render(targetSelector);
+    });
+  }
 
   public getId(): string {
     return this.id;
@@ -26,7 +33,9 @@ export class GameboardComponent {
     const target: HTMLElement | null = document.querySelector(targetSelector);
 
     if (!target) {
-      throw new Error(`Target element not found: ${targetSelector}`);
+      throw new Error(
+        `Target element not found with ID - ${this.id} and selector - "${targetSelector}".`
+      );
     }
 
     if (this.boardContainer) {
@@ -70,14 +79,18 @@ export class GameboardComponent {
   ): DocumentFragment {
     const cellFragment: DocumentFragment = new DocumentFragment();
 
-    gameboard.forEach((row: ShipSymbolValue[]) => {
-      row.forEach((symbol: ShipSymbolValue) => {
+    gameboard.forEach((row: ShipSymbolValue[], rowIndex) => {
+      row.forEach((symbol: ShipSymbolValue, colIndex) => {
         const symbolDescription: string = symbol.description!.toLowerCase();
 
-        const gridCell: HTMLDivElement = createElement('div', [
-          `${this.createIdentifier(symbolDescription)}-cell`,
-          'grid-cell',
-        ]);
+        const gridCell: HTMLDivElement = createElement(
+          'div',
+          [`${this.createIdentifier(symbolDescription)}-cell`, 'grid-cell'],
+          {
+            'aria-label': `Row ${rowIndex + 1}, Column ${colIndex + 1}`,
+            role: 'gridCell',
+          }
+        );
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
           this.createIdentifier(`${symbolDescription}-cell-container`),
@@ -108,10 +121,14 @@ export class GameboardComponent {
       id: this.createIdentifier(shipType),
     });
 
-    const shipContainerElement: HTMLDivElement = createElement( 'div', ['ship-container'], {
-      id: this.createIdentifier(`${shipType}-container`),
-      'data-length': shipLength.toString(),
-    });
+    const shipContainerElement: HTMLDivElement = createElement(
+      'div',
+      ['ship-container'],
+      {
+        id: this.createIdentifier(`${shipType}-container`),
+        'data-length': shipLength.toString(),
+      }
+    );
 
     shipContainerElement.appendChild(shipElement);
 
@@ -127,9 +144,13 @@ export class GameboardComponent {
   }
 
   private generateBoardContainer(boardSize: number): HTMLElement {
-    const gameboardContainer: HTMLDivElement = createElement( 'div', ['gameboard-container'], {
-      id: this.createIdentifier('gameboard-container'),
-    });
+    const gameboardContainer: HTMLDivElement = createElement(
+      'div',
+      ['gameboard-container'],
+      {
+        id: this.createIdentifier('gameboard-container'),
+      }
+    );
 
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
 
@@ -137,9 +158,13 @@ export class GameboardComponent {
   }
 
   private generateBoardFragment(boardSize: number): DocumentFragment {
-    const gameboardBackground: HTMLDivElement = createElement('div', ['gameboard-background'], {
-      id: this.createIdentifier('gameboard-background'),
-    });
+    const gameboardBackground: HTMLDivElement = createElement(
+      'div',
+      ['gameboard-background'],
+      {
+        id: this.createIdentifier('gameboard-background'),
+      }
+    );
     gameboardBackground.appendChild(
       this.createBackgroundCellsFragment(
         this.playerState.gameboardBuilder.board
@@ -166,12 +191,16 @@ export class GameboardComponent {
     }
 
     for (const ship of Object.values(fleetBuilder.fleet)) {
-      const { type: shipType, length: shipLength } = ship;
-      const { orientation, coordinatesArray } =
-        ship.currentplacementConfigurations;
+      const shipType: ShipType = ship.type;
+      const shipLength: ShipLength = ship.length;
+
+      const orientation: Orientation | null =
+        ship.currentplacementConfigurations.orientation;
+      const coordinatesArray: CoordinatesArray | null =
+        ship.currentplacementConfigurations.coordinatesArray;
 
       if (!coordinatesArray || coordinatesArray.length === 0) {
-        console.log(`Skipping ship ${shipType} due to missing coordinates.`);
+        console.log(`The ${shipType} has not been placed. Continuing...`);
         continue;
       }
 

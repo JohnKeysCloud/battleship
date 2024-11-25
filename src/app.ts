@@ -2,9 +2,9 @@ import { BattleshipBuilder } from './typescript/logic/bs-ship-builder/bs-ship-bu
 import { BattleshipBoardController } from './typescript/logic/bs-gameboard-controller/bs-gameboard-controller';
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
 import { players } from './typescript/state/player-state';
-import { GameboardComponent } from './typescript/components/bs-gameboard-component/bs-gameboard-component';
+import { GameboardComponent } from './typescript/components/gameboard-component';
 import './styles/sass/main.scss'
-import { ShipType } from './typescript/types/logic-types';
+import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component';
 
 function init() {
   const randomizeBSGameboards = () => {
@@ -27,25 +27,14 @@ function init() {
   const gameboardComponent = new GameboardComponent('playerTwo', players.playerTwo);
   gameboardComponent.render('#content');
 
-  // 💭 --------------------------------------------------------------
-  // 💭 RANDOMIZER BUTTON COMPONENT
-  
-  // randomizer button
-  const randomizeBoardButton = document.createElement('button');
-  randomizeBoardButton.textContent = 'Randomize Board'
-  const content = document.getElementById('content');
-  content?.appendChild(randomizeBoardButton);
+  const shipShuffler = new ShipShufflerButtonComponent(
+    players.playerTwo.gameboardController,
+    players.playerTwo.fleetBuilder.fleet,
+    '#content',
+    'player-one-randomizer-button',
+  );
 
-  randomizeBoardButton.addEventListener('click', () => {
-    players.playerTwo.gameboardController.removeAllPieces(players.playerTwo.fleetBuilder.fleet);
-    randomizeBSGameboard(
-      players.playerTwo.gameboardController,
-      players.playerTwo.fleetBuilder.fleet
-    );
-    gameboardComponent.render('#content');
-  });
-
-  // 💭 --------------------------------------------------------------
+  shipShuffler.render('#content');
 
   // 💭 --------------------------------------------------------------
   // 💭 ----------------- TESTING GAMEBOARD METHODS ------------------
