@@ -1,14 +1,14 @@
-import { BattleshipFleetBuilder } from "../../logic/bs-fleet-builder/bs-fleet-builder";
+import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
 import {
   Coordinates,
   Gameboard,
   ShipLength,
   ShipSymbolValue,
-  ShipType
-} from "../../types/logic-types";
-import { createElement } from "../../utilities/random-utilities";
-import { GridPlacementValue } from "../../types/css-types";
-import { PlayerState } from "../../types/state-types";
+  ShipType,
+} from '../../types/logic-types';
+import { createElement } from '../../utilities/random-utilities';
+import { GridPlacementValue } from '../../types/css-types';
+import { PlayerState } from '../../types/state-types';
 
 export class GameboardComponent {
   private boardContainer: HTMLElement;
@@ -74,12 +74,12 @@ export class GameboardComponent {
       row.forEach((symbol: ShipSymbolValue) => {
         const symbolDescription: string = symbol.description!.toLowerCase();
 
-        const gridCell: HTMLElement = createElement('div', [
+        const gridCell: HTMLDivElement = createElement('div', [
           `${this.createIdentifier(symbolDescription)}-cell`,
           'grid-cell',
         ]);
 
-        const gridCellContainer: HTMLElement = createElement('div', [
+        const gridCellContainer: HTMLDivElement = createElement('div', [
           this.createIdentifier(`${symbolDescription}-cell-container`),
           'grid-cell-container',
         ]);
@@ -104,11 +104,11 @@ export class GameboardComponent {
     gridCrossAxis: number,
     isHorizontal: boolean
   ): HTMLElement {
-    const shipElement: HTMLElement = createElement('div', ['ship'], {
+    const shipElement: HTMLDivElement = createElement('div', ['ship'], {
       id: this.createIdentifier(shipType),
     });
 
-    const shipContainerElement: HTMLElement = createElement( 'div', ['ship-container'], {
+    const shipContainerElement: HTMLDivElement = createElement( 'div', ['ship-container'], {
       id: this.createIdentifier(`${shipType}-container`),
       'data-length': shipLength.toString(),
     });
@@ -127,7 +127,7 @@ export class GameboardComponent {
   }
 
   private generateBoardContainer(boardSize: number): HTMLElement {
-    const gameboardContainer: HTMLElement = createElement('div', ['gameboard-container'], {
+    const gameboardContainer: HTMLDivElement = createElement( 'div', ['gameboard-container'], {
       id: this.createIdentifier('gameboard-container'),
     });
 
@@ -137,7 +137,7 @@ export class GameboardComponent {
   }
 
   private generateBoardFragment(boardSize: number): DocumentFragment {
-    const gameboardBackground = createElement('div', ['gameboard-background'], {
+    const gameboardBackground: HTMLDivElement = createElement('div', ['gameboard-background'], {
       id: this.createIdentifier('gameboard-background'),
     });
     gameboardBackground.appendChild(
@@ -166,7 +166,7 @@ export class GameboardComponent {
     }
 
     for (const ship of Object.values(fleetBuilder.fleet)) {
-      const { length: shipLength, type: shipType } = ship;
+      const { type: shipType, length: shipLength } = ship;
       const { orientation, coordinatesArray } =
         ship.currentplacementConfigurations;
 
@@ -175,13 +175,10 @@ export class GameboardComponent {
         continue;
       }
 
-      const [x, y] = coordinatesArray[0];
-      const isHorizontal = orientation === 'horizontal';
-      const [gridPlacementValue, gridCrossAxis] = this.calculateGridPlacement(
-        [x, y],
-        isHorizontal,
-        shipLength
-      );
+      const [x, y]: Coordinates = coordinatesArray[0];
+      const isHorizontal: boolean = orientation === 'horizontal';
+      const [gridPlacementValue, gridCrossAxis]: [GridPlacementValue, number] =
+        this.calculateGridPlacement([x, y], isHorizontal, shipLength);
 
       const shipElement = this.createShipElement(
         shipType,

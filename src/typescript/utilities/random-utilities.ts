@@ -19,15 +19,15 @@ export type Range<N extends number, Acc extends number[] = []> =
     : Range<N, [...Acc, Acc['length']]>;
     
 
-export const createElement = (
-  tag: string,
+export const createElement = <K extends keyof HTMLElementTagNameMap>(
+  tag: K,
   classes: string[] = [],
   attributes: Record<string, string> = {}
-): HTMLElement => {
-  const element: HTMLElement = document.createElement(tag);
+): HTMLElementTagNameMap[K] => {
+  const element: HTMLElementTagNameMap[K] = document.createElement(tag);
   classes.forEach((cls) => element.classList.add(cls));
   Object.entries(attributes).forEach(([key, value]) =>
     element.setAttribute(key, value)
   );
   return element;
-}
+};
