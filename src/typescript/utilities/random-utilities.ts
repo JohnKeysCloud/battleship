@@ -31,3 +31,8 @@ export const createElement = <K extends keyof HTMLElementTagNameMap>(
   );
   return element;
 };
+
+export const createPlayerIdentifier = (playerId: string , identifier: string): string => {
+  const playerNumber = playerId.split('player')[1].toLowerCase();
+  return `player-${playerNumber}-${identifier}`;
+}

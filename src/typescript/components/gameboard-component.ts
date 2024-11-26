@@ -8,7 +8,7 @@ import {
   ShipSymbolValue,
   ShipType,
 } from '../types/logic-types';
-import { createElement } from '../utilities/random-utilities';
+import { createElement, createPlayerIdentifier } from '../utilities/random-utilities';
 import { GridPlacementValue } from '../types/css-types';
 import { PlayerState } from '../types/state-types';
 import GlobalEventBus from '../utilities/event-bus';
@@ -85,7 +85,7 @@ export class GameboardComponent {
 
         const gridCell: HTMLDivElement = createElement(
           'div',
-          [`${this.createIdentifier(symbolDescription)}-cell`, 'grid-cell'],
+          [`${createPlayerIdentifier(this.id, symbolDescription)}-cell`, 'grid-cell'],
           {
             'aria-label': `Row ${rowIndex + 1}, Column ${colIndex + 1}`,
             role: 'gridCell',
@@ -93,7 +93,7 @@ export class GameboardComponent {
         );
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
-          this.createIdentifier(`${symbolDescription}-cell-container`),
+          createPlayerIdentifier(this.id, `${symbolDescription}-cell-container`),
           'grid-cell-container',
         ]);
 
@@ -105,11 +105,6 @@ export class GameboardComponent {
     return cellFragment;
   }
 
-  private createIdentifier(identifier: string): string {
-    const playerNumber = this.id.toLowerCase().split('player')[1];
-    return `player-${playerNumber}-${identifier}`;
-  }
-
   private createShipElement(
     shipType: ShipType,
     shipLength: ShipLength,
@@ -118,14 +113,14 @@ export class GameboardComponent {
     isHorizontal: boolean
   ): HTMLElement {
     const shipElement: HTMLDivElement = createElement('div', ['ship'], {
-      id: this.createIdentifier(shipType),
+      id: createPlayerIdentifier(this.id, shipType),
     });
 
     const shipContainerElement: HTMLDivElement = createElement(
       'div',
       ['ship-container'],
       {
-        id: this.createIdentifier(`${shipType}-container`),
+        id: createPlayerIdentifier(this.id, `${shipType}-container`),
         'data-length': shipLength.toString(),
       }
     );
@@ -148,7 +143,7 @@ export class GameboardComponent {
       'div',
       ['gameboard-container'],
       {
-        id: this.createIdentifier('gameboard-container'),
+        id: createPlayerIdentifier(this.id, 'gameboard-container'),
       }
     );
 
@@ -162,7 +157,7 @@ export class GameboardComponent {
       'div',
       ['gameboard-background'],
       {
-        id: this.createIdentifier('gameboard-background'),
+        id: createPlayerIdentifier(this.id, 'gameboard-background'),
       }
     );
     gameboardBackground.appendChild(
@@ -172,7 +167,7 @@ export class GameboardComponent {
     );
 
     const gameboard = createElement('div', ['gameboard'], {
-      id: this.createIdentifier('gameboard'),
+      id: createPlayerIdentifier(this.id, 'gameboard'),
     });
     gameboard.style.setProperty('--grid-size', boardSize.toString());
 
