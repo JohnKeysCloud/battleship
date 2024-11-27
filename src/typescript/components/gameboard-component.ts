@@ -8,7 +8,10 @@ import {
   ShipSymbolValue,
   ShipType,
 } from '../types/logic-types';
-import { createElement, createPlayerIdentifier } from '../utilities/random-utilities';
+import {
+  createElement,
+  createPlayerIdentifier,
+} from '../utilities/random-utilities';
 import { GridPlacementValue } from '../types/css-types';
 import { PlayerState } from '../types/state-types';
 import GlobalEventBus from '../utilities/event-bus';
@@ -56,7 +59,7 @@ export class GameboardComponent {
     this.placeFleet(this.playerState.fleetBuilder);
   }
 
-  private calculateGridPlacement(
+  private getGridPlacementValue(
     coordinates: Coordinates,
     isHorizontal: boolean,
     shipLength: ShipLength
@@ -79,21 +82,24 @@ export class GameboardComponent {
   ): DocumentFragment {
     const cellFragment: DocumentFragment = new DocumentFragment();
 
+    // TODO: Create object stores row and column indices to fill gameboard div with missing empty cells
     gameboard.forEach((row: ShipSymbolValue[], rowIndex) => {
       row.forEach((symbol: ShipSymbolValue, colIndex) => {
         const symbolDescription: string = symbol.description!.toLowerCase();
 
-        const gridCell: HTMLDivElement = createElement(
-          'div',
-          [`${createPlayerIdentifier(this.id, symbolDescription)}-cell`, 'grid-cell'],
-          {
-            'aria-label': `Row ${rowIndex + 1}, Column ${colIndex + 1}`,
-            role: 'gridCell',
-          }
-        );
+        const gridCell: HTMLDivElement = createElement('div', [
+          `${createPlayerIdentifier(this.id, symbolDescription)}-cell`,
+          'grid-cell',
+        ], {
+          'aria-label': `Row ${rowIndex + 1}, Column ${colIndex + 1}`,
+          role: 'gridCell',
+        });
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
-          createPlayerIdentifier(this.id, `${symbolDescription}-cell-container`),
+          createPlayerIdentifier(
+            this.id,
+            `${symbolDescription}-cell-container`
+          ),
           'grid-cell-container',
         ]);
 
@@ -105,6 +111,74 @@ export class GameboardComponent {
     return cellFragment;
   }
 
+  private generateShipUnitFragment(
+    shipLength: ShipLength,
+    shipType: ShipType,
+    id: string
+  ): DocumentFragment {
+    const shipUnitFragment: DocumentFragment = new DocumentFragment();
+
+    for (let i = 0; i < shipLength; i++) {
+      const isBow: boolean = i === 0;
+      const shipUnit: HTMLDivElement = createElement('div', [
+        'ship-unit',
+        createPlayerIdentifier(id, shipType),
+      ]);
+
+      if (isBow) {
+        shipUnit.classList.add('ship-bow');
+        shipUnit.setAttribute(
+          'id',
+          createPlayerIdentifier(id, `${shipType}-bow`)
+        );
+      }
+
+      shipUnitFragment.appendChild(shipUnit);
+    }
+
+    return shipUnitFragment;
+  }
+
+  private addDragStartListener(
+    shipContainerElement: HTMLDivElement,
+    isHorizontal: boolean
+  ): void {
+    const shipBowElement: HTMLDivElement | null = shipContainerElement.querySelector('.ship-bow');
+    
+    if (!shipBowElement) {
+      console.warn('Ship-bow element not found.');
+      return;
+    }
+
+    shipContainerElement.addEventListener('dragstart', (e: DragEvent) => {
+      if (!e.dataTransfer) {
+        console.error('DataTransfer is null');
+        return; // Handle this gracefully if necessary
+      }
+
+      const shipBowRect: DOMRect = shipBowElement.getBoundingClientRect();
+      const containerRect: DOMRect =
+        shipContainerElement.getBoundingClientRect();
+      
+      const halfOfCellLength: number = shipBowRect.width / 2;
+
+      let offsetX: number, offsetY: number;
+      if (isHorizontal) {
+        const horizontalDistanceFromContainerToShipBow = shipBowRect.left - containerRect.left;
+
+        offsetX = horizontalDistanceFromContainerToShipBow + halfOfCellLength;
+        offsetY = halfOfCellLength;
+      } else {
+        const verticalDistanceFromContainerToShipBow = shipBowRect.top - containerRect.top
+
+        offsetX = halfOfCellLength;
+        offsetY = verticalDistanceFromContainerToShipBow + halfOfCellLength;
+      }
+
+      e.dataTransfer.setDragImage(shipContainerElement, offsetX, offsetY);
+    });
+  }
+
   private createShipElement(
     shipType: ShipType,
     shipLength: ShipLength,
@@ -112,40 +186,35 @@ export class GameboardComponent {
     gridCrossAxis: number,
     isHorizontal: boolean
   ): HTMLElement {
-    const shipElement: HTMLDivElement = createElement('div', ['ship'], {
-      id: createPlayerIdentifier(this.id, shipType),
+    const shipUnitFragment: DocumentFragment = this.generateShipUnitFragment(shipLength, shipType, this.id);
+    
+    const shipContainerElement: HTMLDivElement = createElement('div', ['ship-container'], {
+      id: createPlayerIdentifier(this.id, `${shipType}-container`),
+      'data-length': shipLength.toString(),
+      draggable: 'true',
     });
-
-    const shipContainerElement: HTMLDivElement = createElement(
-      'div',
-      ['ship-container'],
-      {
-        id: createPlayerIdentifier(this.id, `${shipType}-container`),
-        'data-length': shipLength.toString(),
-      }
-    );
-
-    shipContainerElement.appendChild(shipElement);
+    shipContainerElement.style.display = 'grid';
+    shipContainerElement.appendChild(shipUnitFragment);
 
     if (isHorizontal) {
       shipContainerElement.style.gridColumn = gridPlacementValue;
       shipContainerElement.style.gridRow = gridCrossAxis.toString();
+      shipContainerElement.style.gridTemplateColumns = `repeat(${shipLength}, 1fr)`;
     } else {
       shipContainerElement.style.gridRow = gridPlacementValue;
       shipContainerElement.style.gridColumn = gridCrossAxis.toString();
+      shipContainerElement.style.gridTemplateRows = `repeat(${shipLength}, 1fr)`;
     }
+
+    this.addDragStartListener(shipContainerElement, isHorizontal);
 
     return shipContainerElement;
   }
 
   private generateBoardContainer(boardSize: number): HTMLElement {
-    const gameboardContainer: HTMLDivElement = createElement(
-      'div',
-      ['gameboard-container'],
-      {
-        id: createPlayerIdentifier(this.id, 'gameboard-container'),
-      }
-    );
+    const gameboardContainer: HTMLDivElement = createElement('div', ['gameboard-container'], {
+      id: createPlayerIdentifier(this.id, 'gameboard-container'),
+    });
 
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
 
@@ -153,13 +222,9 @@ export class GameboardComponent {
   }
 
   private generateBoardFragment(boardSize: number): DocumentFragment {
-    const gameboardBackground: HTMLDivElement = createElement(
-      'div',
-      ['gameboard-background'],
-      {
-        id: createPlayerIdentifier(this.id, 'gameboard-background'),
-      }
-    );
+    const gameboardBackground: HTMLDivElement = createElement('div',['gameboard-background'], {
+      id: createPlayerIdentifier(this.id, 'gameboard-background'),
+    });
     gameboardBackground.appendChild(
       this.createBackgroundCellsFragment(
         this.playerState.gameboardBuilder.board
@@ -202,7 +267,7 @@ export class GameboardComponent {
       const [x, y]: Coordinates = coordinatesArray[0];
       const isHorizontal: boolean = orientation === 'horizontal';
       const [gridPlacementValue, gridCrossAxis]: [GridPlacementValue, number] =
-        this.calculateGridPlacement([x, y], isHorizontal, shipLength);
+        this.getGridPlacementValue([x, y], isHorizontal, shipLength);
 
       const shipElement = this.createShipElement(
         shipType,
@@ -214,5 +279,7 @@ export class GameboardComponent {
 
       gameboardContainer.appendChild(shipElement);
     }
+
+    // TODO: fill empty cells here
   }
 }
