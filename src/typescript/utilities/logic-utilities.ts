@@ -2,8 +2,8 @@ import {
   AnglesOfRotation,
   AxisArrayKey,
   Coordinates,
-  CoordinatesSet,
-  CoordinatesSetMemberKey,
+  OccupiedCoordinatesSet,
+  OccupiedCoordinatesSetMemberKey,
   FleetCoordinates,
   IBattlehipFleetBuilderSet,
   IBattleshipFleetBuilderSet,
@@ -18,7 +18,8 @@ import {
   RotatedCoordinatesValue,
   ShipLength,
   ShipType,
-  Version
+  Version,
+  PositionArray
 } from "../types/logic-types";
 import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
 import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
@@ -38,7 +39,6 @@ export function createBattleshipBoardController(
 export function createBattleshipControllerSet(
   { playerOneBoardBuilder, playerTwoBoardBuilder}: IBattleshipGameboardBuilderSet,
   { playerOneBoardRepository, playerTwoBoardRepository }: IBattleshipGameboardRepositorySet,
-  { playerOneFleetBuilder, playerTwoFleetBuilder }: IBattleshipFleetBuilderSet
 ): IBattleshipGameboardControllerSet {
   return {
     playerOneBoardController: createBattleshipBoardController(
@@ -150,12 +150,12 @@ export const isCoordinates = (value: unknown): value is Coordinates => {
 
   return value.every((coordinate) => typeof coordinate === 'number');
 };
-export const isCoordinatesSet = (value: unknown): value is CoordinatesSet => {
+export const isOccupiedCoordinatesSet = (value: unknown): value is OccupiedCoordinatesSet => {
   if (value === null) return true;
   if (!(value instanceof Set)) return false;
 
   for (const member of value) {
-    if (!isCoordinatesSetMemberKey(member)) {
+    if (!isOccupiedCoordinatesSetMemberKey(member)) {
       return false;
     }
   }
@@ -172,16 +172,27 @@ export const isFleetCoordinates = (
       return false
     }
 
-    const coordinatesSetOrNull = (value as FleetCoordinates)[
+    const OccupiedCoordinatesSetOrNull = (value as FleetCoordinates)[
       key as ShipType
     ];
 
-    if (coordinatesSetOrNull !== null && !isCoordinatesSet(coordinatesSetOrNull)) {
+    if (OccupiedCoordinatesSetOrNull !== null && !isOccupiedCoordinatesSet(OccupiedCoordinatesSetOrNull)) {
       return false;
     }
   }
   return true;
 };
+export const isPlainObject = (value: unknown): value is object => {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+  // ? Why `proto === null`: Object.create(null) is a valid plain object.
+}
+export const isOrientation = (value: unknown): value is Orientation => {
+  if (typeof value !== 'string') return false;
+  return ['horizontal', 'vertical'].includes(value);
+}
 export const isOutOfBounds = (value: unknown): value is OutOfBounds => {
   return (value) === 'outOfBounds';
 };
@@ -194,7 +205,19 @@ export const isPlacePieceParams = (
 
   return true;
 };
-export const isCoordinatesSetMemberKey = (value: unknown): value is CoordinatesSetMemberKey => {
+export const isPosition = (value: unknown): value is IPosition => {
+  if (!isPlainObject(value)) return false;
+
+  const { bow, stern } = value as IPosition;
+
+  return isCoordinates(bow) && isCoordinates(stern);
+};
+export const isPositionsArray = (value: unknown): value is PositionArray => {
+  if (!Array.isArray(value)) return false;
+
+  return value.every(position => isPosition(position));
+};
+export const isOccupiedCoordinatesSetMemberKey = (value: unknown): value is OccupiedCoordinatesSetMemberKey => {
   if (typeof value !== 'string') return false;
 
   const match = value.match(/^\[\d{1}, \d{1}\]$/);
@@ -205,8 +228,17 @@ export const isRotatedCoordinatesValue = (
 ): value is RotatedCoordinatesValue => {
   return isCoordinates(value) || isOutOfBounds(value);
 };
+export const isShipLength = (value: unknown): value is ShipLength => {
+  return typeof value === 'number' && [2, 3, 4, 5].includes(value);
+}
 export const isShipType = (
   value: unknown
 ): value is ShipType => {
   return Object.values(ShipType).includes(value as ShipType);
 };
+
+// 💭 --------------------------------------------------------------
+
+export const isNotNull = <T>(value: T | null | undefined): value is T => {
+  return value !== null && value !== undefined;
+}

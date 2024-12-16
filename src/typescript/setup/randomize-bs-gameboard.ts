@@ -5,6 +5,7 @@ import {
   IShipPlacementConfigurations,
   Orientation,
   IPosition,
+  PositionArray,
   AxisArrayKey,
 } from '../types/logic-types';
 import {
@@ -55,7 +56,7 @@ export function randomizeBSGameboard(
     const axisArrayKey: AxisArrayKey = isHorizontal
       ? `row-${axisIndex}`
       : `column-${axisIndex}`;
-    const axisArray: IPosition[] = validPositions[axisArrayKey];
+    const axisArray: PositionArray = validPositions[axisArrayKey];
 
     return axisArray.some((position: IPosition) =>
       areArraysEqual(position.bow, coordinates)

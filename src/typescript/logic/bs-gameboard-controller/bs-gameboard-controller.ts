@@ -21,6 +21,7 @@ import {
   ShipLength,
   ShipType,
   ValidRotationalPositionMap,
+  PositionArray,
 } from '../../types/logic-types';
 import { PlayerState } from '../../types/state-types';
 import {
@@ -32,6 +33,7 @@ import {
   isOutOfBounds,
   isPlacePieceParams,
   isPositionInBounds,
+  isPositionsArray,
 } from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
@@ -53,6 +55,21 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     };
 
     return getValidShipPositions(validPlacementArg);
+  }
+
+  public getAllValidBowCoordinates(orientation: Orientation, shipLength: ShipLength): Set<Coordinates> {
+    let allValidBowCoordinates: Set<Coordinates> = new Set();
+    const validPositions: IValidPositionsResult = this.getValidPositions({ orientation, shipLength });
+
+    for (const positionsInAxis of Object.values(validPositions)) {
+      if (!isPositionsArray(positionsInAxis)) throw new Error(
+        `Expected each value of validPositions to be an array of IPosition objects, but received: ${typeof positionsInAxis}.`
+      );
+
+      positionsInAxis.forEach(position => allValidBowCoordinates.add(position.bow));
+    };
+
+    return allValidBowCoordinates;
   }
 
   public movePiece(
@@ -93,7 +110,7 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       isHorizontal
     );
 
-    const axisArray: IPosition[] = validPositions[axisArrayKey];
+    const axisArray: PositionArray = validPositions[axisArrayKey];
 
     const isNewPositionValid: boolean = axisArray.some(
       (position: IPosition): boolean => arePositionsEqual(position, newPosition)

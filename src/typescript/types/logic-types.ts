@@ -33,8 +33,8 @@ export type AngleOfRotation = null | AnglesOfRotation;
 export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type CoordinatesArray = Coordinates[];
-export type CoordinatesSet = Set<CoordinatesSetMemberKey> | null;
-export type CoordinatesSetMemberKey = `[${number}, ${number}]`;
+export type OccupiedCoordinatesSet = Set<OccupiedCoordinatesSetMemberKey> | null;
+export type OccupiedCoordinatesSetMemberKey = `[${number}, ${number}]`;
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;
 };
@@ -42,7 +42,7 @@ export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
 };
 export type FleetCoordinates = {
-  [key in ShipType]?: CoordinatesSet | null;
+  [key in ShipType]?: OccupiedCoordinatesSet | null;
 };
 
 export type FleetValidRotationalParams = {
@@ -51,6 +51,7 @@ export type FleetValidRotationalParams = {
 export type Gameboard = symbol[][];
 export type OutOfBounds = 'outOfBounds';
 export type Orientation = 'horizontal' | 'vertical';
+export type PositionArray = IPosition[];
 export type RotatedCoordinatesValue = Coordinates | OutOfBounds;
 export type RotatedPlacePieceParams = {
   [Key in AnglesOfRotation]?: RotatedPlacePieceParamsValue;
@@ -65,6 +66,7 @@ export type ShipLength = 2 | 3 | 4 | 5;
 export type ShipSymbols = {
   [key in ShipType]: symbol; // Each key in ShipType maps to a symbol
 };
+export type ShipSymbolValueArray = ShipSymbolValue[];
 export type ShipSymbolValue = typeof SHIP_SYMBOLS[ShipType];
 export type SizeLookupKey = `${ShipType}-${Version}`;
 export type ValidRotationalPositionMap = Map<AnglesOfRotation, IPlacePieceParams>;
@@ -76,7 +78,6 @@ export type Version = 1990 | 2002;
 interface IGridGameboard<T> {
   readonly board: T[][];
   fillValue: T;
-
 };
 export interface IGridGameboardSquare<T> extends IGridGameboard<T> {
   boardSize: number;
@@ -164,5 +165,5 @@ export interface IValidPlacementCallbackParams extends IShipPlacementConfigurati
   battleshipBoardController: BattleshipBoardController;
 };
 export interface IValidPositionsResult {
-  [key: AxisArrayKey]: IPosition[];
+  [key: AxisArrayKey]: PositionArray;
 };

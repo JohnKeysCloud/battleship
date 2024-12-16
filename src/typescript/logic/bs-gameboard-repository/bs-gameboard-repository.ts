@@ -2,14 +2,13 @@ import { BattleshipBuilder } from "../bs-ship-builder/bs-ship-builder";
 import {
   Coordinates,
   CoordinatesArray,
-  CoordinatesSet,
-  CoordinatesSetMemberKey,
+  OccupiedCoordinatesSetMemberKey,
   FleetCoordinates,
   FleetValidRotationalParams,
   ShipType,
   ValidRotationalPositionMap
 } from "../../types/logic-types";
-import { isCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
+import { isOccupiedCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
 
 export class BattleshipBoardRepository {
   private readonly _fleetCoordinates: FleetCoordinates = {};
@@ -34,10 +33,11 @@ export class BattleshipBoardRepository {
 
     placementCoordinates.forEach((coordinates: Coordinates) => {
       const [x, y]: Coordinates = coordinates;
-      const setMemberTemplate: CoordinatesSetMemberKey = `[${x}, ${y}]`;
+      const setMemberTemplate: OccupiedCoordinatesSetMemberKey = `[${x}, ${y}]`;
       this.fleetCoordinates[shipType]!.add(setMemberTemplate);
     });
   }
+
   public getShipDataAt(coordinates: Coordinates) {
     if (!isFleetCoordinates(this.fleetCoordinates)) {
       throw new Error(
@@ -45,33 +45,35 @@ export class BattleshipBoardRepository {
       );
     }
 
-    const validateTypes = (shipType: unknown, coordinatesSet: unknown) => {
+    const validateTypes = (shipType: unknown, OccupiedCoordinatesSet: unknown): void => {
       if (!isShipType(shipType))
         throw new Error(
           `Invalid Type: "${shipType}" doesn't conform to "ShipType".`
         );
-      if (!isCoordinatesSet(coordinatesSet))
+      if (!isOccupiedCoordinatesSet(OccupiedCoordinatesSet))
         throw new Error(
-          `Invalid Type: "${coordinatesSet}" doesn't conform to "CoordinatesSet".`
+          `Invalid Type: "${OccupiedCoordinatesSet}" doesn't conform to "OccupiedCoordinatesSet".`
         );
     };
 
     const [x, y]: Coordinates = coordinates;
-    const coordinateSetMemberKey: CoordinatesSetMemberKey = `[${x}, ${y}]`;
+    const coordinateSetMemberKey: OccupiedCoordinatesSetMemberKey = `[${x}, ${y}]`;
 
-    for (const shipType in this.fleetCoordinates) {
-      validateTypes(shipType, this.fleetCoordinates[shipType]);
+    for (const [shipType, occupiedCoordinatesSet] of Object.entries(this.fleetCoordinates)) {
+      if (!isShipType(shipType)) throw new Error('');
+      if (!isOccupiedCoordinatesSet(occupiedCoordinatesSet)) throw new Error();
 
-      const shipCoordinateSet: CoordinatesSet = this.fleetCoordinates[shipType];
+      validateTypes(shipType, occupiedCoordinatesSet);
 
-      if (shipCoordinateSet!.has(coordinateSetMemberKey)) {
+      if (occupiedCoordinatesSet?.has(coordinateSetMemberKey)) {
         return {
           shipType,
-          shipCoordinateSet,
-        };
+          occupiedCoordinatesSet
+        }
       }
     }
   }
+  
   public isShipPlaced(shipType: ShipType): boolean {
     return this.fleetCoordinates[shipType] !== null;
   }

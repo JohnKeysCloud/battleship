@@ -18,17 +18,16 @@ export class ShipShufflerButtonComponent {
   ) {
     this.validateGameboardTarget(this.gameboardTargetSelector);
 
-    this.ShipShufflerButton = this.createShipShufflerButton(this.id, this.classes);
+    this.ShipShufflerButton = this.createShipShufflerButton(
+      this.id,
+      this.classes
+    );
     this.ShipShufflerButton.classList.add(...this.classes);
     this.ShipShufflerButton.textContent = this.ShipShufflerButtonTextContent;
     this.addEventListener(this.ShipShufflerButton);
 
     this.ShipShufflerButtonContainer = this.createShipShufflerButtonContainer();
     this.ShipShufflerButtonContainer.appendChild(this.ShipShufflerButton);
-  }
-
-  public getId() {
-    return this.id;
   }
 
   public render(targetSelector: string) {
@@ -41,10 +40,13 @@ export class ShipShufflerButtonComponent {
     target.appendChild(this.ShipShufflerButtonContainer);
   }
 
+  // 💭 --------------------------------------------------------------
+  // 💭 Helpers
+
   private addEventListener(ShipShufflerButton: HTMLButtonElement) {
     ShipShufflerButton.addEventListener('click', () => {
       this.randomizeGameboard();
-      this.renderGameboard(this.gameboardTargetSelector);
+      this.updateGameboard(this.gameboardTargetSelector);
     });
   }
 
@@ -65,13 +67,13 @@ export class ShipShufflerButtonComponent {
     return container;
   }
 
-  private renderGameboard(targetSelector: string) {
-    GlobalEventBus.emit('renderGameboard', targetSelector);
-  }
-
   private randomizeGameboard() {
     this.gameboardController.removeAllPieces(this.fleet);
     randomizeBSGameboard(this.gameboardController, this.fleet);
+  }
+
+  private updateGameboard(targetSelector: string) {
+    GlobalEventBus.emit('updateGameboard', targetSelector);
   }
 
   private validateGameboardTarget(gameboardTargetSelector: string) {
@@ -80,5 +82,12 @@ export class ShipShufflerButtonComponent {
         `Invalid gameboard target selector: "${gameboardTargetSelector}"`
       );
     }
+  }
+
+  // 💭 --------------------------------------------------------------
+  // 💭 Utilities
+
+  public getId() {
+    return this.id;
   }
 }

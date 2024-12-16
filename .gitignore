@@ -1,5 +1,6 @@
 .DS_Store
 todo.md
+tsconfig.json
 /_shells
 /node_modules
 /src/test.ts

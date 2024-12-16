@@ -2,10 +2,10 @@ import {
   AxisArrayKey,
   Coordinates,
   Gameboard,
-  IPosition,
   IValidPlacementCallbackParams,
   IValidPositionsResult,
   Orientation,
+  PositionArray,
   ShipLength,
 } from '../../../../types/logic-types';
 
@@ -30,9 +30,9 @@ export function getValidShipPositions({
     isHorizontal: boolean,
     axisIndex: number,
     shipLength: ShipLength
-  ): IPosition[] => {
+  ): PositionArray => {
     let streak: number = 0;
-    let validAxisPositions: IPosition[] = [];
+    let validAxisPositions: PositionArray = [];
     
     for (let i = 0; i < axisArray.length; i++) {
       if (axisArray[i] === battleshipBoardBuilder.fillValue) {
@@ -68,7 +68,7 @@ export function getValidShipPositions({
 
   for (let axisIndex = 0; axisIndex < board.length; axisIndex++) {
     const axisArray: Array<symbol> = extractAxisArray(axisIndex, orientation, board);
-    const validPositions: IPosition[] = findValidPositionsInAxis(
+    const validPositions: PositionArray = findValidPositionsInAxis(
       axisArray,
       isHorizontal,
       axisIndex,

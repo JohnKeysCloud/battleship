@@ -18,22 +18,21 @@ const { playerOneFleetBuilder, playerTwoFleetBuilder } =
 const { playerOneBoardController, playerTwoBoardController } =
   createBattleshipControllerSet(
     { playerOneBoardBuilder, playerTwoBoardBuilder },
-    { playerOneBoardRepository, playerTwoBoardRepository },
-    { playerOneFleetBuilder, playerTwoFleetBuilder }
+    { playerOneBoardRepository, playerTwoBoardRepository }
   );
 
 const playerOne: PlayerState = {
   gameboardBuilder: playerOneBoardBuilder,
   gameboardController: playerOneBoardController,
   gameboardRepository: playerOneBoardRepository,
-  fleetBuilder: playerOneFleetBuilder,
+  fleetBuilder: playerOneFleetBuilder
 };
 
 const playerTwo: PlayerState = {
   gameboardBuilder: playerTwoBoardBuilder,
   gameboardController: playerTwoBoardController,
   gameboardRepository: playerTwoBoardRepository,
-  fleetBuilder: playerTwoFleetBuilder,
+  fleetBuilder: playerTwoFleetBuilder
 };
 
 export const players = {
