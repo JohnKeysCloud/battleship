@@ -12,8 +12,7 @@ import {
 export function getValidShipPositions({
   shipLength,
   orientation,
-  battleshipBoardBuilder,
-  battleshipBoardController
+  battleshipBoardBuilder
 }: IValidPlacementCallbackParams): IValidPositionsResult {
   const extractAxisArray = (
     axisIndex: number,

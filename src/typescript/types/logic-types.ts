@@ -45,8 +45,8 @@ export type FleetCoordinates = {
   [key in ShipType]?: OccupiedCoordinatesSet | null;
 };
 
-export type FleetValidRotationalParams = {
-  [key in ShipType]?: ValidRotationalPositionMap | null;
+export type InBoundRotationalPlacePieceParamsForFleet = {
+  [key in ShipType]?: RotationalPositionMap | null;
 };
 export type Gameboard = symbol[][];
 export type OutOfBounds = 'outOfBounds';
@@ -69,7 +69,7 @@ export type ShipSymbols = {
 export type ShipSymbolValueArray = ShipSymbolValue[];
 export type ShipSymbolValue = typeof SHIP_SYMBOLS[ShipType];
 export type SizeLookupKey = `${ShipType}-${Version}`;
-export type ValidRotationalPositionMap = Map<AnglesOfRotation, IPlacePieceParams>;
+export type RotationalPositionMap = Map<AnglesOfRotation, IPlacePieceParams>;
 export type Version = 1990 | 2002;
 
 // 💭 --------------------------------------------------------------
@@ -124,7 +124,7 @@ export interface IPlacementConfigurations {
   orientation: Orientation | null;
 };
 export interface IRotationalPivotConfigurations extends IPlacementConfigurations {
-  currentAngleOfRotation: AngleOfRotation;
+  transientAngleOfRotation: AngleOfRotation;
 };
 export interface IPlacePieceParams {
   coordinates: Coordinates;

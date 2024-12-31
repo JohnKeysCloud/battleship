@@ -20,7 +20,7 @@ import {
   RotatedPlacePieceParamsValue,
   ShipLength,
   ShipType,
-  ValidRotationalPositionMap,
+  RotationalPositionMap,
   PositionArray,
 } from '../../types/logic-types';
 import { PlayerState } from '../../types/state-types';
@@ -38,10 +38,15 @@ import {
 import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './helpers/place-ship/place-ship';
 
-export class BattleshipBoardController implements IBattleshipGameboardController { 
+export class BattleshipBoardController
+  implements IBattleshipGameboardController
+{
   constructor(
-    public readonly playerState: Omit<PlayerState, 'gameboardController' | 'fleetBuilder'>
+    public readonly playerState: Omit<PlayerState, 'gameboardController'>
   ) {}
+
+  // 💭 --------------------------------------------------------------
+  // 💭 Public
 
   public getValidPositions({
     orientation,
@@ -57,17 +62,26 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     return getValidShipPositions(validPlacementArg);
   }
 
-  public getAllValidBowCoordinates(orientation: Orientation, shipLength: ShipLength): Set<Coordinates> {
+  public getAllValidBowCoordinates(
+    orientation: Orientation,
+    shipLength: ShipLength
+  ): Set<Coordinates> {
     let allValidBowCoordinates: Set<Coordinates> = new Set();
-    const validPositions: IValidPositionsResult = this.getValidPositions({ orientation, shipLength });
+    const validPositions: IValidPositionsResult = this.getValidPositions({
+      orientation,
+      shipLength,
+    });
 
     for (const positionsInAxis of Object.values(validPositions)) {
-      if (!isPositionsArray(positionsInAxis)) throw new Error(
-        `Expected each value of validPositions to be an array of IPosition objects, but received: ${typeof positionsInAxis}.`
-      );
+      if (!isPositionsArray(positionsInAxis))
+        throw new Error(
+          `Expected each value of validPositions to be an array of IPosition objects, but received: ${typeof positionsInAxis}.`
+        );
 
-      positionsInAxis.forEach(position => allValidBowCoordinates.add(position.bow));
-    };
+      positionsInAxis.forEach((position) =>
+        allValidBowCoordinates.add(position.bow)
+      );
+    }
 
     return allValidBowCoordinates;
   }
@@ -90,7 +104,12 @@ export class BattleshipBoardController implements IBattleshipGameboardController
       ship.length
     );
 
-    if (!isPositionInBounds(newPosition, this.playerState.gameboardBuilder.boardSize)) {
+    if (
+      !isPositionInBounds(
+        newPosition,
+        this.playerState.gameboardBuilder.boardSize
+      )
+    ) {
       console.warn(
         `Invalid Command: Position - Bow: [${newPosition.bow}] & Stern: [${newPosition.stern}] is out of bounds for the ${ship.type}.`
       );
@@ -151,6 +170,8 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     };
 
     placeShip(placeShipArg);
+
+    this.setFleetRotatedPlacePieceParams(this.playerState.fleetBuilder.fleet);
   }
 
   public prettyPrint(): void {
@@ -171,18 +192,23 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
     const removeShipFromBoard = (shipCoordinates: CoordinatesArray): void => {
       shipCoordinates.forEach(([x, y]) => {
-        this.playerState.gameboardBuilder.board[y][x] = this.playerState.gameboardBuilder.fillValue;
+        this.playerState.gameboardBuilder.board[y][x] =
+          this.playerState.gameboardBuilder.fillValue;
       });
     };
     const nullifyShipCoordinateSetValue = (shipType: ShipType): void => {
-      this.playerState.gameboardRepository.nullifyShipCoordinatesValue(shipType);
+      this.playerState.gameboardRepository.nullifyShipCoordinatesValue(
+        shipType
+      );
     };
     const resetShipConfigurations = (
       ship: BattleshipBuilder,
       shouldResetShipRotationalData: boolean
     ): void => {
       if (shouldResetShipRotationalData) {
-        this.playerState.gameboardRepository.nullifyShipValidRotationalParams(ship.type);
+        this.playerState.gameboardRepository.nullifyShipValidRotationalParams(
+          ship.type
+        );
       }
 
       ship.resetConfigurations(shouldResetShipRotationalData);
@@ -210,70 +236,44 @@ export class BattleshipBoardController implements IBattleshipGameboardController
   }
 
   public rotatePiece(ship: BattleshipBuilder): void {
-    const setValidRotatedPlacePieceParams = (ship: BattleshipBuilder): void => {
-        const validRotatedPlacePieceParams: ValidRotationalPositionMap = this.getValidRotatedPlacePieceParams(ship);
-
-        this.playerState.gameboardRepository.setShipValidRotationalParams(
-          ship,
-          validRotatedPlacePieceParams
-        );
-    };
-
-    setValidRotatedPlacePieceParams(ship);
-
-    const canShipBeRotated = (
-      validRotationalPositionMap: ValidRotationalPositionMap
-    ): boolean => validRotationalPositionMap.size > 1;
-
-    const validRotationalPositionMap: ValidRotationalPositionMap =
-      this.playerState.gameboardRepository.fleetValidRotationalParams[ship.type]!;
-
-    if (!canShipBeRotated(validRotationalPositionMap)) {
-      console.warn(`Invalid Command: The ${ship.type} cannot be rotated.`);
-      return;
-    }
-
-    const getNextGreatestAngleOfRotation = (
-      validRotationalPositionMap: ValidRotationalPositionMap
+    const getNextAngle = (
+      rotationalPositionMap: RotationalPositionMap,
+      currentAngle: AngleOfRotation
     ): AngleOfRotation => {
-      const validAnglesOfRotation: AnglesOfRotation[] = Array.from(
-        validRotationalPositionMap.keys()
+      if (currentAngle === null || currentAngle === undefined)
+        throw new Error("Current angle doesn't exist");
+
+      const angles: AnglesOfRotation[] = Array.from(
+        rotationalPositionMap.keys()
       );
 
-      const greatestValidAngleOfRotation: AngleOfRotation =
-        validAnglesOfRotation.filter(
-          (angleOfRotation) => angleOfRotation > shipCurrentAngleOfRotation!
-        )[0];
-
-      return greatestValidAngleOfRotation;
+      return (
+        angles.find((angle) => angle > currentAngle) ??
+        AnglesOfRotation.Degrees0
+      );
     };
-    const getGreatestValidAngleOfRotation = (
-      validRotationalPositionMap: ValidRotationalPositionMap
-    ): AngleOfRotation => {
-      let greatestValidAngleOfRotation: AngleOfRotation =
-        AnglesOfRotation.Degrees0;
-
-      for (const [angleOfRotation, _] of validRotationalPositionMap) {
-        greatestValidAngleOfRotation = angleOfRotation;
-      }
-
-      return greatestValidAngleOfRotation;
-    };
-    const getNextValidPiecePlacementParams = (
-      ship: BattleshipBuilder
+    const getMaxAngle = (
+      rotationalPositionMap: RotationalPositionMap
+    ): AngleOfRotation =>
+      Array.from(rotationalPositionMap.keys()).pop() ??
+      AnglesOfRotation.Degrees0;
+    const getNextPiecePlacementParams = (
+      ship: BattleshipBuilder,
+      rotationalPositionMap: RotationalPositionMap
     ): IPlacePieceWrapperParams => {
-      const shipCurrentAngleOfRotation: AngleOfRotation =
-        ship.rotationalPivotConfigurations.currentAngleOfRotation;
-      const greatestValidAngleOfRotation: AngleOfRotation =
-        getGreatestValidAngleOfRotation(validRotationalPositionMap);
+      const currentAngle: AngleOfRotation =
+        ship.rotationalPivotConfigurations.transientAngleOfRotation;
 
-      if (shipCurrentAngleOfRotation === greatestValidAngleOfRotation) {
+      const maxAngle: AngleOfRotation = getMaxAngle(rotationalPositionMap);
+
+      if (currentAngle === maxAngle) {
         const originalBowCoordinates: Coordinates =
           ship.rotationalPivotConfigurations.coordinatesArray![0];
         const originalOrientation: Orientation =
           ship.rotationalPivotConfigurations.orientation!;
 
-        ship.rotationalPivotConfigurations.currentAngleOfRotation =
+        // set current degree of rotation
+        ship.rotationalPivotConfigurations.transientAngleOfRotation =
           AnglesOfRotation.Degrees0;
 
         return {
@@ -281,45 +281,100 @@ export class BattleshipBoardController implements IBattleshipGameboardController
           coordinates: originalBowCoordinates,
           orientation: originalOrientation,
         };
-      } else {
-        const validRotationalPositionMap: ValidRotationalPositionMap =
-          this.playerState.gameboardRepository.fleetValidRotationalParams[ship.type]!;
-
-        const nextValidAngleOfRotation: AngleOfRotation =
-          getNextGreatestAngleOfRotation(validRotationalPositionMap);
-
-        const nextValidRotatedPlacePieceParams = validRotationalPositionMap.get(
-          nextValidAngleOfRotation!
-        );
-
-        ship.rotationalPivotConfigurations.currentAngleOfRotation =
-          nextValidAngleOfRotation;
-
-        return {
-          ship,
-          coordinates: nextValidRotatedPlacePieceParams!.coordinates,
-          orientation: nextValidRotatedPlacePieceParams!.orientation,
-        };
       }
+
+      const nextAngle: AngleOfRotation = getNextAngle(
+        rotationalPositionMap,
+        currentAngle
+      );
+      const nextPlacePieceParams: IPlacePieceParams | undefined =
+        rotationalPositionMap.get(nextAngle!);
+
+      // set current degree of rotation
+      ship.rotationalPivotConfigurations.transientAngleOfRotation = nextAngle;
+
+      return {
+        ship,
+        coordinates: nextPlacePieceParams!.coordinates,
+        orientation: nextPlacePieceParams!.orientation,
+      };
+    };
+    const updateTransientPlacementParams = (
+      rotationalPositionMap: RotationalPositionMap
+    ): IPlacePieceWrapperParams => {
+      let nextPlacePieceParams: IPlacePieceWrapperParams =
+        getNextPiecePlacementParams(ship, rotationalPositionMap);
+
+      while (
+        ship.rotationalPivotConfigurations.transientAngleOfRotation !==
+        initialAngle
+      ) {
+        if (
+          this.isRotatedPositionValid(
+            nextPlacePieceParams.coordinates,
+            nextPlacePieceParams.orientation,
+            ship.rotationalPivotConfigurations.transientAngleOfRotation,
+            ship.length
+          )
+        ) {
+          break;
+        }
+        nextPlacePieceParams = getNextPiecePlacementParams(
+          ship,
+          rotationalPositionMap
+        );
+      }
+
+      return nextPlacePieceParams;
     };
 
-    const shipCurrentAngleOfRotation: AngleOfRotation =
-      ship.rotationalPivotConfigurations.currentAngleOfRotation;
-    const nextValidPiecePlacementParams: IPlacePieceWrapperParams =
-      getNextValidPiecePlacementParams(ship);
+    const rotationalPositionMap: RotationalPositionMap =
+      this.playerState.gameboardRepository.inBoundRotationalPlacePieceForFleet[
+        ship.type
+      ]!;
+
+    const initialAngle =
+      ship.rotationalPivotConfigurations.transientAngleOfRotation;
+    
+    /* 
+    ┌──────────────────────────────────────────────────────────────────────────────┐
+    │ The coolest part of this whole transient concept is that it                  │
+    │ allows me to name a variable `finalPlacePieceParams`… which implies a         │
+    │ predetermined value, with a function named `updateTransientPlacementParams`… │
+    │ which implies something transient… while the semantic naming of the          │ 
+    | key-value pair maintain sound logicality. I am intuit. - 💭                  │
+    └──────────────────────────────────────────────────────────────────────────────┘
+    */ 
+
+    const finalPlacePieceParams: IPlacePieceWrapperParams =
+      updateTransientPlacementParams(rotationalPositionMap);
+
+    if (
+      ship.rotationalPivotConfigurations.transientAngleOfRotation ===
+      initialAngle
+    ) {
+      console.warn('No valid rotational position found.');
+      return;
+    }
 
     const shouldResetShipRotationalData: boolean = false;
 
     this.relocateShip(
       ship,
-      nextValidPiecePlacementParams,
+      finalPlacePieceParams,
       shouldResetShipRotationalData
     );
   }
 
+  // 💭 --------------------------------------------------------------
+  // 💭 Private
+
   private areCoordinatesVacant(coordinates: Coordinates): boolean {
     const [x, y] = coordinates;
-    return this.playerState.gameboardBuilder.board[y][x] === this.playerState.gameboardBuilder.fillValue;
+    return (
+      this.playerState.gameboardBuilder.board[y][x] ===
+      this.playerState.gameboardBuilder.fillValue
+    );
   }
 
   // ? maybe use this with UI? (TODO: create return value type)
@@ -329,7 +384,47 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     return this.playerState.gameboardRepository.getShipDataAt(coordinates);
   }
 
-  private getValidRotatedPlacePieceParams(ship: BattleshipBuilder) {
+  private isRotatedPositionValid = (
+    [x, y]: Coordinates,
+    orientation: Orientation,
+    angleOfRotation: AngleOfRotation,
+    shipLength: ShipLength
+  ): boolean => {
+    const isHorizontal = orientation === 'horizontal';
+    const gameboardSize = this.playerState.gameboardBuilder.boardSize;
+    const gameboard = this.playerState.gameboardBuilder.board;
+    const fillValue = this.playerState.gameboardBuilder.fillValue;
+    const newAxisIndexStart = isHorizontal ? x : y;
+
+    let i: number;
+    let axisIndexEnd: number;
+
+    if (
+      (!isHorizontal && angleOfRotation === AnglesOfRotation.Degrees90) ||
+      (isHorizontal && angleOfRotation === AnglesOfRotation.Degrees270) ||
+      angleOfRotation === AnglesOfRotation.Degrees0
+    ) {
+      i = 1;
+      axisIndexEnd = shipLength;
+    } else {
+      i = 0;
+      axisIndexEnd = shipLength - 1;
+    }
+
+    if (newAxisIndexStart + shipLength - 1 >= gameboardSize) return false;
+
+    for (i; i < axisIndexEnd; i++) {
+      const cellValue = isHorizontal
+        ? gameboard[y][x + i]
+        : gameboard[y + i][x];
+
+      if (cellValue !== fillValue) return false;
+    }
+
+    return true;
+  };
+
+  private getRotatedPlacePieceParams(ship: BattleshipBuilder) {
     const applyOffsetToCoordinate = (
       coordinate: number,
       shipLength: ShipLength
@@ -370,7 +465,10 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         ? [x, applyOffsetToCoordinate(y, ship.length)]
         : [applyOffsetToCoordinate(x, ship.length), y]; // angleOfRotation === 90
 
-      return areCoordinatesInBounds(rotatedBowCoordinates, this.playerState.gameboardBuilder.boardSize)
+      return areCoordinatesInBounds(
+        rotatedBowCoordinates,
+        this.playerState.gameboardBuilder.boardSize
+      )
         ? rotatedBowCoordinates
         : 'outOfBounds';
     };
@@ -414,85 +512,50 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
       return rotatedPiecePlacementParams;
     };
-    const validatePosition = (
-      [x, y]: Coordinates,
-      orientation: Orientation,
-      angleOfRotation: AngleOfRotation,
-      shipLength: ShipLength
-    ): boolean => {
-      if (angleOfRotation === AnglesOfRotation.Degrees0) return true;
-
-      const isHorizontal = orientation === 'horizontal';
-      let i: number;
-      let axisIndexEnd: number;
-
-      if (
-        (!isHorizontal && angleOfRotation === AnglesOfRotation.Degrees90) ||
-        (isHorizontal && angleOfRotation === AnglesOfRotation.Degrees270)
-      ) {
-        i = 1;
-        axisIndexEnd = shipLength;
-      } else {
-        i = 0;
-        axisIndexEnd = shipLength - 1;
-      }
-
-      for (i; i < axisIndexEnd; i++) {
-        if (isHorizontal) {
-          if (this.playerState.gameboardBuilder.board[y][x + i] !== this.playerState.gameboardBuilder.fillValue) return false;
-        } else {
-          if (this.playerState.gameboardBuilder.board[y + i][x] !== this.playerState.gameboardBuilder.fillValue) return false;
-        }
-      }
-      return true;
-    };
-    const generateValidRotatedPlacePieceParams = (
+    const generateRotationalPositionMap = (
       rotatedPiecePlacementParams: RotatedPlacePieceParams
-    ): ValidRotationalPositionMap => {
-      const validRotatedPlacePieceParams: ValidRotationalPositionMap =
-        new Map();
+    ): RotationalPositionMap => {
+      const rotatedPlacePieceParams: RotationalPositionMap = new Map();
 
-      for (const angleOfRotationString of Object.keys(rotatedPiecePlacementParams)) {
+      for (const angleOfRotationString of Object.keys(
+        rotatedPiecePlacementParams
+      )) {
         const angleOfRotationToNum = +angleOfRotationString as AngleOfRotation;
 
         if (!isAngleOfRotation(angleOfRotationToNum)) {
-          throw new Error(`Invalid Type: "${angleOfRotationString}" doesn't conform to "AngleOfRotation".`);
+          throw new Error(
+            `Invalid Type: "${angleOfRotationString}" doesn't conform to "AngleOfRotation".`
+          );
         }
-      
+
         const rotatedPlacePieceParamsValue: RotatedPlacePieceParamsValue =
           rotatedPiecePlacementParams[angleOfRotationToNum]!;
-      
+
         if (
-          !(isPlacePieceParams(rotatedPlacePieceParamsValue) ||
-          isOutOfBounds(rotatedPlacePieceParamsValue))
+          !(
+            isPlacePieceParams(rotatedPlacePieceParamsValue) ||
+            isOutOfBounds(rotatedPlacePieceParamsValue)
+          )
         ) {
           throw new Error(
             `Invalid Type: "${rotatedPlacePieceParamsValue}" doesn't conform to "RotatedPlacePieceParams".`
           );
         }
-      
+
         if (!isPlacePieceParams(rotatedPlacePieceParamsValue)) continue;
-      
-        const { coordinates: bowCoordinates, orientation }: IPlacePieceParams = rotatedPlacePieceParamsValue;
-      
-        const isPositionValid: boolean = validatePosition(
-          bowCoordinates,
+
+        const { coordinates: bowCoordinates, orientation }: IPlacePieceParams =
+          rotatedPlacePieceParamsValue;
+
+        const placePieceParams: IPlacePieceParams = {
+          coordinates: bowCoordinates,
           orientation,
-          angleOfRotationToNum,
-          ship.length
-        );
-      
-        if (isPositionValid) {
-          const placePieceParams: IPlacePieceParams = {
-            coordinates: bowCoordinates,
-            orientation,
-          };
-        
-          validRotatedPlacePieceParams.set(angleOfRotationToNum, placePieceParams);
-        }
+        };
+
+        rotatedPlacePieceParams.set(angleOfRotationToNum, placePieceParams);
       }
 
-      return validRotatedPlacePieceParams;
+      return rotatedPlacePieceParams;
     };
 
     const rotationalPivotBowCoordinates: Coordinates =
@@ -505,10 +568,10 @@ export class BattleshipBoardController implements IBattleshipGameboardController
         rotationalPivotOrientation
       );
 
-    const validRotatedPlacePieceParams: ValidRotationalPositionMap =
-      generateValidRotatedPlacePieceParams(rotatedPiecePlacementParams);
+    const rotatedPlacePieceParamsMap: RotationalPositionMap =
+      generateRotationalPositionMap(rotatedPiecePlacementParams);
 
-    return validRotatedPlacePieceParams;
+    return rotatedPlacePieceParamsMap;
   }
 
   private isShipValidForRemoval(ship: BattleshipBuilder): boolean {
@@ -532,5 +595,21 @@ export class BattleshipBoardController implements IBattleshipGameboardController
   ): void {
     this.removePiece(ship, shouldResetShipRotationalData);
     this.placePiece(placementParameters);
+  }
+
+  private setFleetRotatedPlacePieceParams(fleet: Fleet): void {
+    for (const ship of Object.values(fleet)) {
+      if (ship.isPlaced()) this.setShipRotatedPlacePieceParams(ship);
+    }
+  }
+
+  private setShipRotatedPlacePieceParams(ship: BattleshipBuilder): void {
+    const rotatedPlacePieceParams: RotationalPositionMap =
+      this.getRotatedPlacePieceParams(ship);
+
+    this.playerState.gameboardRepository.setShipValidRotationalParams(
+      ship,
+      rotatedPlacePieceParams
+    );
   }
 }

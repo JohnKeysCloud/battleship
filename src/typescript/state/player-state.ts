@@ -18,7 +18,8 @@ const { playerOneFleetBuilder, playerTwoFleetBuilder } =
 const { playerOneBoardController, playerTwoBoardController } =
   createBattleshipControllerSet(
     { playerOneBoardBuilder, playerTwoBoardBuilder },
-    { playerOneBoardRepository, playerTwoBoardRepository }
+    { playerOneBoardRepository, playerTwoBoardRepository },
+    { playerOneFleetBuilder, playerTwoFleetBuilder }
   );
 
 const playerOne: PlayerState = {

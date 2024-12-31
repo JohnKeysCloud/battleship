@@ -39,7 +39,7 @@ export class BattleshipBuilder implements IShipOptions {
   public readonly seaworthy: boolean = true;
   public readonly symbol: ShipSymbolValue;
   public rotationalPivotConfigurations: IRotationalPivotConfigurations = {
-    currentAngleOfRotation: null,
+    transientAngleOfRotation: null,
     coordinatesArray: null,
     orientation: null
   };
@@ -79,7 +79,7 @@ export class BattleshipBuilder implements IShipOptions {
     if (shouldResetShipRotationalData === true) {
       this.rotationalPivotConfigurations = {
         ...placementConfigurations,
-        currentAngleOfRotation: null
+        transientAngleOfRotation: null
       };
     }
   };

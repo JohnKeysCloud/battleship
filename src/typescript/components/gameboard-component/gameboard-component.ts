@@ -183,6 +183,7 @@ export class GameboardComponent {
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
 
     this.handleDragListeners(gameboardContainer);
+    this.handleClickListeners(gameboardContainer);
 
     return gameboardContainer;
   }
@@ -326,7 +327,7 @@ export class GameboardComponent {
   }
 
   // 💭 --------------------------------------------------------------
-  // 💭 HTML Drag and Drop API
+  // 💭 HTML Drag and Drop API (Repositioning)
 
   private handleDragListeners(gameboardContainer: HTMLDivElement) {
     const dragState: DragState = {
@@ -683,6 +684,38 @@ export class GameboardComponent {
       console.error(error);
     }
   }
+
+  // 💭 --------------------------------------------------------------
+  // 💭 Handle Ship Click (Rotation)
+
+  private handleClickListeners(gameboardContainer: HTMLDivElement) {
+    
+    gameboardContainer.addEventListener('click', (e: MouseEvent) => {
+      this.handleShipRotation(e);
+    });
+
+  }
+
+  private handleShipRotation(e: MouseEvent) {
+    if (!(e.target instanceof HTMLDivElement))
+      throw new Error('Target element not found or is not an HTMLElement.');
+
+    // Ensure it's a valid ship container
+    if (!e.target.classList.contains('ship-container')) return;
+
+    const shipContainer: HTMLDivElement = e.target;
+
+    const shipType: ShipType = getConvertedTypeFromAttr(
+      shipContainer,
+      'data-shiptype',
+      isShipType
+    );
+    
+    const ship = this.playerState.fleetBuilder.getShip(shipType);
+
+    this.playerState.gameboardController.rotatePiece(ship);
+    this.updateGameboard();
+  };
 
   // 💭 --------------------------------------------------------------
   // 💭 Utilities

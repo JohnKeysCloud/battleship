@@ -118,7 +118,7 @@ export function placeShip({
       if (Object.values(ship.rotationalPivotConfigurations).every(value => value === null)) {
         ship.rotationalPivotConfigurations = {
           ...placementConfigurations,
-          currentAngleOfRotation: AnglesOfRotation.Degrees0,
+          transientAngleOfRotation: AnglesOfRotation.Degrees0,
         }
       }      
     };

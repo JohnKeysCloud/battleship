@@ -4,23 +4,24 @@ import {
   CoordinatesArray,
   OccupiedCoordinatesSetMemberKey,
   FleetCoordinates,
-  FleetValidRotationalParams,
+  InBoundRotationalPlacePieceParamsForFleet,
   ShipType,
-  ValidRotationalPositionMap
+  RotationalPositionMap
 } from "../../types/logic-types";
 import { isOccupiedCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
 
 export class BattleshipBoardRepository {
   private readonly _fleetCoordinates: FleetCoordinates = {};
-  private readonly _fleetValidRotationalParams: FleetValidRotationalParams = {};
+  private readonly _inBoundRotationalPlacePieceParamsForFleet: InBoundRotationalPlacePieceParamsForFleet = {};
 
   // 💭 --------------------------------------------------------------
 
   public get fleetCoordinates(): FleetCoordinates {
     return this._fleetCoordinates;
   }
-  public get fleetValidRotationalParams(): FleetValidRotationalParams {
-    return this._fleetValidRotationalParams;
+
+  public get inBoundRotationalPlacePieceForFleet(): InBoundRotationalPlacePieceParamsForFleet {
+    return this._inBoundRotationalPlacePieceParamsForFleet;
   }
 
   public addShipToFleetCoordinates(
@@ -73,22 +74,25 @@ export class BattleshipBoardRepository {
       }
     }
   }
-  
+
   public isShipPlaced(shipType: ShipType): boolean {
     return this.fleetCoordinates[shipType] !== null;
   }
+
   public nullifyShipCoordinatesValue(shipType: ShipType): void {
     this.fleetCoordinates[shipType] = null;
   }
+
   public nullifyShipValidRotationalParams(shipType: ShipType): void {
-    this.fleetValidRotationalParams[shipType] = null;
+    this.inBoundRotationalPlacePieceForFleet[shipType] = null;
   }
+  
   public setShipValidRotationalParams(
     ship: BattleshipBuilder,
-    validRotatedPlacePieceParams: ValidRotationalPositionMap
+    validRotatedPlacePieceParams: RotationalPositionMap
   ): void {
-    if (!this._fleetValidRotationalParams[ship.type])
-      this._fleetValidRotationalParams[ship.type] =
+    if (!this._inBoundRotationalPlacePieceParamsForFleet[ship.type])
+      this._inBoundRotationalPlacePieceParamsForFleet[ship.type] =
         validRotatedPlacePieceParams;
   }
 }
