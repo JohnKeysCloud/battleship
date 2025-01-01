@@ -3,8 +3,8 @@ import { BattleshipBoardController } from './typescript/logic/bs-gameboard-contr
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
 import { players } from './typescript/state/player-state';
 import { PlayerGameboardComponent } from './typescript/components/player-gameboard-component/player-gameboard-component';
-import './styles/sass/main.scss'
-import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component';
+import './styles/sass/index.scss'
+import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component/ship-shuffler-component';
 
 function init() {
   const randomizeBSGameboards = () => {
@@ -31,7 +31,7 @@ function init() {
     players.playerTwo.gameboardController,
     players.playerTwo.fleetBuilder.fleet,
     '#content',
-    'player-one-randomizer-button',
+    'player-one-ship-shuffler-button',
   );
 
   shipShuffler.render('#content');
@@ -43,83 +43,6 @@ function init() {
   const computerBoardRepository = players.playerTwo.gameboardRepository;
   const computerCarrier: BattleshipBuilder = players.playerTwo.fleetBuilder.fleet.carrier!;
 
-  // // * Should log warning because ship is already placed
-  // // console.log('Intentional invalid ship placement:')
-  // // computerBoardController.placePiece({ ship: computerCarrier, coordinates: [0, 0], orientation: 'horizontal' });
-  
-  // console.log('Initial fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-
-  // // * initial board print
-  // console.log('Initial randomized board');
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship once
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship again
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship another time
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship penultimately
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship once more
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * move da ship
-  // console.log(`Move ${computerCarrier.type}:`);
-  // computerBoardController.movePiece(computerCarrier, [9, 0]);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship in new position
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship penultimately, again
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  // console.log('Fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
-  
-  // // * rotate ship once more, again
-  // console.log(`Rotate ${computerCarrier.type}:`);
-  // computerBoardController.rotatePiece(computerCarrier);
-  // computerBoardController.prettyPrint();
-  
-  // // * check all coordinates the ship occupies
-  // console.log('Final fleet coordinates:');
-  // console.log(computerBoardRepository.fleetCoordinates);
 }
 
 // time all the above stuff

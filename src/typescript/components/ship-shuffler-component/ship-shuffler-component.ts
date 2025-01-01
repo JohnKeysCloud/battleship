@@ -1,8 +1,8 @@
-import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
-import { createElement } from "../utilities/random-utilities";
-import { Fleet } from "../types/logic-types";
-import { randomizeBSGameboard } from "../setup/randomize-bs-gameboard";
-import GlobalEventBus from "../utilities/event-bus";
+import { BattleshipBoardController } from "../../logic/bs-gameboard-controller/bs-gameboard-controller";
+import { createElement } from "../../utilities/random-utilities";
+import { Fleet } from "../../types/logic-types";
+import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
+import GlobalEventBus from "../../utilities/event-bus";
 
 export class ShipShufflerButtonComponent {
   private readonly ShipShufflerButton: HTMLButtonElement;
@@ -13,8 +13,8 @@ export class ShipShufflerButtonComponent {
     private gameboardController: BattleshipBoardController,
     private fleet: Fleet,
     private gameboardTargetSelector: string,
-    private id: string = 'randomizer-button',
-    private classes: string[] = ['randomizer-button']
+    private id: string = 'ship-shuffler-button',
+    private classes: string[] = ['ship-shuffler-button']
   ) {
     this.validateGameboardTarget(this.gameboardTargetSelector);
 
@@ -62,7 +62,7 @@ export class ShipShufflerButtonComponent {
 
   private createShipShufflerButtonContainer(): HTMLDivElement {
     const container: HTMLDivElement = createElement('div', [
-      'randomizer-button-container',
+      'ship-shuffler-button-container',
     ]);
     return container;
   }
