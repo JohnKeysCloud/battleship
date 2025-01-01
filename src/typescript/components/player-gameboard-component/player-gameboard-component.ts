@@ -104,6 +104,7 @@ export class PlayerGameboardComponent {
           'div',
           [
             `${createPlayerIdentifier(this.id, symbolDescription)}-cell`,
+            `player-${symbolDescription}-cell`,
             'grid-cell',
           ],
           {
