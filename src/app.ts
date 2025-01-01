@@ -2,7 +2,7 @@ import { BattleshipBuilder } from './typescript/logic/bs-ship-builder/bs-ship-bu
 import { BattleshipBoardController } from './typescript/logic/bs-gameboard-controller/bs-gameboard-controller';
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
 import { players } from './typescript/state/player-state';
-import { GameboardComponent } from './typescript/components/gameboard-component/gameboard-component';
+import { PlayerGameboardComponent } from './typescript/components/player-gameboard-component/player-gameboard-component';
 import './styles/sass/main.scss'
 import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component';
 
@@ -24,8 +24,8 @@ function init() {
   console.timeEnd('randomizeBSGameboards'); 
 
   // create and render gameboard component to '#content`
-  const gameboardComponent = new GameboardComponent('playerTwo', players.playerTwo);
-  gameboardComponent.render('#content');
+  const playerGameboardComponent = new PlayerGameboardComponent('playerTwo', players.playerTwo);
+  playerGameboardComponent.render('#content');
 
   const shipShuffler = new ShipShufflerButtonComponent(
     players.playerTwo.gameboardController,

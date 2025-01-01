@@ -23,7 +23,7 @@ import { isOrientation, isShipLength, isShipType } from '../../utilities/logic-u
 import { DragState } from '../component-types';
 import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
 
-export class GameboardComponent {
+export class PlayerGameboardComponent {
   private boardContainer: HTMLDivElement;
   private fleetElements: Set<HTMLDivElement> = new Set();
 
