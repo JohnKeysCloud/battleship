@@ -13,8 +13,8 @@ import {
 import {
   areArraysEqual,
   createElement,
-  createPlayerIdentifier,
-  getConvertedTypeFromAttr,
+  createIdentifier,
+  getConvertedTypeFromAttr
 } from '../../utilities/random-utilities';
 import { GridPlacementValue } from '../../types/css-types';
 import { PlayerState } from '../../types/state-types';
@@ -103,7 +103,7 @@ export class PlayerGameboardComponent {
         const gridCell: HTMLDivElement = createElement(
           'div',
           [
-            `${createPlayerIdentifier(this.id, symbolDescription)}-cell`,
+            `${createIdentifier(this.id, 'player', symbolDescription)}-cell`,
             `player-${symbolDescription}-cell`,
             'grid-cell',
           ],
@@ -116,9 +116,10 @@ export class PlayerGameboardComponent {
         );
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
-          createPlayerIdentifier(
+          createIdentifier(
             this.id,
-            `${symbolDescription}-cell-container`
+            'player',
+            `${symbolDescription}-grid-cell-container`
           ),
           'grid-cell-container',
         ]);
@@ -148,7 +149,7 @@ export class PlayerGameboardComponent {
       'div',
       ['ship-container'],
       {
-        id: createPlayerIdentifier(this.id, `${shipType}-container`),
+        id: createIdentifier(this.id, 'player', `${shipType}-container`),
         'data-shipType': shipType,
         'data-length': shipLength.toString(),
         'data-orientation': orientation,
@@ -177,7 +178,7 @@ export class PlayerGameboardComponent {
       'div',
       ['gameboard-container'],
       {
-        id: createPlayerIdentifier(this.id, 'gameboard-container'),
+        id: createIdentifier(this.id, 'player', 'gameboard-container'),
       }
     );
 
@@ -194,7 +195,7 @@ export class PlayerGameboardComponent {
       'div',
       ['gameboard-background'],
       {
-        id: createPlayerIdentifier(this.id, 'gameboard-background'),
+        id: createIdentifier(this.id, 'player', 'gameboard-background'),
       }
     );
     gameboardBackground.appendChild(
@@ -204,7 +205,7 @@ export class PlayerGameboardComponent {
     );
 
     const gameboard = createElement('div', ['gameboard'], {
-      id: createPlayerIdentifier(this.id, 'gameboard'),
+      id: createIdentifier(this.id, 'player', 'gameboard'),
     });
     gameboard.style.setProperty('--grid-size', boardSize.toString());
 
@@ -225,14 +226,14 @@ export class PlayerGameboardComponent {
       const isBow: boolean = i === 0;
       const shipUnit: HTMLDivElement = createElement('div', [
         'ship-unit',
-        createPlayerIdentifier(id, shipType),
+        createIdentifier(id, 'player',shipType),
       ]);
 
       if (isBow) {
         shipUnit.classList.add('ship-bow');
         shipUnit.setAttribute(
           'id',
-          createPlayerIdentifier(id, `${shipType}-bow`)
+          createIdentifier(id, 'player',`${shipType}-bow`)
         );
       }
 

@@ -44,7 +44,12 @@ export const createElement = <K extends keyof HTMLElementTagNameMap>(
   return element;
 };
 
-export const createPlayerIdentifier = (playerId: string, identifier: string): string => {
-  const playerNumberString: string = playerId.split('player')[1].toLowerCase();
-  return `player-${playerNumberString}-${identifier}`;
-};
+export const createIdentifier = (id: string, playerType: string, identifier?: string): string => {
+  if (playerType !== 'player' && playerType !== 'bot')
+    throw new Error('`playerType` must be either "player" or "bot"');
+
+  const extractedNumberString: string = id.split(playerType)[1].toLowerCase();
+  return identifier
+    ? `${playerType}-${extractedNumberString}-${identifier}`
+    : `${playerType}-${extractedNumberString}`;
+}
