@@ -18,10 +18,13 @@ describe('`getValidShipPositions`', () => {
   // Initialized with instance to ensure definition in setup/helper functions
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
   let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController({
-    gameboardBuilder: testBoardBuilder,
-    gameboardRepository: testBoardRepository,
-  });
+  let testFleetBuilder: BattleshipFleetBuilder =BattleshipFleetBuilder.createHasbroFleet();
+  let testBoardController: BattleshipBoardController =
+    new BattleshipBoardController({
+      gameboardBuilder: testBoardBuilder,
+      gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
+    });
 
   // Creates a new instance for each test run
   beforeEach(() => {
@@ -30,6 +33,7 @@ describe('`getValidShipPositions`', () => {
     testBoardController = new BattleshipBoardController({
       gameboardBuilder: testBoardBuilder,
       gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
     });
   });
 

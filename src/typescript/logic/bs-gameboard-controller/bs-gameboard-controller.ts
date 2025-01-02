@@ -184,6 +184,17 @@ export class BattleshipBoardController
     );
   }
 
+  public receiveAttack(coordinates: Coordinates): void {
+    const attackedShip = this.getShipAt(coordinates);
+
+    if (!attackedShip) {
+      console.log('Missed me with that, bitch!');
+      return;
+    }
+
+    console.log(attackedShip);
+  }
+
   public removePiece(
     ship: BattleshipBuilder,
     shouldResetShipRotationalData: boolean = true
@@ -379,7 +390,7 @@ export class BattleshipBoardController
 
   // ? maybe use this with UI? (TODO: create return value type)
   private getShipAt(coordinates: Coordinates) {
-    if (this.areCoordinatesVacant(coordinates)) return;
+    if (this.areCoordinatesVacant(coordinates)) return null;
 
     return this.playerState.gameboardRepository.getShipDataAt(coordinates);
   }

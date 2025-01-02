@@ -24,10 +24,13 @@ describe('`placeShip`', () => {
 
   let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
   let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
-  let testBoardController: BattleshipBoardController = new BattleshipBoardController({
-    gameboardBuilder: testBoardBuilder,
-    gameboardRepository: testBoardRepository,
-  });
+  let testFleetBuilder: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+  let testBoardController: BattleshipBoardController =
+    new BattleshipBoardController({
+      gameboardBuilder: testBoardBuilder,
+      gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
+    });
 
   beforeEach(() => {
     testBoardBuilder = new BattleshipBoardBuilder();
@@ -35,6 +38,7 @@ describe('`placeShip`', () => {
     testBoardController = new BattleshipBoardController({
       gameboardBuilder: testBoardBuilder,
       gameboardRepository: testBoardRepository,
+      fleetBuilder: testFleetBuilder,
     });
   });
 
