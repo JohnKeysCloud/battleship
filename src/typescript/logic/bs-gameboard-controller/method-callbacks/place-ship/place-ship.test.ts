@@ -11,10 +11,10 @@ import {
   BattleshipBoardBuilder,
 } from '../../../bs-gameboard-builder/bs-gameboard-builder';
 import { BattleshipBoardController } from '../../bs-gameboard-controller';
-import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
+import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { createPositionObject } from '../../../../utilities/logic-utilities';
-import { BattleshipBoardRepository } from '../../../bs-gameboard-repository/bs-gameboard-repository';
+import { createLogicTestObject } from '../../core-method-tests/utilities/logic-test-init';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
@@ -22,24 +22,15 @@ describe('`placeShip`', () => {
   const getNewCarrierTestShip = (): BattleshipBuilder =>
     BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
 
-  let testBoardBuilder: BattleshipBoardBuilder = new BattleshipBoardBuilder();
-  let testBoardRepository: BattleshipBoardRepository = new BattleshipBoardRepository();
-  let testFleetBuilder: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
-  let testBoardController: BattleshipBoardController =
-    new BattleshipBoardController({
-      gameboardBuilder: testBoardBuilder,
-      gameboardRepository: testBoardRepository,
-      fleetBuilder: testFleetBuilder,
-    });
+  let logicTestObject = createLogicTestObject();
+
+  let testBoardBuilder: BattleshipBoardBuilder = logicTestObject.boardBuilder;
+  let testBoardController: BattleshipBoardController = logicTestObject.boardController;
 
   beforeEach(() => {
-    testBoardBuilder = new BattleshipBoardBuilder();
-    testBoardRepository = new BattleshipBoardRepository();
-    testBoardController = new BattleshipBoardController({
-      gameboardBuilder: testBoardBuilder,
-      gameboardRepository: testBoardRepository,
-      fleetBuilder: testFleetBuilder,
-    });
+    logicTestObject = createLogicTestObject();
+    testBoardBuilder = logicTestObject.boardBuilder;
+    testBoardController = logicTestObject.boardController;
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>

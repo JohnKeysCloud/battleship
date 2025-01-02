@@ -35,8 +35,8 @@ import {
   isPositionInBounds,
   isPositionsArray,
 } from '../../utilities/logic-utilities';
-import { getValidShipPositions } from './helpers/get-valid-ship-positions/get-valid-ship-positions';
-import { placeShip } from './helpers/place-ship/place-ship';
+import { getValidShipPositions } from './method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
+import { placeShip } from './method-callbacks/place-ship/place-ship';
 
 export class BattleshipBoardController
   implements IBattleshipGameboardController
