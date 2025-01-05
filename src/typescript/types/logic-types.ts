@@ -60,17 +60,18 @@ export type RotatedPlacePieceParamsValue = IPlacePieceParams | OutOfBounds;
 export type RotatedPlacePieceConfigurations = IPlacePieceParams | OutOfBounds;
 export type ShipConfig = {
   type: ShipType;
-  version?: Version;
+  version?: FleetVersion;
 };
 export type ShipLength = 2 | 3 | 4 | 5;
 export type ShipSymbols = {
   [key in ShipType]: symbol; // Each key in ShipType maps to a symbol
 };
+export type ShipSymbolDescription = 'CA' | 'BS' | 'CR' | 'SB' | 'DD' | 'PB';
 export type ShipSymbolValueArray = ShipSymbolValue[];
 export type ShipSymbolValue = typeof SHIP_SYMBOLS[ShipType];
-export type SizeLookupKey = `${ShipType}-${Version}`;
+export type SizeLookupKey = `${ShipType}-${FleetVersion}`;
 export type RotationalPositionMap = Map<AnglesOfRotation, IPlacePieceParams>;
-export type Version = 1990 | 2002;
+export type FleetVersion = 1990 | 2002;
 
 // 💭 --------------------------------------------------------------
 // 💭 Interfaces
@@ -146,7 +147,7 @@ export interface IShipOptions {
   hitCounter: number;
   length: ShipLength;
   type: ShipType;
-  version: Version;
+  version: FleetVersion;
 };
 export interface IShipPlacementConfigurations {
   orientation: Orientation;

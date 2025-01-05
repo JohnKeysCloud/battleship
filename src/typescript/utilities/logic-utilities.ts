@@ -1,3 +1,4 @@
+import { SHIP_SYMBOLS } from "../logic/bs-ship-builder/bs-ship-builder";
 import {
   AnglesOfRotation,
   AxisArrayKey,
@@ -5,11 +6,6 @@ import {
   OccupiedCoordinatesSet,
   OccupiedCoordinatesSetMemberKey,
   FleetCoordinates,
-  IBattlehipFleetBuilderSet,
-  IBattleshipFleetBuilderSet,
-  IBattleshipGameboardBuilderSet,
-  IBattleshipGameboardControllerSet,
-  IBattleshipGameboardRepositorySet,
   IPlacePieceParams,
   IPosition,
   IShipPlacementConfigurations,
@@ -18,68 +14,10 @@ import {
   RotatedCoordinatesValue,
   ShipLength,
   ShipType,
-  Version,
-  PositionArray
+  PositionArray,
+  ShipSymbolDescription
 } from "../types/logic-types";
-import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboard-builder";
-import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
-import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-gameboard-repository";
-import { BattleshipFleetBuilder } from "../logic/bs-fleet-builder/bs-fleet-builder";
 import { areArraysEqual } from "./random-utilities";
-
-// 💭 --------------------------------------------------------------
-
-// * FACTORY FUNCTIONS
-export function createBattleshipBoardController(
-  gameboardBuilder: BattleshipBoardBuilder,
-  gameboardRepository: BattleshipBoardRepository,
-  fleetBuilder: BattleshipFleetBuilder
-): BattleshipBoardController {
-  return new BattleshipBoardController({gameboardBuilder, gameboardRepository, fleetBuilder});
-}
-export function createBattleshipControllerSet(
-  { playerOneBoardBuilder, playerTwoBoardBuilder}: IBattleshipGameboardBuilderSet,
-  { playerOneBoardRepository, playerTwoBoardRepository }: IBattleshipGameboardRepositorySet,
-  { playerOneFleetBuilder, playerTwoFleetBuilder }: IBattleshipFleetBuilderSet,
-): IBattleshipGameboardControllerSet {
-  return {
-    playerOneBoardController: createBattleshipBoardController(
-      playerOneBoardBuilder,
-      playerOneBoardRepository,
-      playerOneFleetBuilder
-    ),
-    playerTwoBoardController: createBattleshipBoardController(
-      playerTwoBoardBuilder,
-      playerTwoBoardRepository,
-      playerTwoFleetBuilder
-    ),
-  };
-}
-export function createBattleshipBoardBuilderSet(): IBattleshipGameboardBuilderSet {
-  return {
-    playerOneBoardBuilder: new BattleshipBoardBuilder(),
-    playerTwoBoardBuilder: new BattleshipBoardBuilder(),
-  };
-}
-export function createBattleshipBoardRepositorySet(): IBattleshipGameboardRepositorySet {
-  return {
-    playerOneBoardRepository: new BattleshipBoardRepository(),
-    playerTwoBoardRepository: new BattleshipBoardRepository(),
-  };
-}
-export function createBattleshipFleetBuilderSet(
-  version: Version = 2002
-): IBattlehipFleetBuilderSet {
-  const createBattleshipFleetBuilder =
-    version === 2002
-      ? BattleshipFleetBuilder.createHasbroFleet
-      : BattleshipFleetBuilder.createMBFleet;
-
-  return {
-    playerOneFleetBuilder: createBattleshipFleetBuilder(),
-    playerTwoFleetBuilder: createBattleshipFleetBuilder(),
-  };
-}
 
 // 💭 --------------------------------------------------------------
 
@@ -234,7 +172,10 @@ export const isRotatedCoordinatesValue = (
 };
 export const isShipLength = (value: unknown): value is ShipLength => {
   return typeof value === 'number' && [2, 3, 4, 5].includes(value);
-}
+};
+export const isShipSymbolDescription = (value: unknown): value is ShipSymbolDescription => {
+  return typeof value === 'string' && ['CA', 'BS', 'CR', 'SB', 'DD', 'PB'].includes(value);
+};
 export const isShipType = (
   value: unknown
 ): value is ShipType => {

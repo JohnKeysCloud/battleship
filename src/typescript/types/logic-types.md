@@ -681,7 +681,7 @@ This results in an **empty type**- a type that doesn't have any possible values.
 
 ---
 
-#### Pre-refactored Version
+#### Pre-refactored FleetVersion
 
 ``` typescript
 const shipTypes = [
@@ -818,7 +818,7 @@ myValue = { name: 'submarine' }; // valid, since it matches { name: string }
   * Without `as const`: Types are generalized, allowing broader ranges of values, reducing type specificity and strictness.
 
 
-#### Current Refactored Version
+#### Current Refactored FleetVersion
 
 Instead of duplicating a type definition for ship types in the fleet builder module, I created an enumeration (`enum`) of the ship types (declared [here](../types/logic-types.ts)). This change allows us to import the `ShipType` `enum` directly into the fleet builder module in order to maintain type safety. Additionally, this approach adheres to the DRY (Don't Repeat Yourself) principle by avoiding redundant type definitions. 
 
@@ -842,17 +842,17 @@ Creates a union of the keys in `ShipType`.
 
 ### `ShipConfig` Type
 
-This `type` declaration is used to simplify the parameter definition of the `createFleet` static method, which is responsible for creating fleets and ensuring proper class instantiation. It specifies that the object should have a `type` key whose value conforms to `ShipType` and an optional `version` key whose value conforms to `Version`.
+This `type` declaration is used to simplify the parameter definition of the `createFleet` static method, which is responsible for creating fleets and ensuring proper class instantiation. It specifies that the object should have a `type` key whose value conforms to `ShipType` and an optional `version` key whose value conforms to `FleetVersion`.
 
 By using this type and the `FleetConfigs` type, the static method can enforce type safety and clear structure in the passed configurations, making the code more readable and maintainable.
 
 ### `SizeLookupKey` Type
 
-The type `SizeLookupKey` is defined as `${ShipType}-${Version}`. This type ensures that the keys used in the `sizeLookup` table adhere to a specific format. By using this template literal type, TypeScript enforces that keys in the `sizeLookup` table must combine a valid `ShipType` with a valid Version, separated by a hyphen. This helps maintain consistency and type safety, making sure that only properly formatted keys are used throughout the code.
+The type `SizeLookupKey` is defined as `${ShipType}-${FleetVersion}`. This type ensures that the keys used in the `sizeLookup` table adhere to a specific format. By using this template literal type, TypeScript enforces that keys in the `sizeLookup` table must combine a valid `ShipType` with a valid FleetVersion, separated by a hyphen. This helps maintain consistency and type safety, making sure that only properly formatted keys are used throughout the code.
 
-### `Version` Type
+### `FleetVersion` Type
 
-As of 9/4/24, there are two official versions of the Battleship board game, represented by the years 1990 and 2002. To create a flexible system that can distinguish between these versions in the web implementation, I defined an `type` called `Version`. This `type` includes these years as its members, and it is used to enforce type safety by ensuring that any value assigned to a variable of this type must match one of the specified years. This approach provides a strict type constraint that aligns with the official versions of the game, enhancing code clarity and reliability.
+As of 9/4/24, there are two official versions of the Battleship board game, represented by the years 1990 and 2002. To create a flexible system that can distinguish between these versions in the web implementation, I defined an `type` called `FleetVersion`. This `type` includes these years as its members, and it is used to enforce type safety by ensuring that any value assigned to a variable of this type must match one of the specified years. This approach provides a strict type constraint that aligns with the official versions of the game, enhancing code clarity and reliability.
 
 ## Interfaces
 

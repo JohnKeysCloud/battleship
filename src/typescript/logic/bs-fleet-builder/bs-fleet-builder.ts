@@ -2,7 +2,7 @@ import {
   Fleet,
   FleetConfigs,
   ShipType,
-  Version,
+  FleetVersion,
 } from '../../types/logic-types';
 import {
   BattleshipBuilder,
@@ -10,7 +10,7 @@ import {
 import { isShipType } from '../../utilities/logic-utilities';
 
 export class BattleshipFleetBuilder {
-  private constructor(public readonly fleet: Fleet, public readonly version: Version) {}
+  private constructor(public readonly fleet: Fleet, public readonly version: FleetVersion) {}
 
   private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};

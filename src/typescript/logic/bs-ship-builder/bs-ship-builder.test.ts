@@ -1,14 +1,14 @@
 import {
   ITestCaseShipHit,
   ShipType,
-  Version,
+  FleetVersion,
 } from '../../types/logic-types';
 import { BattleshipBuilder } from './bs-ship-builder';
 
 // Helper function to create a new instance of a ship
 const createShip = (
   type: ShipType,
-  version: Version = 2002
+  version: FleetVersion = 2002
 ): BattleshipBuilder => {
   return new BattleshipBuilder(type, version);
 };

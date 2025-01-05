@@ -39,42 +39,6 @@ export class BattleshipBoardRepository {
     });
   }
 
-  public getShipDataAt(coordinates: Coordinates) {
-    if (!isFleetCoordinates(this.fleetCoordinates)) {
-      throw new Error(
-        `Invalid Type: "${this.fleetCoordinates}" doesn't conform to "FleetCoordinates".`
-      );
-    }
-
-    const validateTypes = (shipType: unknown, OccupiedCoordinatesSet: unknown): void => {
-      if (!isShipType(shipType))
-        throw new Error(
-          `Invalid Type: "${shipType}" doesn't conform to "ShipType".`
-        );
-      if (!isOccupiedCoordinatesSet(OccupiedCoordinatesSet))
-        throw new Error(
-          `Invalid Type: "${OccupiedCoordinatesSet}" doesn't conform to "OccupiedCoordinatesSet".`
-        );
-    };
-
-    const [x, y]: Coordinates = coordinates;
-    const coordinateSetMemberKey: OccupiedCoordinatesSetMemberKey = `[${x}, ${y}]`;
-
-    for (const [shipType, occupiedCoordinatesSet] of Object.entries(this.fleetCoordinates)) {
-      if (!isShipType(shipType)) throw new Error('');
-      if (!isOccupiedCoordinatesSet(occupiedCoordinatesSet)) throw new Error();
-
-      validateTypes(shipType, occupiedCoordinatesSet);
-
-      if (occupiedCoordinatesSet?.has(coordinateSetMemberKey)) {
-        return {
-          shipType,
-          occupiedCoordinatesSet
-        }
-      }
-    }
-  }
-
   public isShipPlaced(shipType: ShipType): boolean {
     return this.fleetCoordinates[shipType] !== null;
   }

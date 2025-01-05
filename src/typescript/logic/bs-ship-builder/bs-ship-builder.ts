@@ -7,7 +7,7 @@ import {
   ShipSymbolValue,
   ShipType,
   SizeLookupKey,
-  Version
+  FleetVersion
 } from '../../types/logic-types';
 
 export const SHIP_SYMBOLS: ShipSymbols = {
@@ -50,7 +50,7 @@ export class BattleshipBuilder implements IShipOptions {
   public isPlaced = (): boolean => this.currentplacementConfigurations.coordinatesArray !== null;
   private _hitCounter: number = 0;
 
-  constructor(public readonly type: ShipType, public readonly version: Version = 2002) {
+  constructor(public readonly type: ShipType, public readonly version: FleetVersion = 2002) {
     this.symbol = SHIP_SYMBOLS[type];
 
     const key: SizeLookupKey = `${type}-${version}`;

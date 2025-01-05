@@ -20,7 +20,7 @@ The values are symbols that will represent ship positions on the gameboard by re
 
 ### `sizeLookup: Record<SizeLookupKey, number | undefined>`
 
-This `sizeLookup` object was defined as a [`Record`](#whats-a-record) to ensure that all potential combinations of `ShipType` and `Version` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type.
+This `sizeLookup` object was defined as a [`Record`](#whats-a-record) to ensure that all potential combinations of `ShipType` and `FleetVersion` are accounted for and explicitly handled. By using `Record<SizeLookupKey, number | undefined>`, TypeScript enforces that the `sizeLookup` object contains all possible keys derived from the `SizeLookupKey` type.
 
 #### Key Points:
 
@@ -119,9 +119,9 @@ Such operations include:
 
 In the `BattleshipBuilder` constructor, the symbol that represents the ship instance is set as a property on a newly created instance (more on why [here](#ship_symbols)).
 
-I also initialized `key` as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `Version` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
+I also initialized `key` as a template literal string that conforms to the `SizeLookupKey` type. This `key` is dynamically constructed using the `ShipType` and `FleetVersion` arguments passed to the constructor, ensuring it matches the expected format (e.g., `'battleship-1990'`).
 
-In addition, I created a `length` variable that utilizes the constructed `key` to look up the corresponding ship length in the `sizeLookup` `Record`. If the `length` retrieved from the lookup is `undefined`, indicating that the combination of `ShipType` and `Version` is invalid or unsupported, an error is thrown to signal the issue. Otherwise, the `length` property of the instance is assigned the retrieved value, ensuring the ship's length is correctly set based on its type and version.
+In addition, I created a `length` variable that utilizes the constructed `key` to look up the corresponding ship length in the `sizeLookup` `Record`. If the `length` retrieved from the lookup is `undefined`, indicating that the combination of `ShipType` and `FleetVersion` is invalid or unsupported, an error is thrown to signal the issue. Otherwise, the `length` property of the instance is assigned the retrieved value, ensuring the ship's length is correctly set based on its type and version.
 
 #### Instance Methods
 

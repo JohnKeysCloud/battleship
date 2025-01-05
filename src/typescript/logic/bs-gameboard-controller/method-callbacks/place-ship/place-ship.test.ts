@@ -7,41 +7,34 @@ import {
   ShipSymbolValue,
   ShipType
 } from '../../../../types/logic-types';
-import {
-  BattleshipBoardBuilder,
-} from '../../../bs-gameboard-builder/bs-gameboard-builder';
-import { BattleshipBoardController } from '../../bs-gameboard-controller';
+import { PlayerState } from '../../../../types/state-types';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { createPositionObject } from '../../../../utilities/logic-utilities';
-import { createLogicTestObject } from '../../core-method-tests/utilities/logic-test-init';
+import { createPlayerStateObject } from '../../../../state/player-state';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
   // 💭 Setup
+
   const getNewCarrierTestShip = (): BattleshipBuilder =>
     BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
 
-  let logicTestObject = createLogicTestObject();
-
-  let testBoardBuilder: BattleshipBoardBuilder = logicTestObject.boardBuilder;
-  let testBoardController: BattleshipBoardController = logicTestObject.boardController;
+  let playerState: PlayerState = createPlayerStateObject();
 
   beforeEach(() => {
-    logicTestObject = createLogicTestObject();
-    testBoardBuilder = logicTestObject.boardBuilder;
-    testBoardController = logicTestObject.boardController;
+    playerState = createPlayerStateObject();
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>
-    testBoardController.placePiece(input);
+    playerState.gameboardController.placePiece(input);
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
   const generateExpectedBoard = (input: IPlacePieceWrapperParams) => {
     const expectedBoard: Gameboard = Array.from({ length: 10 }, () =>
-      Array(10).fill(testBoardBuilder.fillValue)
+      Array(10).fill(playerState.gameboardBuilder.fillValue)
     );
 
     const shipSymbol: ShipSymbolValue = input.ship.symbol;
@@ -126,7 +119,7 @@ describe('`placeShip`', () => {
       'ship is placed correctly on the gameboard',
       ({ input, expected }) => {
         placeShip(input);
-        expect(testBoardBuilder.board).toEqual(expected);
+        expect(playerState.gameboardBuilder.board).toEqual(expected);
       }
     );
   });

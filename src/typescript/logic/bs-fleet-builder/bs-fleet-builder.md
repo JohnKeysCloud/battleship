@@ -34,12 +34,12 @@ It's a helper method that doesn't depend on the instances state, it does not nee
 
 ``` typescript
 // Initial Paramater (Pre-refactor)
-fleetConfigs: { [key in ShipType]?: { type: ShipType; version?: Version } }
+fleetConfigs: { [key in ShipType]?: { type: ShipType; version?: FleetVersion } }
 
 // Refactored with `type` creation
 type ShipConfig = {
   type: ShipType;
-  version?: Version;
+  version?: FleetVersion;
 };
 
 type FleetConfigs = {
@@ -55,7 +55,7 @@ This method accepts an object `fleetConfigs` where:
 - **Keys**: Must be one of the values defined in `ShipType` (e.g., `'carrier' | 'battleship' | 'destroyer' | 'submarine' | 'cruiser' | 'patrolBoat'`).
 - **Values**: Each value is an object with:
   - A required `type` property of type `ShipType`.
-  - An optional `version` property of type `Version` (e.g., `1990 | 2002`).
+  - An optional `version` property of type `FleetVersion` (e.g., `1990 | 2002`).
 
 The use of optional properties means that not all ship types need to be included.
 

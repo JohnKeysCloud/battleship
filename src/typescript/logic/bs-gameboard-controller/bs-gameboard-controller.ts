@@ -22,6 +22,8 @@ import {
   ShipType,
   RotationalPositionMap,
   PositionArray,
+  ShipSymbolValue,
+  ShipSymbolDescription,
 } from '../../types/logic-types';
 import { PlayerState } from '../../types/state-types';
 import {
@@ -34,13 +36,12 @@ import {
   isPlacePieceParams,
   isPositionInBounds,
   isPositionsArray,
+  isShipSymbolDescription
 } from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './method-callbacks/place-ship/place-ship';
 
-export class BattleshipBoardController
-  implements IBattleshipGameboardController
-{
+export class BattleshipBoardController implements IBattleshipGameboardController {
   constructor(
     public readonly playerState: Omit<PlayerState, 'gameboardController'>
   ) {}
@@ -184,15 +185,19 @@ export class BattleshipBoardController
     );
   }
 
-  public receiveAttack(coordinates: Coordinates): void {
-    const attackedShip = this.getShipAt(coordinates);
+  // TODO: Finish ⤵️ 
+  // ? add return signature
+  public receiveAttack(coordinates: Coordinates): ShipType | null {
+    // ? Insted of `ShipType`, it will be `BattleshipBuilder`
+    const attackedShip: ShipType | null = this.getShipAt(coordinates);
 
-    if (!attackedShip) {
-      console.log('Missed me with that, bitch!');
-      return;
-    }
+    // ? increment ship hit point
+    // ? add coordinates to set of `attackedCells` (create this set in the repository)
+    // ? If recieved attack is in repository set, return warning that that cell has already been attacked
+    // ? ... etc.
 
-    console.log(attackedShip);
+    // ? For testing purposes. Will probably return nothing.
+    return attackedShip;
   }
 
   public removePiece(
@@ -346,7 +351,7 @@ export class BattleshipBoardController
 
     const initialAngle =
       ship.rotationalPivotConfigurations.transientAngleOfRotation;
-    
+
     /* 
     ┌──────────────────────────────────────────────────────────────────────────────┐
     │ The coolest part of this whole transient concept is that it                  │
@@ -355,7 +360,7 @@ export class BattleshipBoardController
     │ which implies something transient… while the semantic naming of the          │ 
     | key-value pair maintain sound logicality. I am intuit. - 💭                  │
     └──────────────────────────────────────────────────────────────────────────────┘
-    */ 
+    */
 
     const finalPlacePieceParams: IPlacePieceWrapperParams =
       updateTransientPlacementParams(rotationalPositionMap);
@@ -388,12 +393,45 @@ export class BattleshipBoardController
     );
   }
 
-  // ? maybe use this with UI? (TODO: create return value type)
-  private getShipAt(coordinates: Coordinates) {
+  private getShipAt(coordinates: Coordinates): ShipType | null {
     if (this.areCoordinatesVacant(coordinates)) return null;
 
-    return this.playerState.gameboardRepository.getShipDataAt(coordinates);
+    const gameboard = this.playerState.gameboardBuilder.board;
+    const [x, y]: Coordinates = coordinates;
+
+    const shipSymbolValue: ShipSymbolValue = gameboard[y][x];
+    const shipType = this.getShipTypeFromSymbol(shipSymbolValue);
+
+    return shipType;
+
+    // * convert ship type to actual ship
+    // * return ship from fleet
   }
+
+  private getShipTypeFromSymbol = (shipSymbol: ShipSymbolValue) => {
+    if (!isShipSymbolDescription(shipSymbol.description))
+      throw new Error('Invalid ship symbol description');
+    const shipSymbolDescription: ShipSymbolDescription = shipSymbol.description; // ? Create Type
+
+    switch (shipSymbolDescription) {
+      case 'CA':
+        return ShipType.Carrier;
+      case 'DD':
+        return ShipType.Destroyer;
+      case 'SB':
+        return ShipType.Submarine;
+      case 'BS':
+        return ShipType.Battleship;
+      case 'CR':
+        return ShipType.Cruiser;
+      case 'PB':
+        return ShipType.PatrolBoat;
+      default:
+        throw new Error(
+          'The symbol description does not return valid ship type.'
+        );
+    }
+  };
 
   private isRotatedPositionValid = (
     [x, y]: Coordinates,
