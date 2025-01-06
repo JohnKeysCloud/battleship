@@ -226,7 +226,8 @@ export class PlayerGameboardComponent {
       const isBow: boolean = i === 0;
       const shipUnit: HTMLDivElement = createElement('div', [
         'ship-unit',
-        createIdentifier(id, 'player',shipType),
+        `${shipType}-unit`,
+        createIdentifier(id, 'player', `${shipType}-unit`),
       ]);
 
       if (isBow) {

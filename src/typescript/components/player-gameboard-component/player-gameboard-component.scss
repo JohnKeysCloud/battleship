@@ -1,10 +1,17 @@
+:root {
+  --color-battleship: var(--color-pacman);
+  --color-carrier: var(--color-binky);
+  --color-destroyer: var(--color-clyde);
+  --color-patrolBoat: var(--color-inky);
+  --color-submarine: var(--color-sue);
+}
+
 .gameboard-container {
-  border: 1px solid black;
   display: grid;
   grid-template: 1fr / 1fr;
-  height: 33vw;
+  height: 50vw;
   position: relative;
-  width: 33vw;
+  width: 50vw;
 
     .gameboard,
     .gameboard-background {
@@ -22,10 +29,14 @@
 
     .gameboard-background {
       .grid-cell-container {
-        border: 1px solid black;
+        border: 1px solid rgba(128, 128, 128, 0.633);
 
         .grid-cell {
-          background-color: aqua;
+          background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Soft shadow */
+          backdrop-filter: blur(10px); /* Glass blur effect */
+          -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+          // border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border */
           height: 100%;
           position: relative;
           width: 100%;
@@ -71,23 +82,23 @@
         }
 
         .player-ca-cell {
-          background-color: red;
+          background-color: var(--color-carrier);
           opacity: 0.3;
         }
         .player-bs-cell {
-          background-color: blue;
+          background-color: var(--color-battleship);
           opacity: 0.3;
         }
         .player-dd-cell {
-          background-color: green;
+          background-color: var(--color-destroyer);
           opacity: 0.3;
         }
         .player-pb-cell {
-          background-color: yellow;
+          background-color: var(--color-patrolBoat);
           opacity: 0.3;
         }
         .player-sb-cell {
-          background-color: purple;
+          background-color: var(--color-submarine);
           opacity: 0.3;
         }
       }
@@ -95,15 +106,47 @@
 }
 
 .ship-container {
-  border: 2px solid black;
+  border: 1px solid black;
   cursor: grab;
   pointer-events: auto;
   position: relative;
-  
-  .ship-unit {
-    background-color: red;
-    opacity: 0.2;
-    pointer-events: none;
+
+  &#player-one-battleship-container {
+    box-shadow: 0 0 8px var(--color-battleship);
+  }
+  &#player-one-carrier-container {
+    box-shadow: 0 0 8px var(--color-carrier);
+  }
+  &#player-one-destroyer-container {
+    box-shadow: 0 0 8px var(--color-destroyer);
+  }
+  &#player-one-patrolBoat-container {
+    box-shadow: 0 0 8px var(--color-patrolBoat);
+  }
+  &#player-one-submarine-container {
+    box-shadow: 0 0 8px var(--color-submarine);
+  }
+}
+
+.ship-unit {
+  border: 1px solid rgb(0, 0, 0);
+  opacity: 1;
+  pointer-events: none;
+
+  &.battleship-unit {
+    background-color: var(--color-battleship);
+  }
+  &.carrier-unit {
+    background-color: var(--color-carrier);
+  }
+  &.destroyer-unit {
+    background-color:  var(--color-destroyer);
+  }
+  &.patrolBoat-unit {
+    background-color: var(--color-patrolBoat);
+  }
+  &.submarine-unit {
+    background-color: var(--color-submarine);
   }
 }
 
