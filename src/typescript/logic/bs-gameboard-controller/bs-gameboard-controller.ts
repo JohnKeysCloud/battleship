@@ -38,8 +38,8 @@ import {
   isPositionsArray,
   isShipSymbolDescription
 } from '../../utilities/logic-utilities';
-import { getValidShipPositions } from './method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
-import { placeShip } from './method-callbacks/place-ship/place-ship';
+import { getValidShipPositions } from './abstracted-method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
+import { placeShip } from './abstracted-method-callbacks/place-ship/place-ship';
 
 export class BattleshipBoardController implements IBattleshipGameboardController {
   constructor(
