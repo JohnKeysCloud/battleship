@@ -11,7 +11,7 @@ beforeEach(() => {
 });
 
 describe('receive attack method', () => {
-  test('get ship type', () => {
+  test('get ship', () => {
     // Place carrier on gameboard
     playerState.gameboardController.placePiece({
       ship: playerState.fleetBuilder.getShip(ShipType.Carrier),
@@ -24,6 +24,6 @@ describe('receive attack method', () => {
       [0, 1]
     );
 
-    expect(shipType).toBe(ShipType.Carrier);
+    expect(shipType).toBe(playerState.fleetBuilder.getShip(ShipType.Carrier));
   });
 });

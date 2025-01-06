@@ -36,7 +36,8 @@ import {
   isPlacePieceParams,
   isPositionInBounds,
   isPositionsArray,
-  isShipSymbolDescription
+  isShipSymbolDescription,
+  isShipType
 } from '../../utilities/logic-utilities';
 import { getValidShipPositions } from './abstracted-method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './abstracted-method-callbacks/place-ship/place-ship';
@@ -187,17 +188,22 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
   // TODO: Finish ⤵️ 
   // ? add return signature
-  public receiveAttack(coordinates: Coordinates): ShipType | null {
+  public receiveAttack(coordinates: Coordinates) {
     // ? Insted of `ShipType`, it will be `BattleshipBuilder`
-    const attackedShip: ShipType | null = this.getShipAt(coordinates);
+    const attackedShip: BattleshipBuilder | null = this.getShipAt(coordinates);
+    
+    if (!attackedShip) {
+      // TODO: create switch to generate random miss messages? (use JSON?)
+      console.warn('Missed me with that nigga!');
+      return;
+    }
+
+    return attackedShip;
 
     // ? increment ship hit point
     // ? add coordinates to set of `attackedCells` (create this set in the repository)
     // ? If recieved attack is in repository set, return warning that that cell has already been attacked
     // ? ... etc.
-
-    // ? For testing purposes. Will probably return nothing.
-    return attackedShip;
   }
 
   public removePiece(
@@ -393,19 +399,18 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     );
   }
 
-  private getShipAt(coordinates: Coordinates): ShipType | null {
+  private getShipAt(coordinates: Coordinates): BattleshipBuilder | null {
     if (this.areCoordinatesVacant(coordinates)) return null;
 
     const gameboard = this.playerState.gameboardBuilder.board;
     const [x, y]: Coordinates = coordinates;
 
     const shipSymbolValue: ShipSymbolValue = gameboard[y][x];
-    const shipType = this.getShipTypeFromSymbol(shipSymbolValue);
+    const shipType: ShipType = this.getShipTypeFromSymbol(shipSymbolValue);
 
-    return shipType;
+    const ship: BattleshipBuilder = this.playerState.fleetBuilder.getShip(shipType);
 
-    // * convert ship type to actual ship
-    // * return ship from fleet
+    return ship;
   }
 
   private getShipTypeFromSymbol = (shipSymbol: ShipSymbolValue) => {
