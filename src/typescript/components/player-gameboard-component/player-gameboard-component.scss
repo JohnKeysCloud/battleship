@@ -3,60 +3,80 @@
   --color-carrier: var(--color-binky);
   --color-destroyer: var(--color-clyde);
   --color-patrolBoat: var(--color-inky);
-  --color-submarine: var(--color-sue);
+  --color-submarine: var(--color-pinky);
+
+  // pixels only
+  --ship-container-border-size: 6px;
+
+  // ship clone position
+  --ship-clone-left: -9999px
+  --ship-clone-top: auto;
 }
 
 .gameboard-container {
+  background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+  backdrop-filter: blur(10px); /* Glass blur effect */
+  border: 3px ridge silver;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Soft shadow */
   display: grid;
   grid-template: 1fr / 1fr;
-  height: 50vw;
+  height: min(380px, 90vw);
+  overflow: hidden;
+  padding: 1rem;
   position: relative;
-  width: 50vw;
+  width: min(380px, 90vw);
 
     .gameboard,
     .gameboard-background {
       display: grid;
+      gap: min(1.2vw, 0.75rem);
       // ? row-start / column-start / row-span / column-span
       grid-area: 1 / 1 / span 1 / span 1; 
       grid-template: repeat(var(--grid-size), 1fr) / repeat(var(--grid-size), 1fr);
     }
 
     .gameboard {
+      border-radius: inherit;
       pointer-events: none;
       width: 100%;
       z-index: 1;
     }
 
     .gameboard-background {
+      border-radius: inherit;
+
       .grid-cell-container {
         border: 1px solid rgba(128, 128, 128, 0.633);
+        border-radius: 50%;
 
         .grid-cell {
-          background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Soft shadow */
-          backdrop-filter: blur(10px); /* Glass blur effect */
-          -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
-          // border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border */
           height: 100%;
           position: relative;
           width: 100%;
           z-index: 0;
 
           &::before {
+            border-radius: 50%;
             content: '';
             position: absolute;
             inset: 0;
             opacity: 0;
-            background-color: green;
+            background-color: var(--color-funky);
+            box-shadow: 0 0 8px var(--color-funky);
             z-index: 1;
           }
 
           &::after {
+            border-radius: 50%;
             content: '';
             position: absolute;
             inset: 0;
             opacity: 0;
-            background-color: red;
+            background-color: var(--color-binky);
+            box-shadow: 0 0 8px var(--color-binky);
             z-index: 1;
           }
 
@@ -70,7 +90,6 @@
             &::after {
               opacity: 1;
             }
-
           }
 
           // ?
@@ -81,33 +100,41 @@
           // }
         }
 
-        .player-ca-cell {
-          background-color: var(--color-carrier);
-          opacity: 0.3;
-        }
-        .player-bs-cell {
-          background-color: var(--color-battleship);
-          opacity: 0.3;
-        }
-        .player-dd-cell {
-          background-color: var(--color-destroyer);
-          opacity: 0.3;
-        }
-        .player-pb-cell {
-          background-color: var(--color-patrolBoat);
-          opacity: 0.3;
-        }
-        .player-sb-cell {
-          background-color: var(--color-submarine);
-          opacity: 0.3;
-        }
+        // .player-ca-cell {
+        //   background-color: var(--color-carrier);
+        //   border-radius: 1rem;
+        //   opacity: 0.3;
+        // }
+        // .player-bs-cell {
+        //   background-color: var(--color-battleship);
+        //   border-radius: 1rem;
+        //   opacity: 0.3;
+        // }
+        // .player-dd-cell {
+        //   background-color: var(--color-destroyer);
+        //   border-radius: 1rem;
+        //   opacity: 0.3;
+        // }
+        // .player-pb-cell {
+        //   background-color: var(--color-patrolBoat);
+        //   border-radius: 1rem;
+        //   opacity: 0.3;
+        // }
+        // .player-sb-cell {
+        //   background-color: var(--color-submarine);
+        //   border-radius: 1rem;
+        //   opacity: 0.3;
+        // }
       }
     }
 }
 
 .ship-container {
-  border: 1px solid black;
+  border: var(--ship-container-border-size) solid black;
+  border-radius: 10vw;
   cursor: grab;
+  display: grid;
+  overflow: hidden;
   pointer-events: auto;
   position: relative;
 
@@ -126,12 +153,23 @@
   &#player-one-submarine-container {
     box-shadow: 0 0 8px var(--color-submarine);
   }
+
+  &.lower-opacity {
+    opacity: 0.25;
+  }
 }
 
 .ship-unit {
-  border: 1px solid rgb(0, 0, 0);
-  opacity: 1;
+  // Allows smooth rotation
   pointer-events: none;
+
+  // &.ship-unit-horizontal:not(:last-of-type) {
+  //   border-right: 1px solid black;
+  // }
+
+  // &.ship-unit-vertical:not(:last-of-type) {
+  //   border-bottom: 1px solid black;
+  // }
 
   &.battleship-unit {
     background-color: var(--color-battleship);
@@ -151,12 +189,51 @@
 }
 
 .ship-container-clone {
-  border: 1px dashed red;
-  background-color: hsla(0, 100%, 50%, 0.35);
+  border-radius: 50vw;
   left: -9999px;
+  opacity: 0;
   overflow: hidden;
   pointer-events: none;
   position: absolute;
   top: auto;
   visibility: hidden;
+  z-index: 2;
+  
+  &.visible {
+    left: var(--ship-clone-left);
+    opacity: 1;
+    top: var(--ship-clone-top);
+    visibility: visible;
+
+    &.placement-is-valid {
+      &::before {
+        opacity: 0;
+      }
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+
+  &::before,
+  &::after {
+    border-radius: inherit;
+    content: '';
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+  }
+
+  &::before {
+    border: 1px dashed var(--color-binky);
+    box-shadow: inset 0 0 12px var(--color-binky);
+    opacity: 1;
+  }
+  
+  &::after {
+    border: 1px dashed var(--color-funky);
+    box-shadow: inset 0 0 12px var(--color-funky);
+    opacity: 0;
+  }
 }

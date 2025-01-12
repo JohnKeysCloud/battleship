@@ -6,4 +6,16 @@ export interface DragState {
   initialPlacementConfigurations: IPlacementConfigurations | null;
   isValidDropTarget: boolean;
   currentDragOverCell: HTMLDivElement | null;
+  cloneSnapOffset: CloneSnapOffset | null;
+  shipBorderValueSplit: ShipBorderValueSplit | null;
+}
+
+export type CloneSnapOffset = {
+  offsetX: number;
+  offsetY: number;
+};
+
+export type ShipBorderValueSplit = {
+  numberValue: string;
+  unitType: string;
 }

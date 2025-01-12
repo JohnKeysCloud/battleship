@@ -1,4 +1,6 @@
 import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
+import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { GridPlacementValue } from '../../types/css-types';
 import {
   Coordinates,
   CoordinatesArray,
@@ -10,22 +12,23 @@ import {
   ShipSymbolValueArray,
   ShipType,
 } from '../../types/logic-types';
+import { PlayerState } from '../../types/state-types';
+import GlobalEventBus from '../../utilities/event-bus';
+import { isOrientation, isShipLength, isShipType } from '../../utilities/logic-utilities';
 import {
   areArraysEqual,
   createElement,
   createIdentifier,
   getConvertedTypeFromAttr
 } from '../../utilities/random-utilities';
-import { GridPlacementValue } from '../../types/css-types';
-import { PlayerState } from '../../types/state-types';
-import GlobalEventBus from '../../utilities/event-bus';
-import { isOrientation, isShipLength, isShipType } from '../../utilities/logic-utilities';
-import { DragState } from '../component-types';
-import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { CloneSnapOffset, DragState, ShipBorderValueSplit } from '../component-types';
 
 export class PlayerGameboardComponent {
   private boardContainer: HTMLDivElement;
+  private gameboard: DocumentFragment
   private fleetElements: Set<HTMLDivElement> = new Set();
+  private dragImage: HTMLImageElement;
+  private shipDragClone: HTMLDivElement;
 
   constructor(
     private readonly id: string,
@@ -34,6 +37,12 @@ export class PlayerGameboardComponent {
     this.boardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
+
+    this.gameboard = this.generateBoardFragment(
+      this.playerState.gameboardBuilder.boardSize
+    );
+    this.dragImage = this.createDragImage();
+    this.shipDragClone = this.createShipDragClone();
 
     GlobalEventBus.on('updateGameboard', () => {
       this.updateGameboard();
@@ -49,12 +58,11 @@ export class PlayerGameboardComponent {
       );
     }
 
-    const gameboard: DocumentFragment = this.generateBoardFragment(
-      this.playerState.gameboardBuilder.boardSize
+    this.boardContainer.append(
+      this.dragImage,
+      this.shipDragClone,
+      this.gameboard
     );
-
-    this.boardContainer.appendChild(gameboard);
-
     this.handleFleetPlacement(
       this.playerState.fleetBuilder,
       this.fleetElements
@@ -66,29 +74,48 @@ export class PlayerGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
-  private appendFleetClonesToGameboard(fleetElements: Set<HTMLDivElement>) {
-    const gameboard: HTMLDivElement | null =
-      this.boardContainer.querySelector('.gameboard');
+  // private appendFleetClonesToGameboard(fleetElements: Set<HTMLDivElement>) {
+  //   const gameboard: HTMLDivElement | null =
+  //     this.boardContainer.querySelector('.gameboard');
 
-    if (!gameboard) throw new Error('Gameboard not found');
+  //   if (!gameboard) throw new Error('Gameboard not found');
 
-    fleetElements.forEach((shipElement) => {
-      const shipCloneElement: HTMLDivElement = createElement(
-        'div',
-        ['ship-container-clone'],
-        {
-          id: `${shipElement.getAttribute('id')}-clone`,
-        }
-      );
+  //   fleetElements.forEach((shipElement) => {
+  //     const shipCloneElement: HTMLDivElement = createElement(
+  //       'div',
+  //       ['ship-container-clone'],
+  //       {
+  //         id: `${shipElement.getAttribute('id')}-clone`,
+  //       }
+  //     );
 
-      gameboard.appendChild(shipCloneElement);
-    });
+  //     gameboard.appendChild(shipCloneElement);
+  //   });
+  // }
+
+  private createDragImage(): HTMLImageElement {
+    const invisibleImage = createElement(
+      'img',
+      ['drag-image', 'accessibility'],
+      {
+        id: createIdentifier(this.id, 'player', 'drag-image'),
+        src: 'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/1x1_transparent.png'
+      }
+    )
+    
+    return invisibleImage;
   }
+  
+  private createShipDragClone(): HTMLDivElement {
+    const shipCloneElement: HTMLDivElement = createElement(
+      'div',
+      ['ship-container-clone'],
+      {
+        id: `${this.id}-ship-drag-clone`,
+      }
+    );
 
-  private clearBoardContainer(boardContainer: HTMLDivElement): void {
-    while (boardContainer.firstChild) {
-      boardContainer.removeChild(boardContainer.firstChild);
-    }
+    return shipCloneElement;
   }
 
   private createBackgroundCellsFragment(
@@ -142,6 +169,7 @@ export class PlayerGameboardComponent {
     const shipUnitFragment: DocumentFragment = this.generateShipUnitFragment(
       shipLength,
       shipType,
+      orientation,
       this.id
     );
 
@@ -156,7 +184,7 @@ export class PlayerGameboardComponent {
         draggable: 'true',
       }
     );
-    shipContainerElement.style.display = 'grid';
+
     shipContainerElement.appendChild(shipUnitFragment);
 
     const isHorizontal: boolean = orientation === 'horizontal';
@@ -218,17 +246,25 @@ export class PlayerGameboardComponent {
   private generateShipUnitFragment(
     shipLength: ShipLength,
     shipType: ShipType,
+    orientation: Orientation,
     id: string
   ): DocumentFragment {
     const shipUnitFragment: DocumentFragment = new DocumentFragment();
 
     for (let i = 0; i < shipLength; i++) {
       const isBow: boolean = i === 0;
+      const isStern: boolean = i === shipLength - 1;
       const shipUnit: HTMLDivElement = createElement('div', [
         'ship-unit',
         `${shipType}-unit`,
         createIdentifier(id, 'player', `${shipType}-unit`),
       ]);
+
+      const isHorizontal: boolean = orientation === 'horizontal';
+
+      isHorizontal
+        ? shipUnit.classList.add('ship-unit-horizontal')
+        : shipUnit.classList.add('ship-unit-vertical');
 
       if (isBow) {
         shipUnit.classList.add('ship-bow');
@@ -236,6 +272,14 @@ export class PlayerGameboardComponent {
           'id',
           createIdentifier(id, 'player',`${shipType}-bow`)
         );
+      }
+      
+      if (isStern) {
+        shipUnit.classList.add('ship-stern');
+        shipUnit.setAttribute(
+          'id',
+          createIdentifier(id, 'player',`${shipType}-stern`)
+        );  
       }
 
       shipUnitFragment.appendChild(shipUnit);
@@ -264,7 +308,6 @@ export class PlayerGameboardComponent {
   ) {
     this.updateFleetElements(fleetBuilder);
     this.placeFleetOnGameboard(fleetElements);
-    this.appendFleetClonesToGameboard(fleetElements);
   }
 
   private placeFleetOnGameboard(fleetElements: Set<HTMLDivElement>): void {
@@ -315,13 +358,22 @@ export class PlayerGameboardComponent {
   };
 
   private updateGameboard() {
-    this.clearBoardContainer(this.boardContainer);
+    // TODO: can i get these values in a better way?
+    const gameboard = this.boardContainer.querySelector('#player-one-gameboard');
+    const gameboardBackground = this.boardContainer.querySelector('#player-one-gameboard-background');
 
-    const gameboard: DocumentFragment = this.generateBoardFragment(
+    // ! fix this shit
+    if (!gameboard || !gameboardBackground) throw new Error('fuck');
+
+    this.boardContainer.removeChild(gameboard);
+    this.boardContainer.removeChild(gameboardBackground);
+    this.shipDragClone.classList.remove('visible');
+
+    this.gameboard = this.generateBoardFragment(
       this.playerState.gameboardBuilder.boardSize
     );
 
-    this.boardContainer.appendChild(gameboard);
+    this.boardContainer.appendChild(this.gameboard);
 
     this.handleFleetPlacement(
       this.playerState.fleetBuilder,
@@ -338,16 +390,18 @@ export class PlayerGameboardComponent {
       initialPlacementConfigurations: null,
       isValidDropTarget: false,
       currentDragOverCell: null,
+      cloneSnapOffset: null,
+      shipBorderValueSplit: null
     };
 
     gameboardContainer.addEventListener('dragstart', (e: DragEvent) =>
       this.handleShipDragStart(e, dragState)
     );
+    gameboardContainer.addEventListener('drag', (e: DragEvent) =>
+      this.handleShipDrag(e, dragState)
+    );
     gameboardContainer.addEventListener('dragenter', (e: DragEvent) =>
       this.handleShipDragEnter(e)
-    );
-    gameboardContainer.addEventListener('dragleave', (e: DragEvent) =>
-      this.handleShipDragLeave(e)
     );
     gameboardContainer.addEventListener('dragleave', (e: DragEvent) =>
       this.handleShipDragLeave(e)
@@ -367,54 +421,124 @@ export class PlayerGameboardComponent {
     if (!(e.target instanceof HTMLDivElement))
       throw new Error('Target element not found or is not an HTMLElement.');
 
-    // Ensure it's a valid ship container
     if (!e.target.classList.contains('ship-container')) return;
 
-    const snapToClone = (
-      e: DragEvent,
-      boardContainer: HTMLDivElement
+    const setInitialDragStyles = (
+      shipContainerElement: HTMLDivElement
     ): void => {
-      if (!e.target || !(e.target instanceof HTMLDivElement))
-        throw new Error('Target element not found or is not an HTMLElement.');
+      // Lower Ship Container Opacity
+      shipContainerElement.classList.add('lower-opacity');
 
-      const shipContainerElement: HTMLDivElement = e.target;
-      const shipContainerId: string | null =
-        shipContainerElement.getAttribute('id');
-
-      const shipContainerClone: HTMLDivElement | null =
-        boardContainer.querySelector(`#${shipContainerId}-clone`);
-
-      if (!shipContainerClone) throw new Error('Ship clone not found.');
-      if (!shipContainerId)
-        throw new Error("Ship container doesn't have an ID.");
-
-      const shipBoundingRect = shipContainerElement.getBoundingClientRect();
-
-      shipContainerClone.style.height = `${shipBoundingRect.height}px`;
-      shipContainerClone.style.width = `${shipBoundingRect.width}px`;
-
-      const shipBow = shipContainerElement.querySelector(`.ship-bow`);
-      if (!shipBow) throw new Error('Ship bow not found.');
-
-      const shipBowBoundingRect = shipBow?.getBoundingClientRect();
-
-      e.dataTransfer?.setDragImage(
-        shipContainerClone,
-        shipBowBoundingRect.width / 2,
-        shipBowBoundingRect.height / 2
-      );
-
-      // reveal ship container clone
-      shipContainerClone.style.visibility = 'visible'; // Ensure the clone is visible
-      shipContainerClone.style.pointerEvents = 'auto'; // Ensure pointer events work on the clone
-
-      // TODO: Make this less hacky 🫠
-      // enable drag events for grid cells under ships
+      // TODO: Make this less hacky 🫠 by adding class instead?
+      // Enable drag events for grid cells under ship containers
       setTimeout(() => {
         shipContainerElement.style.pointerEvents = 'none';
       }, 0);
-    };
 
+      // Make clone visible
+      this.shipDragClone.classList.add('visible');
+    };
+    
+    const setCloneDimensions = (
+      shipContainer: HTMLDivElement,
+      shipClone: HTMLDivElement
+    ) => {
+      const shipBoundingRect = shipContainer.getBoundingClientRect();
+      shipClone.style.height = `${shipBoundingRect.height}px`;
+      shipClone.style.width = `${shipBoundingRect.width}px`;
+    };
+    
+    const getCloneSnapOffset = (
+      shipContainerElement: HTMLDivElement,
+      orientation: Orientation,
+      dragState: DragState
+    ): CloneSnapOffset => {
+      const getShipBow = (
+        shipContainerElement: HTMLDivElement
+      ): HTMLDivElement => {
+        const shipBow: HTMLDivElement | null =
+          shipContainerElement.querySelector(`.ship-bow`);
+        if (!shipBow) throw new Error('Ship bow not found.');
+        return shipBow;
+      };
+
+      // Get ship bow element (cursor snap position)
+      const shipBow: HTMLDivElement = getShipBow(shipContainerElement);
+
+      // Get border of ship border to include in offset calculations
+      const shipBorderSize = getComputedStyle(document.documentElement)
+        .getPropertyValue('--ship-container-border-size')
+        .trim();
+
+      const match = shipBorderSize.match(
+        /^(?<numberValue>\d+(\.\d+)?)(?<unitType>[a-z%]+)$/i
+      );
+
+      /* 
+       ┌─────────────────────────────────────────────────────────────────────────────┐
+       │ REGARDING ABOVE ⤴️ 💭…                                                       │
+       │                                                                             │
+       │ Use ES2018 named match groups syntax to extract CSS variable values.        │
+       │                                                                             │
+       │ (\d+(\.\d+)?) matches any number of digits as  (primary capturing group)    │
+       │                                                                             │
+       │ This is followed by an optional subgroup (\.\d+) for a decimal point        │
+       │ and fractional                                                              │
+       │ digits.                                                                     │
+       │                                                                             │
+       │ This allows the entire first capturing group (\d+(\.\d+)?) to match          │
+       │ integers or floating-point                                                   │
+       │ numbers.                                                                    │
+       │                                                                             │  
+       │ The ?<numberValue> syntax names the capturing group, storing it in          │
+       │ `match.groups` for easy                                                     │
+       │ access.                                                                     │
+       │                                                                             │  
+       │ This is destructured to extract potential floating-point numbers             │
+       │ representing the ship's border                                              │
+       │ size.                                                                       │
+       │                                                                             │
+       │ The script dynamically updates the border size by reading the value         │
+       │ directly from the SCSS                                                      │
+       │ file.                                                                        │
+       │                                                                             │  
+       │ Currently, it only supports border sizes specified in pixels, but            │
+       │ the `unitType` match group could be used to support other unit types        │
+       │ in the future.                                                              │
+       │                                                                             │  
+       │ I don't feel like doing all that right now. 💭                               |
+       └─────────────────────────────────────────────────────────────────────────────┘
+      */
+
+      if (!match || !match.groups)
+        throw new Error('No matches found when parsing');
+
+      const shipBorderValueSplit = match.groups as ShipBorderValueSplit;
+
+      dragState.shipBorderValueSplit = shipBorderValueSplit;
+
+      const isHorizontal: boolean = orientation === 'horizontal';
+
+      const [offsetX, offsetY] = isHorizontal
+        ? [
+            shipBow.getBoundingClientRect().width / 2,
+            shipBow.getBoundingClientRect().height / 2 +
+              Number(shipBorderValueSplit.numberValue),
+          ]
+        : [
+            shipBow.getBoundingClientRect().width / 2 +
+              Number(shipBorderValueSplit.numberValue),
+            shipBow.getBoundingClientRect().height / 2,
+          ];
+
+      const cloneSnapOffset: CloneSnapOffset = {
+        offsetX,
+        offsetY,
+      };
+
+      return cloneSnapOffset;
+    };
+    
     const classifyValidCellCoordinates = (
       boardContainer: HTMLDivElement,
       shipContainerElement: HTMLDivElement,
@@ -460,15 +584,14 @@ export class PlayerGameboardComponent {
 
       classifyValidBowCells(gridCells, shipLength, orientation);
     };
-
-    // Update drag state
-    const setUpShipForDrag = (
+    
+    const updateDragState = (
       dragState: DragState,
       fleet: Fleet,
-      shipType: ShipType
+      shipType: ShipType,
+      cloneSnapOffset: CloneSnapOffset
     ) => {
       // Ensure the ship type exists in the fleet
-
       if (!fleet[shipType])
         throw new Error(`The ${shipType} is not present in the fleet.`);
 
@@ -476,26 +599,30 @@ export class PlayerGameboardComponent {
       dragState.currentShipInstance = fleet[shipType];
       dragState.initialPlacementConfigurations =
         dragState.currentShipInstance.currentplacementConfigurations;
+      dragState.cloneSnapOffset = cloneSnapOffset;
     };
 
-    const shipContainer: HTMLDivElement = e.target;
-
-    // Get ship type and orientation, ensuring valid attributes and types
-    const shipType: ShipType = getConvertedTypeFromAttr(
-      e.target,
-      'data-shiptype',
-      isShipType
-    );
-
+    const shipContainerElement: HTMLDivElement = e.target;
     const orientation: Orientation = getConvertedTypeFromAttr(
-      e.target,
+      shipContainerElement,
       'data-orientation',
       isOrientation
     );
-
+    
     const fleet: Fleet = this.playerState.fleetBuilder.fleet;
+    const shipType: ShipType = getConvertedTypeFromAttr(
+      shipContainerElement,
+      'data-shiptype',
+      isShipType
+    );
+    
+    const cloneSnapOffset: CloneSnapOffset = getCloneSnapOffset(
+      shipContainerElement,
+      orientation,
+      dragState
+    );
 
-    setUpShipForDrag(dragState, fleet, shipType);
+    updateDragState(dragState, fleet, shipType, cloneSnapOffset);
 
     if (!dragState.currentShipInstance)
       throw new Error(
@@ -509,14 +636,32 @@ export class PlayerGameboardComponent {
       dragState.currentShipInstance
     );
 
-    // Handle snapping and classifying valid cells
-    snapToClone(e, this.boardContainer);
+    // Set drag image to be transparent 1 x 1 png
+    e.dataTransfer?.setDragImage(this.dragImage, 0, 0);
+
+    setCloneDimensions(shipContainerElement, this.shipDragClone);
+    setInitialDragStyles(shipContainerElement);
     classifyValidCellCoordinates(
       this.boardContainer,
-      shipContainer,
+      shipContainerElement,
       orientation,
       this.playerState.gameboardController
     );
+    this.snapCloneToCursor(e, cloneSnapOffset);
+  }
+
+  private handleShipDrag(e: DragEvent, dragState: DragState) {
+    if (!(e.target instanceof HTMLDivElement))
+      throw new Error('Target element not found or is not an HTMLElement.');
+
+    // Ensure it's a valid ship container
+    if (!e.target.classList.contains('ship-container')) return;
+
+    const cloneSnapOffset: CloneSnapOffset | null = dragState.cloneSnapOffset;
+
+    if (!cloneSnapOffset) throw new Error('An error has occured during the `cloneSnapOffset` reading.');
+
+    this.snapCloneToCursor(e, cloneSnapOffset);
   }
 
   private handleShipDragEnter(e: DragEvent) {
@@ -529,7 +674,7 @@ export class PlayerGameboardComponent {
     const gridCell: HTMLDivElement = e.target;
 
     // Check if current grid cell is valid for placement
-    const areValidBowCoordinates = gridCell.classList.contains(
+    const areValidBowCoordinates: boolean = gridCell.classList.contains(
       'valid-bow-coordinates'
     );
 
@@ -537,6 +682,10 @@ export class PlayerGameboardComponent {
     areValidBowCoordinates
       ? gridCell.classList.add('placement-is-valid')
       : gridCell.classList.add('placement-is-invalid');
+
+    // Add appropriate visual feedback class to ship drag clone
+    if (areValidBowCoordinates)
+      this.shipDragClone.classList.add('placement-is-valid');
   }
 
   private handleShipDragLeave(e: DragEvent) {
@@ -547,12 +696,17 @@ export class PlayerGameboardComponent {
 
     const gridCell: HTMLDivElement = e.target;
 
+    const areValidBowCoordinates: boolean =
+      gridCell.classList.contains('placement-is-valid');
+
     // Remove assigned visual feedback class from grid cell
-    if (gridCell.classList.contains('placement-is-valid')) {
-      gridCell.classList.remove('placement-is-valid');
-    } else if (gridCell.classList.contains('placement-is-invalid')) {
-      gridCell.classList.remove('placement-is-invalid');
-    }
+    areValidBowCoordinates
+      ? gridCell.classList.remove('placement-is-valid')
+      : gridCell.classList.remove('placement-is-invalid');
+
+    // Remove assigned visual feedback class from ship drag clone
+    if (this.shipDragClone.classList.contains('placement-is-valid'))
+      this.shipDragClone.classList.remove('placement-is-valid');
   }
 
   private handleShipDragOver(e: DragEvent, dragState: DragState) {
@@ -561,6 +715,7 @@ export class PlayerGameboardComponent {
 
     if (!(e.target instanceof HTMLDivElement))
       throw new Error('Target element not found or is not an HTMLElement.');
+
     if (!e.target.classList.contains('grid-cell')) return;
 
     const gridCell: HTMLDivElement = e.target;
@@ -583,6 +738,7 @@ export class PlayerGameboardComponent {
     // Validate and modify state
     const { coordinatesArray, orientation: initialOrientation } =
       dragState.initialPlacementConfigurations || {};
+    
     if (!coordinatesArray || !initialOrientation) {
       throw new Error('Initial placement configurations are incomplete.');
     }
@@ -617,28 +773,7 @@ export class PlayerGameboardComponent {
       throw new Error('Target element not found or is not an HTMLElement.');
 
     if (!e.target.classList.contains('ship-container')) return;
-    const resetDragStyles = (shipContainerElement: HTMLDivElement): void => {
-      // Extract and validate ship container ID
-      const shipContainerId: string | null =
-        shipContainerElement.getAttribute('id');
 
-      // Retrieve and validate ship clone element
-      const shipContainerClone: HTMLDivElement | null =
-        this.boardContainer.querySelector(`#${shipContainerId}-clone`);
-
-      if (!shipContainerId || !shipContainerClone) {
-        throw new Error(
-          `Invalid ship container state. ID: ${shipContainerId}, Clone: ${shipContainerClone}`
-        );
-      }
-
-      // Re-hide drag clone
-      shipContainerClone.style.visibility = 'hidden'; // Ensure the clone is visible
-      shipContainerClone.style.pointerEvents = 'none'; // Ensure pointer events are revoked from clone
-
-      // Remove drag events for grid cells under ships
-      shipContainerElement.style.pointerEvents = 'auto';
-    };
     const resetShipPosition = (): void => {
       const { coordinatesArray, orientation: initialOrientation } =
         dragState.initialPlacementConfigurations || {};
@@ -656,29 +791,46 @@ export class PlayerGameboardComponent {
         orientation: initialOrientation,
       });
     };
-    const removeVisualFeedback = (
+
+    const removeDragStyles = (
+      shipContainerElement: HTMLDivElement,
       currentDragOverCell: HTMLDivElement,
       isValidDropTarget: boolean
     ): void => {
-      const feedbackClass: string = isValidDropTarget
+      const cellFeedbackClass: string = isValidDropTarget
         ? 'placement-is-valid'
         : 'placement-is-invalid';
-      currentDragOverCell.classList.remove(feedbackClass);
+      
+      // Lower grid cell validation pseudo-element opacity
+      currentDragOverCell.classList.remove(cellFeedbackClass);
+
+      // Lower ship container opacity
+      shipContainerElement.classList.remove('lower-opacity');
+
+      // Re-hide drag clone
+      this.shipDragClone.classList.remove('visible');
+
+      // Restore ship container draggability
+      shipContainerElement.style.pointerEvents = 'auto';
     };
 
     const shipContainerElement: HTMLDivElement = e.target;
 
     try {
-      resetDragStyles(shipContainerElement);
-
       const { currentDragOverCell, isValidDropTarget } = dragState;
+
       if (!currentDragOverCell)
         throw new Error(
           `Current drag over cell is missing. Drag state: ${JSON.stringify(
             dragState
           )}`
         );
-      removeVisualFeedback(currentDragOverCell, isValidDropTarget);
+      
+      removeDragStyles(
+        shipContainerElement,
+        currentDragOverCell,
+        isValidDropTarget
+      );
 
       if (!isValidDropTarget) {
         resetShipPosition();
@@ -686,6 +838,26 @@ export class PlayerGameboardComponent {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private snapCloneToCursor(
+    e: DragEvent,
+    cloneSnapOffset: CloneSnapOffset
+  ): void {
+    const cursorX: number = e.clientX;
+    const cursorY: number = e.clientY;
+
+    const { offsetX, offsetY }: CloneSnapOffset = cloneSnapOffset;
+
+    document.documentElement.style.setProperty(
+      '--ship-clone-left',
+      `${cursorX - offsetX}px`
+    );
+
+    document.documentElement.style.setProperty(
+      '--ship-clone-top',
+      `${cursorY - offsetY}px`
+    );
   }
 
   // 💭 --------------------------------------------------------------
@@ -706,10 +878,10 @@ export class PlayerGameboardComponent {
     // Ensure it's a valid ship container
     if (!e.target.classList.contains('ship-container')) return;
 
-    const shipContainer: HTMLDivElement = e.target;
+    const shipContainerElement: HTMLDivElement = e.target;
 
     const shipType: ShipType = getConvertedTypeFromAttr(
-      shipContainer,
+      shipContainerElement,
       'data-shiptype',
       isShipType
     );
