@@ -31,7 +31,7 @@ export class PlayerGameboardComponent {
   private shipDragClone: HTMLDivElement;
 
   constructor(
-    private readonly id: string,
+    public readonly id: string,
     public readonly playerState: PlayerState
   ) {
     this.boardContainer = this.generateBoardContainer(

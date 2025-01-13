@@ -58,10 +58,10 @@ function init() {
   playerGameboardComponent.render('#content');
 
   const shipShuffler = new ShipShufflerButtonComponent(
+    playerGameboardComponent.id,
     players.playerOne.gameboardController,
     players.playerOne.fleetBuilder.fleet,
     '#content',
-    'player-one-ship-shuffler-button'
   );
 
   shipShuffler.render('#content');
