@@ -5,9 +5,9 @@ import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
 import GlobalEventBus from "../../utilities/event-bus";
 
 export class ShipShufflerButtonComponent {
-  private readonly ShipShufflerButton: HTMLButtonElement;
-  private readonly ShipShufflerButtonContainer: HTMLDivElement;
-  private readonly ShipShufflerButtonTextContent: string = 'Shuffle Ships';
+  private readonly shipShufflerButton: HTMLButtonElement;
+  private readonly shipShufflerButtonContainer: HTMLDivElement;
+  private readonly shipShufflerButtonTextContent: string = 'Shuffle Ships';
   private readonly buttonClass: string = 'ship-shuffler-button'
 
   constructor(
@@ -18,16 +18,16 @@ export class ShipShufflerButtonComponent {
   ) {
     this.validateGameboardTarget(this.gameboardTargetSelector);
 
-    this.ShipShufflerButton = this.createShipShufflerButton(
+    this.shipShufflerButton = this.createshipShufflerButton(
       createIdentifier(this.id, 'player', this.buttonClass),
       [this.buttonClass]
     );
-    this.ShipShufflerButton.classList.add(this.buttonClass);
-    this.ShipShufflerButton.textContent = this.ShipShufflerButtonTextContent;
-    this.addEventListener(this.ShipShufflerButton);
+    this.shipShufflerButton.classList.add(this.buttonClass);
+    this.shipShufflerButton.textContent = this.shipShufflerButtonTextContent;
+    this.addEventListener(this.shipShufflerButton);
 
-    this.ShipShufflerButtonContainer = this.createShipShufflerButtonContainer();
-    this.ShipShufflerButtonContainer.appendChild(this.ShipShufflerButton);
+    this.shipShufflerButtonContainer = this.createshipShufflerButtonContainer();
+    this.shipShufflerButtonContainer.appendChild(this.shipShufflerButton);
   }
 
   public render(targetSelector: string) {
@@ -37,20 +37,20 @@ export class ShipShufflerButtonComponent {
       throw new Error(`Target element not found: "${targetSelector}."`);
     }
 
-    target.appendChild(this.ShipShufflerButtonContainer);
+    target.appendChild(this.shipShufflerButtonContainer);
   }
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
-  private addEventListener(ShipShufflerButton: HTMLButtonElement) {
-    ShipShufflerButton.addEventListener('click', () => {
+  private addEventListener(shipShufflerButton: HTMLButtonElement) {
+    shipShufflerButton.addEventListener('click', () => {
       this.randomizeGameboard();
       this.updateGameboard(this.gameboardTargetSelector);
     });
   }
 
-  private createShipShufflerButton(
+  private createshipShufflerButton(
     id: string,
     classes: string[]
   ): HTMLButtonElement {
@@ -60,7 +60,7 @@ export class ShipShufflerButtonComponent {
     return button;
   }
 
-  private createShipShufflerButtonContainer(): HTMLDivElement {
+  private createshipShufflerButtonContainer(): HTMLDivElement {
     const container: HTMLDivElement = createElement('div', [
       'ship-shuffler-button-container',
     ]);
