@@ -416,7 +416,7 @@ export class PlayerGameboardComponent {
       this.handleShipDragEnd(e, dragState)
     );
   }
-
+  
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
     if (!(e.target instanceof HTMLDivElement))
       throw new Error('Target element not found or is not an HTMLElement.');
@@ -437,8 +437,7 @@ export class PlayerGameboardComponent {
 
       // Make clone visible
       this.shipDragClone.classList.add('visible');
-    };
-    
+    };   
     const setCloneDimensions = (
       shipContainer: HTMLDivElement,
       shipClone: HTMLDivElement
@@ -446,8 +445,7 @@ export class PlayerGameboardComponent {
       const shipBoundingRect = shipContainer.getBoundingClientRect();
       shipClone.style.height = `${shipBoundingRect.height}px`;
       shipClone.style.width = `${shipBoundingRect.width}px`;
-    };
-    
+    };  
     const getCloneSnapOffset = (
       shipContainerElement: HTMLDivElement,
       orientation: Orientation,
@@ -537,8 +535,7 @@ export class PlayerGameboardComponent {
       };
 
       return cloneSnapOffset;
-    };
-    
+    };  
     const classifyValidCellCoordinates = (
       boardContainer: HTMLDivElement,
       shipContainerElement: HTMLDivElement,
@@ -584,7 +581,6 @@ export class PlayerGameboardComponent {
 
       classifyValidBowCells(gridCells, shipLength, orientation);
     };
-    
     const updateDragState = (
       dragState: DragState,
       fleet: Fleet,
@@ -844,19 +840,23 @@ export class PlayerGameboardComponent {
     e: DragEvent,
     cloneSnapOffset: CloneSnapOffset
   ): void {
+    const gameboardClientRect = this.boardContainer.getBoundingClientRect();
+    const gameboardOffsetX = gameboardClientRect.left;
+    const gameboardOffsetY = gameboardClientRect.top;
+
     const cursorX: number = e.clientX;
     const cursorY: number = e.clientY;
 
     const { offsetX, offsetY }: CloneSnapOffset = cloneSnapOffset;
-
+    
     document.documentElement.style.setProperty(
       '--ship-clone-left',
-      `${cursorX - offsetX}px`
+      `${cursorX - gameboardOffsetX - offsetX}px`
     );
 
     document.documentElement.style.setProperty(
       '--ship-clone-top',
-      `${cursorY - offsetY}px`
+      `${cursorY - gameboardOffsetY - offsetY}px`
     );
   }
 

@@ -1,3 +1,28 @@
-body {
-  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)
+#content {
+  min-height: 100vh;
+  min-width: 100vw;
 }
+
+body {
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  color: whitesmoke;
+  font-family: 'pixeBoy', monospace;
+  text-shadow: 0 0 8px whitesmoke;
+}
+
+h1 {
+  font-size: 6rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+button {
+  border: 3px ridge;
+  border-radius: 0.5rem;
+  color: whitesmoke;
+  font-family: 'pixeBoy', monospace;
+  padding: 0.25rem 0.5rem;
+}
+

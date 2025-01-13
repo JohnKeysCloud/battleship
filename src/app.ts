@@ -5,6 +5,7 @@ import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard'
 import { BotGameboardComponent } from './typescript/components/bot-gameboard-component/bot-gameboard-component';
 import { PlayerGameboardComponent } from './typescript/components/player-gameboard-component/player-gameboard-component';
 import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component/ship-shuffler-component';
+import { createElement } from './typescript/utilities/random-utilities';
 
 function init() {
   const randomizeBSGameboards = () => {
@@ -23,8 +24,33 @@ function init() {
   randomizeBSGameboards();
   console.timeEnd('randomizeBSGameboards');
 
+  // > --------------------------------------------------------------
+  // > DOM
+
+  // 💭 --------------------------------------------------------------
+  // 💭 Content  
+
+  const content = document.getElementById('content');
+  console.log(content);
+
+  // 💭 --------------------------------------------------------------
+  // 💭 Heading
+
+  const heading = createElement(
+    'h1', ['main-heading']
+  );
+  heading.textContent = 'ShattleBips';
+  content?.appendChild(heading);
+
+  const subheading = createElement(
+    'h2', ['sub-heading']);
+  subheading.textContent = 'Configure your Bips!'
+  content?.appendChild(subheading);
+  
+
   // 💭 --------------------------------------------------------------
   // 💭 Player
+
   const playerGameboardComponent = new PlayerGameboardComponent(
     'playerOne',
     players.playerOne
@@ -42,6 +68,7 @@ function init() {
 
   // 💭 --------------------------------------------------------------
   // 💭 Bot
+
   const botGameboardComponent = new BotGameboardComponent('botOne', players.playerTwo);
   botGameboardComponent.render('#content');
 }
