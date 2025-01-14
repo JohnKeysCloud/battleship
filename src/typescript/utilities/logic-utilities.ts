@@ -1,4 +1,3 @@
-import { SHIP_SYMBOLS } from "../logic/bs-ship-builder/bs-ship-builder";
 import {
   AnglesOfRotation,
   AxisArrayKey,

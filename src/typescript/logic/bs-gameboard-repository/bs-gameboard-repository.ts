@@ -8,7 +8,6 @@ import {
   ShipType,
   RotationalPositionMap
 } from "../../types/logic-types";
-import { isOccupiedCoordinatesSet, isFleetCoordinates, isShipType } from "../../utilities/logic-utilities";
 
 export class BattleshipBoardRepository {
   private readonly _fleetCoordinates: FleetCoordinates = {};
