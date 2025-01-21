@@ -1,21 +1,20 @@
 import './styles/sass/index.scss'
+
+import { createElement } from './typescript/utilities/random-utilities';
 import { players } from './typescript/state/player-state';
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
-
-import { BotGameboardComponent } from './typescript/components/bot-gameboard-component/bot-gameboard-component';
-import { PlayerGameboardComponent } from './typescript/components/player-gameboard-component/player-gameboard-component';
-import { ShipShufflerButtonComponent } from './typescript/components/ship-shuffler-component/ship-shuffler-component';
-import { createElement } from './typescript/utilities/random-utilities';
+import { createGitHubLink } from './typescript/utilities/create-github-link';
+import { createMain } from './typescript/markup/main/create-main';
 
 function init() {
   const randomizeBSGameboards = () => {
     randomizeBSGameboard(
-      players.playerOne.gameboardController,
-      players.playerOne.fleetBuilder.fleet
+      players.player.gameboardController,
+      players.player.fleetBuilder.fleet
     );
     randomizeBSGameboard(
-      players.playerTwo.gameboardController,
-      players.playerTwo.fleetBuilder.fleet
+      players.opponent.gameboardController,
+      players.opponent.fleetBuilder.fleet
     );
   };
 
@@ -27,50 +26,33 @@ function init() {
   // > --------------------------------------------------------------
   // > DOM
 
-  // 💭 --------------------------------------------------------------
-  // 💭 Content  
-
   const content = document.getElementById('content');
-  console.log(content);
+  if (!content) throw new Error('Fuck!');
 
   // 💭 --------------------------------------------------------------
-  // 💭 Heading
 
-  const heading = createElement(
-    'h1', ['main-heading']
-  );
-  heading.textContent = 'ShattleBips';
-  content?.appendChild(heading);
+  // ? ./typescript/markup/nav/create-nav.ts)
 
-  const subheading = createElement(
-    'h2', ['sub-heading']);
-  subheading.textContent = 'Configure your Bips!'
-  content?.appendChild(subheading);
-  
+  const headingLink = createElement('a', ['heading-link'], {
+    id: 'heading-link',
+    href: 'https://johnkeyscloud.github.io/battleship/',
+  });
+  headingLink.textContent = 'ShattleBip';
 
-  // 💭 --------------------------------------------------------------
-  // 💭 Player
+  const heading: HTMLHeadingElement = createElement('h1', ['main-heading']);
+  heading.appendChild(headingLink);
 
-  const playerGameboardComponent = new PlayerGameboardComponent(
-    'playerOne',
-    players.playerOne
-  );
-  playerGameboardComponent.render('#content');
+  const gitHubLogoLink: HTMLAnchorElement = createGitHubLink();
 
-  const shipShuffler = new ShipShufflerButtonComponent(
-    playerGameboardComponent.id,
-    players.playerOne.gameboardController,
-    players.playerOne.fleetBuilder.fleet,
-    '#content',
-  );
+  const navigation: HTMLElement = createElement('nav');
+  navigation.append(heading, gitHubLogoLink);
 
-  shipShuffler.render('#content');
+  content.appendChild(navigation); // 💭
 
   // 💭 --------------------------------------------------------------
-  // 💭 Bot
 
-  const botGameboardComponent = new BotGameboardComponent('botOne', players.playerTwo);
-  botGameboardComponent.render('#content');
+  const mainElement = createMain(players);
+  content.appendChild(mainElement);
 }
 
 // time all the above stuff

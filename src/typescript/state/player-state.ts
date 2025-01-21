@@ -5,8 +5,6 @@ import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-g
 import { FleetVersion } from "../types/logic-types";
 import { PlayerState } from "../types/state-types";
 
-// TODO: add params here that determine if player or bot, adjust return object accordingly
-// Player State Factory 😉
 export const createPlayerStateObject = (fleetVersion: FleetVersion = 2002) => { 
   const gameboardBuilder = new BattleshipBoardBuilder();
   const gameboardRepository = new BattleshipBoardRepository();
@@ -27,10 +25,10 @@ export const createPlayerStateObject = (fleetVersion: FleetVersion = 2002) => {
   }
 }
 
-const playerOne: PlayerState = createPlayerStateObject();
-const playerTwo: PlayerState = createPlayerStateObject();
+const player: PlayerState = createPlayerStateObject();
+const opponent: PlayerState = createPlayerStateObject();
 
-export const players = {
-  playerOne,
-  playerTwo
+export const players: { player: PlayerState; opponent: PlayerState } = {
+  player,
+  opponent,
 };

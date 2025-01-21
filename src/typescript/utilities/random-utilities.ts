@@ -44,12 +44,31 @@ export const createElement = <K extends keyof HTMLElementTagNameMap>(
   return element;
 };
 
-export const createIdentifier = (id: string, playerType: string, identifier?: string): string => {
-  if (playerType !== 'player' && playerType !== 'bot')
-    throw new Error('`playerType` must be either "player" or "bot"');
+export const generateListFragment = (
+  listItemTextContentArray: { textContent: string }[],
+  identifier: string,
+  attributes: Record<string, string> = {}
+): DocumentFragment => {
+  if (!listItemTextContentArray.length)
+    throw new Error('The listItemTextContentArray is empty.');
 
-  const extractedNumberString: string = id.split(playerType)[1].toLowerCase();
-  return identifier
-    ? `${playerType}-${extractedNumberString}-${identifier}`
-    : `${playerType}-${extractedNumberString}`;
-}
+  if (!identifier) throw new Error('You must identify your list items.');
+
+  const listFragment = new DocumentFragment();
+
+  listItemTextContentArray.forEach((listItem, index) => {
+    const listElement: HTMLLIElement = createElement(
+      'li',
+      [`${identifier}-list-item`],
+      {
+        id: `${identifier}-list-item-${index}`,
+        ...attributes,
+      }
+    );
+    listElement.textContent = listItem.textContent;
+
+    listFragment.appendChild(listElement);
+  });
+  
+  return listFragment;
+};

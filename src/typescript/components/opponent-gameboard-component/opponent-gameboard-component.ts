@@ -4,16 +4,15 @@ import {
   ShipSymbolValueArray
 } from '../../types/logic-types';
 import {
-  createElement,
-  createIdentifier,
+  createElement
 } from '../../utilities/random-utilities';
 import { PlayerState } from '../../types/state-types';
 
-export class BotGameboardComponent {
+export class OpponentGameboardComponent {
+  private readonly id: string = 'opponent';
   private boardContainer: HTMLDivElement;
 
   constructor(
-    private readonly id: string,
     public readonly playerState: PlayerState
   ) {
     this.boardContainer = this.generateBoardContainer(
@@ -21,12 +20,10 @@ export class BotGameboardComponent {
     );
   }
 
-  public render(targetSelector: string): void {
-    const target: HTMLElement | null = document.querySelector(targetSelector);
-
-    if (!target) {
+  public render(targetElement: HTMLElement): void {
+    if (!targetElement) {
       throw new Error(
-        `Target element not found with ID - ${this.id} and selector - "${targetSelector}".`
+        `Target element not found with ID - ${this.id} and selector - "${targetElement}".`
       );
     }
 
@@ -35,8 +32,8 @@ export class BotGameboardComponent {
     );
 
     this.boardContainer.appendChild(gameboard);
-
-    target.appendChild(this.boardContainer);
+    
+    targetElement.appendChild(this.boardContainer);
   }
 
   // 💭 --------------------------------------------------------------
@@ -51,10 +48,7 @@ export class BotGameboardComponent {
       row.forEach((_: ShipSymbolValue, colIndex: number) => {
         const gridCell: HTMLDivElement = createElement(
           'div',
-          [
-            `${createIdentifier(this.id, 'bot')}-cell`,
-            'grid-cell',
-          ],
+          [`${this.id}-cell`, 'grid-cell'],
           {
             'data-x': colIndex.toString(),
             'data-y': rowIndex.toString(),
@@ -64,11 +58,7 @@ export class BotGameboardComponent {
         );
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
-          createIdentifier(
-            this.id,
-            'bot',
-            `grid-cell-container`
-          ),
+          `${this.id}-grid-cell-container`,
           'grid-cell-container',
         ]);
 
@@ -85,7 +75,7 @@ export class BotGameboardComponent {
       'div',
       ['gameboard-container'],
       {
-        id: createIdentifier(this.id, 'bot', 'gameboard-container'),
+        id: `${this.id}-gameboard-container`,
       }
     );
 
@@ -99,7 +89,7 @@ export class BotGameboardComponent {
       'div',
       ['gameboard-background'],
       {
-        id: createIdentifier(this.id, 'bot', 'gameboard-background'),
+        id: `${this.id}-gameboard-background`,
       }
     );
     gameboardBackground.appendChild(
@@ -109,7 +99,7 @@ export class BotGameboardComponent {
     );
 
     const gameboard = createElement('div', ['gameboard'], {
-      id: createIdentifier(this.id, 'bot', 'gameboard'),
+      id: `${this.id}-gameboard`,
     });
     gameboard.style.setProperty('--grid-size', boardSize.toString());
 

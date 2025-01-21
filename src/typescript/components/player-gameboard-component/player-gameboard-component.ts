@@ -18,20 +18,19 @@ import { isOrientation, isShipLength, isShipType } from '../../utilities/logic-u
 import {
   areArraysEqual,
   createElement,
-  createIdentifier,
   getConvertedTypeFromAttr
 } from '../../utilities/random-utilities';
 import { CloneSnapOffset, DragState, ShipBorderValueSplit } from '../component-types';
 
 export class PlayerGameboardComponent {
-  private boardContainer: HTMLDivElement;
+  public id: string = 'player';
+  public boardContainer: HTMLElement;
   private gameboard: DocumentFragment
   private fleetElements: Set<HTMLDivElement> = new Set();
   private dragImage: HTMLImageElement;
   private shipDragClone: HTMLDivElement;
 
   constructor(
-    public readonly id: string,
     public readonly playerState: PlayerState
   ) {
     this.boardContainer = this.generateBoardContainer(
@@ -44,17 +43,16 @@ export class PlayerGameboardComponent {
     this.dragImage = this.createDragImage();
     this.shipDragClone = this.createShipDragClone();
 
-    GlobalEventBus.on('updateGameboard', () => {
-      this.updateGameboard();
+    // ! add ID to this ? or create event bus for each player gameboard instance?
+    GlobalEventBus.on('updateGameboard', (boardContainer: HTMLDivElement) => {
+      this.updateGameboard(boardContainer);
     });
   }
 
-  public render(targetSelector: string): void {
-    const target: HTMLElement | null = document.querySelector(targetSelector);
-
-    if (!target) {
+  public render(targetElement: HTMLElement): void {
+    if (!targetElement) {
       throw new Error(
-        `Target element not found with ID - ${this.id} and selector - "${targetSelector}".`
+        `Target element not found with ID - ${this.id} and selector - "${targetElement}".`
       );
     }
 
@@ -68,7 +66,7 @@ export class PlayerGameboardComponent {
       this.fleetElements
     );
 
-    target.appendChild(this.boardContainer);
+    targetElement.appendChild(this.boardContainer);
   }
 
   // 💭 --------------------------------------------------------------
@@ -98,7 +96,7 @@ export class PlayerGameboardComponent {
       'img',
       ['drag-image', 'accessibility'],
       {
-        id: createIdentifier(this.id, 'player', 'drag-image'),
+        id: `${this.id}-drag-image`,
         src: 'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/1x1_transparent.png'
       }
     )
@@ -130,7 +128,7 @@ export class PlayerGameboardComponent {
         const gridCell: HTMLDivElement = createElement(
           'div',
           [
-            `${createIdentifier(this.id, 'player', symbolDescription)}-cell`,
+            `${this.id}-${symbolDescription}-cell`,
             `player-${symbolDescription}-cell`,
             'grid-cell',
           ],
@@ -143,11 +141,7 @@ export class PlayerGameboardComponent {
         );
 
         const gridCellContainer: HTMLDivElement = createElement('div', [
-          createIdentifier(
-            this.id,
-            'player',
-            `${symbolDescription}-grid-cell-container`
-          ),
+          `${this.id}-${symbolDescription}-grid-cell-container`,
           'grid-cell-container',
         ]);
 
@@ -177,7 +171,7 @@ export class PlayerGameboardComponent {
       'div',
       ['ship-container'],
       {
-        id: createIdentifier(this.id, 'player', `${shipType}-container`),
+        id: `${this.id}-${shipType}-container`,
         'data-shipType': shipType,
         'data-length': shipLength.toString(),
         'data-orientation': orientation,
@@ -201,15 +195,16 @@ export class PlayerGameboardComponent {
     return shipContainerElement;
   }
 
-  private generateBoardContainer(boardSize: number): HTMLDivElement {
-    const gameboardContainer: HTMLDivElement = createElement(
-      'div',
+  private generateBoardContainer(boardSize: number): HTMLElement {
+    const gameboardContainer: HTMLElement = createElement(
+      'section',
       ['gameboard-container'],
       {
-        id: createIdentifier(this.id, 'player', 'gameboard-container'),
+        id: `${this.id}-gameboard-container`,
       }
     );
 
+  
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
 
     this.handleDragListeners(gameboardContainer);
@@ -223,7 +218,7 @@ export class PlayerGameboardComponent {
       'div',
       ['gameboard-background'],
       {
-        id: createIdentifier(this.id, 'player', 'gameboard-background'),
+        id: `${this.id}-gameboard-background`,
       }
     );
     gameboardBackground.appendChild(
@@ -233,7 +228,7 @@ export class PlayerGameboardComponent {
     );
 
     const gameboard = createElement('div', ['gameboard'], {
-      id: createIdentifier(this.id, 'player', 'gameboard'),
+      id: `${this.id}-gameboard`,
     });
     gameboard.style.setProperty('--grid-size', boardSize.toString());
 
@@ -257,7 +252,7 @@ export class PlayerGameboardComponent {
       const shipUnit: HTMLDivElement = createElement('div', [
         'ship-unit',
         `${shipType}-unit`,
-        createIdentifier(id, 'player', `${shipType}-unit`),
+        `${id}-${shipType}-unit`,
       ]);
 
       const isHorizontal: boolean = orientation === 'horizontal';
@@ -270,7 +265,7 @@ export class PlayerGameboardComponent {
         shipUnit.classList.add('ship-bow');
         shipUnit.setAttribute(
           'id',
-          createIdentifier(id, 'player',`${shipType}-bow`)
+          `${id}-${shipType}-bow`
         );
       }
       
@@ -278,7 +273,7 @@ export class PlayerGameboardComponent {
         shipUnit.classList.add('ship-stern');
         shipUnit.setAttribute(
           'id',
-          createIdentifier(id, 'player',`${shipType}-stern`)
+          `${id}-${shipType}-stern`
         );  
       }
 
@@ -337,7 +332,7 @@ export class PlayerGameboardComponent {
         ship.currentplacementConfigurations.coordinatesArray;
 
       if (!coordinatesArray || coordinatesArray.length === 0) {
-        console.log(`The ${shipType} has not been placed. Continuing...`);
+        console.error(`The ${shipType} has not been placed. Continuing...`);
         continue;
       }
 
@@ -357,13 +352,11 @@ export class PlayerGameboardComponent {
     }
   };
 
-  private updateGameboard() {
-    // TODO: can i get these values in a better way?
-    const gameboard = this.boardContainer.querySelector('#player-one-gameboard');
-    const gameboardBackground = this.boardContainer.querySelector('#player-one-gameboard-background');
+  private updateGameboard(boardContainer: HTMLElement) {
+    const gameboard = boardContainer.querySelector(`#${this.id}-gameboard`);
+    const gameboardBackground = boardContainer.querySelector(`#${this.id}-gameboard-background`);
 
-    // ! fix this shit
-    if (!gameboard || !gameboardBackground) throw new Error('fuck');
+    if (!gameboard || !gameboardBackground) throw new Error('Missing gameboard and/or gameboard background elements');
 
     this.boardContainer.removeChild(gameboard);
     this.boardContainer.removeChild(gameboardBackground);
@@ -384,7 +377,7 @@ export class PlayerGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 HTML Drag and Drop API (Repositioning)
 
-  private handleDragListeners(gameboardContainer: HTMLDivElement) {
+  private handleDragListeners(gameboardContainer: HTMLElement) {
     const dragState: DragState = {
       currentShipInstance: null,
       initialPlacementConfigurations: null,
@@ -394,34 +387,35 @@ export class PlayerGameboardComponent {
       shipBorderValueSplit: null
     };
 
-    gameboardContainer.addEventListener('dragstart', (e: DragEvent) =>
+    // Save each as function 
+    gameboardContainer.addEventListener('dragstart', (e: DragEvent) => {
       this.handleShipDragStart(e, dragState)
-    );
-    gameboardContainer.addEventListener('drag', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('drag', (e: DragEvent) => {
       this.handleShipDrag(e, dragState)
-    );
-    gameboardContainer.addEventListener('dragenter', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('dragenter', (e: DragEvent) => {
       this.handleShipDragEnter(e)
-    );
-    gameboardContainer.addEventListener('dragleave', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('dragleave', (e: DragEvent) => {
       this.handleShipDragLeave(e)
-    );
-    gameboardContainer.addEventListener('dragover', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('dragover', (e: DragEvent) => {
       this.handleShipDragOver(e, dragState)
-    );
-    gameboardContainer.addEventListener('drop', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('drop', (e: DragEvent) => {
       this.handleShipDrop(e, dragState)
-    );
-    gameboardContainer.addEventListener('dragend', (e: DragEvent) =>
+    });
+    gameboardContainer.addEventListener('dragend', (e: DragEvent) => {
       this.handleShipDragEnd(e, dragState)
-    );
+    });
   }
   
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    if (!e.target.classList.contains('ship-container')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.ship-container'))
+    ) return;
 
     const setInitialDragStyles = (
       shipContainerElement: HTMLDivElement
@@ -537,7 +531,7 @@ export class PlayerGameboardComponent {
       return cloneSnapOffset;
     };  
     const classifyValidCellCoordinates = (
-      boardContainer: HTMLDivElement,
+      boardContainer: HTMLElement,
       shipContainerElement: HTMLDivElement,
       orientation: Orientation,
       gameboardController: BattleshipBoardController
@@ -594,7 +588,7 @@ export class PlayerGameboardComponent {
       // Set the current ship instance and its initial configurations
       dragState.currentShipInstance = fleet[shipType];
       dragState.initialPlacementConfigurations =
-        dragState.currentShipInstance.currentplacementConfigurations;
+      dragState.currentShipInstance.currentplacementConfigurations;
       dragState.cloneSnapOffset = cloneSnapOffset;
     };
 
@@ -647,11 +641,11 @@ export class PlayerGameboardComponent {
   }
 
   private handleShipDrag(e: DragEvent, dragState: DragState) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    // Ensure it's a valid ship container
-    if (!e.target.classList.contains('ship-container')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.ship-container')
+      )
+    ) return;
 
     const cloneSnapOffset: CloneSnapOffset | null = dragState.cloneSnapOffset;
 
@@ -661,11 +655,10 @@ export class PlayerGameboardComponent {
   }
 
   private handleShipDragEnter(e: DragEvent) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    // Ensure it's a grid cell
-    if (!e.target.classList.contains('grid-cell')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.grid-cell'))
+    ) return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -685,10 +678,10 @@ export class PlayerGameboardComponent {
   }
 
   private handleShipDragLeave(e: DragEvent) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    if (!e.target.classList.contains('grid-cell')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.grid-cell'))
+    ) return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -709,10 +702,10 @@ export class PlayerGameboardComponent {
     // Enables the drop event to fire
     e.preventDefault();
 
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    if (!e.target.classList.contains('grid-cell')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.grid-cell'))
+    ) return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -726,10 +719,10 @@ export class PlayerGameboardComponent {
   private handleShipDrop(e: DragEvent, dragState: DragState) {
     e.preventDefault();
 
-    if (!e.target || !(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    if (!e.target.classList.contains('valid-bow-coordinates')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.valid-bow-coordinates'))
+    ) return;
 
     // Validate and modify state
     const { coordinatesArray, orientation: initialOrientation } =
@@ -758,17 +751,17 @@ export class PlayerGameboardComponent {
     });
 
     // Re-renders board with new ship placement
-    this.updateGameboard();
+    this.updateGameboard(this.boardContainer);
 
     // Reset valid drop target state
     dragState.isValidDropTarget = false;
   }
 
   private handleShipDragEnd(e: DragEvent, dragState: DragState) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    if (!e.target.classList.contains('ship-container')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.ship-container'))
+    ) return;
 
     const resetShipPosition = (): void => {
       const { coordinatesArray, orientation: initialOrientation } =
@@ -840,9 +833,10 @@ export class PlayerGameboardComponent {
     e: DragEvent,
     cloneSnapOffset: CloneSnapOffset
   ): void {
-    const gameboardClientRect = this.boardContainer.getBoundingClientRect();
-    const gameboardOffsetX = gameboardClientRect.left;
-    const gameboardOffsetY = gameboardClientRect.top;
+    const gameboardClientRect: DOMRect =
+      this.boardContainer.getBoundingClientRect();
+    const gameboardOffsetX: number = gameboardClientRect.left;
+    const gameboardOffsetY: number = gameboardClientRect.top;
 
     const cursorX: number = e.clientX;
     const cursorY: number = e.clientY;
@@ -863,20 +857,17 @@ export class PlayerGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 Handle Ship Click (Rotation)
 
-  private handleClickListeners(gameboardContainer: HTMLDivElement) {
-    
+  private handleClickListeners(gameboardContainer: HTMLElement) {
     gameboardContainer.addEventListener('click', (e: MouseEvent) => {
       this.handleShipRotation(e);
     });
-
   }
 
   private handleShipRotation(e: MouseEvent) {
-    if (!(e.target instanceof HTMLDivElement))
-      throw new Error('Target element not found or is not an HTMLElement.');
-
-    // Ensure it's a valid ship container
-    if (!e.target.classList.contains('ship-container')) return;
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !(e.target.matches('.ship-container'))
+    ) return;
 
     const shipContainerElement: HTMLDivElement = e.target;
 
@@ -889,7 +880,7 @@ export class PlayerGameboardComponent {
     const ship = this.playerState.fleetBuilder.getShip(shipType);
 
     this.playerState.gameboardController.rotatePiece(ship);
-    this.updateGameboard();
+    this.updateGameboard(this.boardContainer);
   };
 
   // 💭 --------------------------------------------------------------

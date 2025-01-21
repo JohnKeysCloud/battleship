@@ -1,4 +1,8 @@
 #content {
+  display: flex;
+  grid-template-areas: 'heading heading';
+  flex-direction: column;
+  gap: 1rem;
   min-height: 100vh;
   min-width: 100vw;
 }
@@ -7,22 +11,154 @@ body {
   background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   color: whitesmoke;
   font-family: 'pixeBoy', monospace;
-  text-shadow: 0 0 8px whitesmoke;
+  text-shadow: 0 0 8px black;
 }
 
-h1 {
-  font-size: 6rem;
+nav {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-inline: 1rem;
+  margin-top: 1rem;
+
+  .heading-link {
+    color: white;
+    font-size: 3rem;
+    // margin-inline: auto;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .git-hub-svg {
+    height: 25px;
+    width: 25px;
+  }
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
-button {
-  border: 3px ridge;
-  border-radius: 0.5rem;
-  color: whitesmoke;
-  font-family: 'pixeBoy', monospace;
-  padding: 0.25rem 0.5rem;
+ul {
+  // border: 2px solid red;
+  display: flex;
+  font-family: monospace;
+  flex-direction: column;
 }
 
+li {
+  list-style: none;
+
+  &::before {
+    content: '💭';
+  }
+}
+
+// ! organize below
+
+#main-container-three-parabellum {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .ship-shuffler-button {
+    --size: 4rem;
+
+    border-radius: 50%;
+    border: 2px solid #090909;
+    background-color: transparent;
+    background: linear-gradient(145deg, #19202f, #0d0f16);
+    box-shadow: inset 1px 1px 0 #1e2841, inset -1px -1px 0px #1c1c1c;
+    color: whitesmoke;
+    display: grid;
+    height: var(--size);
+    width: var(--size);
+    place-items: center;
+    position: relative;
+    font-family: 'pixeBoy', monospace;
+
+    &::before {
+      background-color: transparent;
+      background-image: linear-gradient(145deg, #262626, #434343);
+      border-radius: inherit;
+      box-shadow: 7px 7px 6px #141414, -7px -7px 6px #1e283c;
+      content: '';
+      inset: 0;
+      position: absolute;
+      z-index: -1;
+    }
+  }
+
+  .ready-up-button {
+    --size: 75px;
+
+    aspect-ratio: 13 / 9; // aspect ratio of inactive SVG
+    color: whitesmoke;
+    filter: hue-rotate(140deg);
+
+    height: auto;
+    position: relative;
+    width: var(--size);
+
+    .ready-up-button-text {
+      display: inline-block;
+      bottom: -1.75rem;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+
+    .inactive-ready-up-button,
+    .active-ready-up-button {
+      filter: drop-shadow(0 3px 3px black);
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+      width: 100%;
+      z-index: -1;
+    }
+
+    .inactive-ready-up-button {
+      opacity: 1;
+    }
+
+    .active-ready-up-button {
+      opacity: 0;
+    }
+
+    &:active {
+      .inactive-ready-up-button {
+        opacity: 0;
+      }
+      .active-ready-up-button {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+#player-gameboard-section {
+  display: grid;
+  place-items: center;
+}
+
+#opponent-gameboard-container {
+  display: none;
+}
+
+#info-box {
+  border-radius: 3rem;
+  background: #111620;
+  box-shadow: inset 9px 9px 18px #080a0f, inset -9px -9px 18px #1a2231;
+  display: grid;
+  place-items: center;
+  margin-inline: 1rem;
+
+  .phase-content-container {
+    padding: 1.5rem;
+    // width: max-content;
+  }
+}
