@@ -13,7 +13,7 @@
     "gitpushnode": "node ./_shells/gitpush.js",
     "minifyhtml": "./_shells/minifyhtml.sh",
     "nodetsc": "tsc -p config/tsconfig.json",
-    "buildpush": "npm run build && git add . && git push origin main && npm run update-gh-page",
+    "push": "git push origin main && npm run update-gh-page",
     "serve": "webpack serve --progress --config config/webpack/webpack.dev.js",
     "test": "jest --config=config/jest.config.js",
     "update-gh-page": "git subtree push --prefix dist origin gh-pages",
