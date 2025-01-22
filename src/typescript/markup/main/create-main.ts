@@ -80,10 +80,7 @@ export function createMain(
 
   // 💭 --------------------------------------------------------------
 
-  const mainElement = createElement('main', ['gameboard-main'], {
-    id: 'player-gameboard-section',
-  });
-
+  const mainElement = createElement('main');
   mainContainerOne.render(mainElement);
   mainContainerTwo.render(mainElement);
   mainContainerThree.render(mainElement);
