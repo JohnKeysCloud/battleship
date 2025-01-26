@@ -1,11 +1,9 @@
 import './styles/sass/index.scss'
 
-import { createElement } from './typescript/utilities/random-utilities';
 import { players } from './typescript/state/player-state';
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
-import { createGitHubLink } from './typescript/utilities/create-github-link';
 import { createHeader } from './typescript/markup/header/header';
-import { createMain } from './typescript/markup/main/create-main';
+import { createMain } from './typescript/markup/main/main';
 
 function init() {
   const randomizeBSGameboards = () => {
