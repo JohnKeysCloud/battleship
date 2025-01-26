@@ -1,3 +1,4 @@
+import './player-gameboard-component.scss';
 import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
 import { GridPlacementValue } from '../../types/css-types';
@@ -14,25 +15,31 @@ import {
 } from '../../types/logic-types';
 import { PlayerState } from '../../types/state-types';
 import GlobalEventBus from '../../utilities/event-bus';
-import { isOrientation, isShipLength, isShipType } from '../../utilities/logic-utilities';
+import {
+  isOrientation,
+  isShipLength,
+  isShipType,
+} from '../../utilities/logic-utilities';
 import {
   areArraysEqual,
   createElement,
-  getConvertedTypeFromAttr
+  getConvertedTypeFromAttr,
 } from '../../utilities/random-utilities';
-import { CloneSnapOffset, DragState, ShipBorderValueSplit } from '../component-types';
+import {
+  CloneSnapOffset,
+  DragState,
+  ShipBorderValueSplit,
+} from '../component-types';
 
 export class PlayerGameboardComponent {
   public id: string = 'player';
   public boardContainer: HTMLElement;
-  private gameboard: DocumentFragment
+  private gameboard: DocumentFragment;
   private fleetElements: Set<HTMLDivElement> = new Set();
   private dragImage: HTMLImageElement;
   private shipDragClone: HTMLDivElement;
 
-  constructor(
-    public readonly playerState: PlayerState
-  ) {
+  constructor(public readonly playerState: PlayerState) {
     this.boardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
@@ -97,13 +104,13 @@ export class PlayerGameboardComponent {
       ['drag-image', 'accessibility'],
       {
         id: `${this.id}-drag-image`,
-        src: 'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/1x1_transparent.png'
+        src: 'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/1x1_transparent.png',
       }
-    )
-    
+    );
+
     return invisibleImage;
   }
-  
+
   private createShipDragClone(): HTMLDivElement {
     const shipCloneElement: HTMLDivElement = createElement(
       'div',
@@ -204,7 +211,6 @@ export class PlayerGameboardComponent {
       }
     );
 
-  
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
 
     this.handleDragListeners(gameboardContainer);
@@ -263,18 +269,12 @@ export class PlayerGameboardComponent {
 
       if (isBow) {
         shipUnit.classList.add('ship-bow');
-        shipUnit.setAttribute(
-          'id',
-          `${id}-${shipType}-bow`
-        );
+        shipUnit.setAttribute('id', `${id}-${shipType}-bow`);
       }
-      
+
       if (isStern) {
         shipUnit.classList.add('ship-stern');
-        shipUnit.setAttribute(
-          'id',
-          `${id}-${shipType}-stern`
-        );  
+        shipUnit.setAttribute('id', `${id}-${shipType}-stern`);
       }
 
       shipUnitFragment.appendChild(shipUnit);
@@ -354,9 +354,12 @@ export class PlayerGameboardComponent {
 
   private updateGameboard(boardContainer: HTMLElement) {
     const gameboard = boardContainer.querySelector(`#${this.id}-gameboard`);
-    const gameboardBackground = boardContainer.querySelector(`#${this.id}-gameboard-background`);
+    const gameboardBackground = boardContainer.querySelector(
+      `#${this.id}-gameboard-background`
+    );
 
-    if (!gameboard || !gameboardBackground) throw new Error('Missing gameboard and/or gameboard background elements');
+    if (!gameboard || !gameboardBackground)
+      throw new Error('Missing gameboard and/or gameboard background elements');
 
     this.boardContainer.removeChild(gameboard);
     this.boardContainer.removeChild(gameboardBackground);
@@ -384,38 +387,39 @@ export class PlayerGameboardComponent {
       isValidDropTarget: false,
       currentDragOverCell: null,
       cloneSnapOffset: null,
-      shipBorderValueSplit: null
+      shipBorderValueSplit: null,
     };
 
-    // Save each as function 
+    // Save each as function
     gameboardContainer.addEventListener('dragstart', (e: DragEvent) => {
-      this.handleShipDragStart(e, dragState)
+      this.handleShipDragStart(e, dragState);
     });
     gameboardContainer.addEventListener('drag', (e: DragEvent) => {
-      this.handleShipDrag(e, dragState)
+      this.handleShipDrag(e, dragState);
     });
     gameboardContainer.addEventListener('dragenter', (e: DragEvent) => {
-      this.handleShipDragEnter(e)
+      this.handleShipDragEnter(e);
     });
     gameboardContainer.addEventListener('dragleave', (e: DragEvent) => {
-      this.handleShipDragLeave(e)
+      this.handleShipDragLeave(e);
     });
     gameboardContainer.addEventListener('dragover', (e: DragEvent) => {
-      this.handleShipDragOver(e, dragState)
+      this.handleShipDragOver(e, dragState);
     });
     gameboardContainer.addEventListener('drop', (e: DragEvent) => {
-      this.handleShipDrop(e, dragState)
+      this.handleShipDrop(e, dragState);
     });
     gameboardContainer.addEventListener('dragend', (e: DragEvent) => {
-      this.handleShipDragEnd(e, dragState)
+      this.handleShipDragEnd(e, dragState);
     });
   }
-  
+
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.ship-container'))
-    ) return;
+      !e.target.matches('.ship-container')
+    )
+      return;
 
     const setInitialDragStyles = (
       shipContainerElement: HTMLDivElement
@@ -431,7 +435,7 @@ export class PlayerGameboardComponent {
 
       // Make clone visible
       this.shipDragClone.classList.add('visible');
-    };   
+    };
     const setCloneDimensions = (
       shipContainer: HTMLDivElement,
       shipClone: HTMLDivElement
@@ -439,7 +443,7 @@ export class PlayerGameboardComponent {
       const shipBoundingRect = shipContainer.getBoundingClientRect();
       shipClone.style.height = `${shipBoundingRect.height}px`;
       shipClone.style.width = `${shipBoundingRect.width}px`;
-    };  
+    };
     const getCloneSnapOffset = (
       shipContainerElement: HTMLDivElement,
       orientation: Orientation,
@@ -529,7 +533,7 @@ export class PlayerGameboardComponent {
       };
 
       return cloneSnapOffset;
-    };  
+    };
     const classifyValidCellCoordinates = (
       boardContainer: HTMLElement,
       shipContainerElement: HTMLDivElement,
@@ -588,7 +592,7 @@ export class PlayerGameboardComponent {
       // Set the current ship instance and its initial configurations
       dragState.currentShipInstance = fleet[shipType];
       dragState.initialPlacementConfigurations =
-      dragState.currentShipInstance.currentplacementConfigurations;
+        dragState.currentShipInstance.currentplacementConfigurations;
       dragState.cloneSnapOffset = cloneSnapOffset;
     };
 
@@ -598,14 +602,14 @@ export class PlayerGameboardComponent {
       'data-orientation',
       isOrientation
     );
-    
+
     const fleet: Fleet = this.playerState.fleetBuilder.fleet;
     const shipType: ShipType = getConvertedTypeFromAttr(
       shipContainerElement,
       'data-shiptype',
       isShipType
     );
-    
+
     const cloneSnapOffset: CloneSnapOffset = getCloneSnapOffset(
       shipContainerElement,
       orientation,
@@ -643,13 +647,16 @@ export class PlayerGameboardComponent {
   private handleShipDrag(e: DragEvent, dragState: DragState) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.ship-container')
-      )
-    ) return;
+      !e.target.matches('.ship-container')
+    )
+      return;
 
     const cloneSnapOffset: CloneSnapOffset | null = dragState.cloneSnapOffset;
 
-    if (!cloneSnapOffset) throw new Error('An error has occured during the `cloneSnapOffset` reading.');
+    if (!cloneSnapOffset)
+      throw new Error(
+        'An error has occured during the `cloneSnapOffset` reading.'
+      );
 
     this.snapCloneToCursor(e, cloneSnapOffset);
   }
@@ -657,8 +664,9 @@ export class PlayerGameboardComponent {
   private handleShipDragEnter(e: DragEvent) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.grid-cell'))
-    ) return;
+      !e.target.matches('.grid-cell')
+    )
+      return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -680,8 +688,9 @@ export class PlayerGameboardComponent {
   private handleShipDragLeave(e: DragEvent) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.grid-cell'))
-    ) return;
+      !e.target.matches('.grid-cell')
+    )
+      return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -704,8 +713,9 @@ export class PlayerGameboardComponent {
 
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.grid-cell'))
-    ) return;
+      !e.target.matches('.grid-cell')
+    )
+      return;
 
     const gridCell: HTMLDivElement = e.target;
 
@@ -721,13 +731,14 @@ export class PlayerGameboardComponent {
 
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.valid-bow-coordinates'))
-    ) return;
+      !e.target.matches('.valid-bow-coordinates')
+    )
+      return;
 
     // Validate and modify state
     const { coordinatesArray, orientation: initialOrientation } =
       dragState.initialPlacementConfigurations || {};
-    
+
     if (!coordinatesArray || !initialOrientation) {
       throw new Error('Initial placement configurations are incomplete.');
     }
@@ -760,8 +771,9 @@ export class PlayerGameboardComponent {
   private handleShipDragEnd(e: DragEvent, dragState: DragState) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.ship-container'))
-    ) return;
+      !e.target.matches('.ship-container')
+    )
+      return;
 
     const resetShipPosition = (): void => {
       const { coordinatesArray, orientation: initialOrientation } =
@@ -789,7 +801,7 @@ export class PlayerGameboardComponent {
       const cellFeedbackClass: string = isValidDropTarget
         ? 'placement-is-valid'
         : 'placement-is-invalid';
-      
+
       // Lower grid cell validation pseudo-element opacity
       currentDragOverCell.classList.remove(cellFeedbackClass);
 
@@ -814,7 +826,7 @@ export class PlayerGameboardComponent {
             dragState
           )}`
         );
-      
+
       removeDragStyles(
         shipContainerElement,
         currentDragOverCell,
@@ -842,7 +854,7 @@ export class PlayerGameboardComponent {
     const cursorY: number = e.clientY;
 
     const { offsetX, offsetY }: CloneSnapOffset = cloneSnapOffset;
-    
+
     document.documentElement.style.setProperty(
       '--ship-clone-left',
       `${cursorX - gameboardOffsetX - offsetX}px`
@@ -866,8 +878,9 @@ export class PlayerGameboardComponent {
   private handleShipRotation(e: MouseEvent) {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !(e.target.matches('.ship-container'))
-    ) return;
+      !e.target.matches('.ship-container')
+    )
+      return;
 
     const shipContainerElement: HTMLDivElement = e.target;
 
@@ -876,12 +889,12 @@ export class PlayerGameboardComponent {
       'data-shiptype',
       isShipType
     );
-    
+
     const ship = this.playerState.fleetBuilder.getShip(shipType);
 
     this.playerState.gameboardController.rotatePiece(ship);
     this.updateGameboard(this.boardContainer);
-  };
+  }
 
   // 💭 --------------------------------------------------------------
   // 💭 Utilities

@@ -1,3 +1,5 @@
+@use 'player-gameboard-animations.scss';
+
 :root {
   --color-battleship: var(--color-pacman);
   --color-carrier: var(--color-binky);
@@ -28,6 +30,10 @@
   padding: 1rem;
   position: relative;
   width: min(380px, 90vw);
+
+    &:has(.ship-container.lower-opacity) .ship-container::before {
+      animation-play-state: paused;
+    }
 
     .gameboard,
     .gameboard-background {
@@ -138,20 +144,57 @@
   pointer-events: auto;
   position: relative;
 
+  &::before {
+    // animation: pulse 1s ease-out alternate infinite; // ? When ship is able to be repostioned
+    background-color: #2121DE;
+    box-shadow: inset 0 0 6px -2px ghostwhite;
+    border-radius: inherit;
+    content: '';
+    height: 100%;
+    opacity:0;
+    overflow: auto;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+  }
+
   &#player-one-battleship-container {
     box-shadow: 0 0 8px var(--color-battleship);
+
+    &::before {
+      background-color: var(--color-battleship);
+    }
   }
   &#player-one-carrier-container {
     box-shadow: 0 0 8px var(--color-carrier);
+
+    &::before {
+      background-color: var(--color-carrier);
+    }
   }
   &#player-one-destroyer-container {
     box-shadow: 0 0 8px var(--color-destroyer);
+
+    &::before {
+      background-color: var(--color-destroyer);
+    }
   }
   &#player-one-patrolBoat-container {
     box-shadow: 0 0 8px var(--color-patrolBoat);
+
+    &::before {
+      background-color: var(--color-patrolBoat);
+    }
   }
   &#player-one-submarine-container {
     box-shadow: 0 0 8px var(--color-submarine);
+
+    &::before {
+
+      // background-color: var(--color-submarine);
+      background-color: black;
+    }
   }
 
   &.lower-opacity {
@@ -160,8 +203,29 @@
 }
 
 .ship-unit {
-  // Allows smooth rotation
+  position: relative;
   pointer-events: none;
+  z-index: 0;
+
+  &::before {
+    background-image: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnAyejY2bndtZXo0dHd6OHluMXprOWZ6cWsyZzR5bjE2YmdvcjhmZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/D3fe42PWaeBGT2RpPo/giphy.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 50px 50px;
+    box-shadow: inset 0 0 6px 1px black;
+    content: '';
+    inset: 0;
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &.cooked {
+    &::before {
+      opacity: 1;
+    }
+  }
 
   // &.ship-unit-horizontal:not(:last-of-type) {
   //   border-right: 1px solid black;

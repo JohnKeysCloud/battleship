@@ -16,7 +16,6 @@ nav {
   .heading-link {
     color: white;
     font-size: 3rem;
-    // margin-inline: auto;
     text-align: center;
     text-decoration: none;
   }
@@ -195,7 +194,7 @@ dialog {
 
   &#info-box {
     border-radius: 3rem;
-    background: #111620;
+    background-color: #111620;
     box-shadow: inset 9px 9px 18px #080a0f, inset -9px -9px 18px #1a2231;
     display: grid;
     place-items: center;
