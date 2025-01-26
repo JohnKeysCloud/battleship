@@ -2,27 +2,32 @@ body {
   background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   color: whitesmoke;
   font-family: 'pixeBoy', monospace;
+  line-height: 1;
   text-shadow: 0 0 8px black;
 }
 
-nav {
-  align-items: center;
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  margin-inline: 1rem;
-  margin-top: 1rem;
+header {
+  margin-bottom: 1rem;
+  padding-inline: 1rem;
+  padding-top: 1rem;
 
-  .heading-link {
-    color: white;
-    font-size: 3rem;
-    text-align: center;
-    text-decoration: none;
-  }
+  nav {
+    align-items: center;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
 
-  .git-hub-svg {
-    height: 25px;
-    width: 25px;
+    .heading-link {
+      color: white;
+      font-size: 3rem;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .git-hub-svg {
+      height: 25px;
+      width: 25px;
+    }
   }
 }
 
@@ -51,7 +56,7 @@ button {
 main {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 
   // .main-container {
     // ?
@@ -89,9 +94,14 @@ main {
   #main-container-two {
     display: grid;
     place-items: center;
+    position: relative;
 
     #opponent-gameboard-container {
-      display: none; // !
+      opacity: 0.5;
+      pointer-events: none;
+      position: absolute;
+      transform: scale(0.8) translateY(8vh);
+      z-index: -1;
     }
   }
 
