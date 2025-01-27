@@ -4,6 +4,7 @@ import { players } from './typescript/state/player-state';
 import { randomizeBSGameboard } from './typescript/setup/randomize-bs-gameboard';
 import { createHeader } from './typescript/markup/header/header';
 import { createMain } from './typescript/markup/main/main';
+import { InstructionsDialogComponent } from './typescript/markup/lightboxes/instructions-dialog';
 
 function init() {
   const randomizeBSGameboards = () => {
@@ -31,6 +32,14 @@ function init() {
   const header = createHeader();
   const mainElement = createMain(players);
   content.append(header, mainElement);
+
+  // 💭 --------------------------------------------------------------
+
+  const instructionsDialog = new InstructionsDialogComponent();
+  instructionsDialog.render(content);
+  instructionsDialog.element.showModal();
+
+  // 💭 --------------------------------------------------------------
 }
 
 // time all the above stuff

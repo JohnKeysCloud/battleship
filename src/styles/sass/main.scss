@@ -1,6 +1,13 @@
+:root {
+  --phase-of-war-color: var(--parabellum-heading-text-shadow-color);
+  --parabellum-heading-text-shadow-color: #2121DE; // TODO: update cyclone reset to include `color-edible-ghost`
+  --bellum-heading-text-shadow-color: var(--color-pacman); 
+  --post-bellum-heading-text-shadow-color: var(--color-binky); 
+}
+
 body {
   background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-  color: whitesmoke;
+  color: ghostwhite;
   font-family: 'pixeBoy', monospace;
   line-height: 1;
   text-shadow: 0 0 8px black;
@@ -18,8 +25,7 @@ header {
     justify-content: center;
 
     .heading-link {
-      color: white;
-      font-size: 3rem;
+      color: ghostwhite;
       text-align: center;
       text-decoration: none;
     }
@@ -31,21 +37,45 @@ header {
   }
 }
 
+h1 {
+  font-size: 3rem;
+}
+
 h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
   font-size: 1.25rem;
+}
+
+h1, h2, h3 {
+  text-shadow: 0 0 12px var(--phase-of-war-color);
 }
 
 ul {
   display: flex;
-  font-family: monospace;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 li {
   list-style: none;
+  text-wrap:  balance;
+  text-shadow: 0 0 1px ghostwhite;
+  text-align: center;
 
   &::before {
-    content: '💭';
+    content: '';
+    display: inline-block;
+    background-image: url('https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_cyclone-studios/alphaLogos/cycloneC/animated/gif+files/flat-white-outline.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 1px ghostwhite);
+    margin-right: 0.125rem;
+    width: 15px;
+    height: 15px;
+    vertical-align: -3px;
   }
 }
 
@@ -121,7 +151,7 @@ main {
         background-color: transparent;
         background: linear-gradient(145deg, #19202f, #0d0f16);
         box-shadow: inset 1px 1px 0 #1e2841, inset -1px -1px 0px #1c1c1c;
-        color: whitesmoke;
+        color: ghostwhite;
         display: grid;
         height: var(--size);
         width: var(--size);
@@ -145,7 +175,7 @@ main {
         --size: 75px;
 
         aspect-ratio: 13 / 9; // aspect ratio of inactive SVG
-        color: whitesmoke;
+        color: ghostwhite;
         filter: hue-rotate(140deg);
 
         height: auto;
@@ -202,23 +232,43 @@ main {
 
 dialog {
 
-  &#info-box {
+  &#instructions-dialog {
     border-radius: 3rem;
     background-color: #111620;
+    color: ghostwhite;
     box-shadow: inset 9px 9px 18px #080a0f, inset -9px -9px 18px #1a2231;
-    display: grid;
+    padding: 2rem 4rem;
+    position: relative;
     place-items: center;
-    margin-inline: 1rem;
 
-    .phase-content-container {
-      padding: 1.5rem;
-      // width: max-content;
+    #instructions-dialog-close-button {
+      // border: 2px solid red;
+      color: var(--color-binky);
+      cursor: pointer;
+      font-size: 2rem;
+      line-height: 0.5;
+      position: absolute;
+      right: 1.5rem;
+      text-shadow: 0 0 3px;
+      top: 1.5rem;
     }
+
+    #instructions-content {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      justify-content: space-evenly;
+
+
+
+    }
+
   }
 }
 
 #content {
-  display: flex;
-  grid-template-areas: 'heading heading';
-  flex-direction: column;
+  // display: flex;
+  // grid-template-areas: 'heading heading';
+  // flex-direction: column;
 }
