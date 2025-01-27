@@ -164,9 +164,20 @@ img {
 button:focus,
 dialog:focus {
   outline: none;
+}
+
+button:focus-visible,
+dialog:focus-visible {
+  outline: revert;
+}
+
+/* Remove outline from buttons inside dialog when focused */
+dialog:focus button,
+dialog:focus-visible button {
+  outline: none;
 
   &:focus-visible {
-    outline:  revert;
+    outline: revert; /* Restore outline for keyboard navigation */
   }
 }
 
