@@ -161,18 +161,20 @@ img {
   image-rendering: crisp-edges;
 }
 
+button:focus,
+dialog:focus {
+  outline: none;
+
+  &:focus-visible {
+    outline:  revert;
+  }
+}
+
 button {
   background-color: transparent;
   border: none;
   font-family: inherit;
   padding: 0;
-
-  // hide the outline when the button is focused and the user is using a pointer device
-  // (eg. a mouse, a trackpad, a finger on a touchscreen).
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
-
 }
 
 picture img {
