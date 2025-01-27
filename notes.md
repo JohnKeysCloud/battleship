@@ -247,3 +247,32 @@ same bow -> `[x + 1, y]`
 Initializer: `i = 1`
 Condition: `i < ship.length - 1`
 Test:  `[x + i, y]`
+
+### 1/27/25 Functional Programming
+``` typescript
+// Utility function to create a board of given size filled with zeros
+const createBoard = (size) => Array.from({ length: size }, () => Array(size).fill(0));
+
+// Utility function to update a cell's value
+const updateCell = (board, row, col, value) => 
+  board.map((r, i) =>
+    r.map((cell, j) => (i === row && j === col ? value : cell))
+  );
+
+// Utility function to retrieve a cell's value
+const getCell = (board, row, col) => board[row][col];
+
+// Example usage
+const boardSize = 10;
+let board = createBoard(boardSize);
+
+console.log("Initial Board:");
+console.table(board);
+
+board = updateCell(board, 1, 2, 42);
+console.log("Board after updating cell (1, 2) to 42:");
+console.table(board);
+
+const value = getCell(board, 1, 2);
+console.log(`Value at cell (1, 2): ${value}`);
+```
