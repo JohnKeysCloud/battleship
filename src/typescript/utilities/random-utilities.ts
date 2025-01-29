@@ -61,7 +61,7 @@ export const generateListFragment = (
       'li',
       [`${identifier}-list-item`],
       {
-        id: `${identifier}-list-item-${index}`,
+        id: `${identifier}-list-item-${++index}`,
         ...attributes,
       }
     );
