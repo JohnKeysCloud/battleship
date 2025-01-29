@@ -55,10 +55,31 @@ export class InstructionsDialogComponent {
     });
     instructionsList.appendChild(listItemFragment);
 
+    const unanchoredShipExample = createElement('div', [], {
+      id: 'unanchored-ship-example',
+    });
+
+    const unanchoredShipText = createElement('p', [], {
+      id: 'unanchored-ship-text',
+    });
+    unanchoredShipText.textContent = '= Bips adrift';
+
+    const visualFeedbackKeyContainer = createElement('div', [], {
+      id: 'visual-feedback-key-container',
+    });
+    visualFeedbackKeyContainer.append(
+      unanchoredShipExample,
+      unanchoredShipText
+    );
+
     const instructionsContentContainer = createElement('div', [], {
       id: 'instructions-content',
     });
-    instructionsContentContainer.append(tertiaryHeading, instructionsList);
+    instructionsContentContainer.append(
+      tertiaryHeading,
+      instructionsList,
+      visualFeedbackKeyContainer,
+    );
 
     const instructionsDialog = createElement('dialog', [], {
       id: InstructionsDialogComponent.dialogId,
