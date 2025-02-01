@@ -3,6 +3,7 @@ import { createElement } from "../../utilities/random-utilities";
 import { Fleet } from "../../types/logic-types";
 import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
 import GlobalEventBus from "../../utilities/event-bus";
+import './ready-up-component.scss';
 
 export class ReadyUpButton {
   private readonly readyUpButton: HTMLButtonElement;

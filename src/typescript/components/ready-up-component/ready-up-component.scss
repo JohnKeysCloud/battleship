@@ -1,0 +1,45 @@
+.ready-up-button {
+  --size: 75px;
+
+  aspect-ratio: 13 / 9; // aspect ratio of inactive SVG
+  color: ghostwhite;
+  height: auto;
+  position: relative;
+  width: var(--size);
+
+  .ready-up-button-text {
+    display: inline-block;
+    bottom: -1.75rem;
+    left: 0;
+    right: 0;
+    position: absolute;
+  }
+
+  .inactive-ready-up-button,
+  .active-ready-up-button {
+    filter: drop-shadow(0 3px 3px black);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+  }
+
+  .inactive-ready-up-button {
+    opacity: 1;
+  }
+
+  .active-ready-up-button {
+    opacity: 0;
+  }
+
+  &:active {
+    .inactive-ready-up-button {
+      opacity: 0;
+    }
+    .active-ready-up-button {
+      opacity: 1;
+    }
+  }
+}

@@ -138,14 +138,22 @@
 .ship-container {
   border: var(--ship-container-border-size) solid black;
   border-radius: 10vw;
-  cursor: grab;
+  cursor: auto;
   display: grid;
   overflow: hidden;
   pointer-events: auto;
   position: relative;
 
+  &.adrift {
+    cursor: grab;
+
+    &::before {
+      animation: pulse 1s ease-out alternate infinite;
+    }
+  }
+
   &::before {
-    // animation: pulse 1s ease-out alternate infinite; // ? When ship is able to be repostioned
+    animation: none;
     background-color: #2121DE;
     box-shadow: inset 0 0 6px -2px ghostwhite;
     border-radius: inherit;

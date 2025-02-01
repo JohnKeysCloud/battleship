@@ -158,12 +158,13 @@ export class PlayerGameboardComponent {
 
     const shipContainerElement: HTMLDivElement = createElement(
       'div',
-      ['ship-container'],
+      ['ship-container', 'adrift'],
       {
         id: `${this.id}-${shipType}-container`,
-        'data-shipType': shipType,
+        'data-dragging': 'false',
         'data-length': shipLength.toString(),
         'data-orientation': orientation,
+        'data-shipType': shipType,
         draggable: 'true',
       }
     );
@@ -406,6 +407,9 @@ export class PlayerGameboardComponent {
     const setInitialDragStyles = (
       shipContainerElement: HTMLDivElement
     ): void => {
+      // Set dragging attribute to true
+      shipContainerElement.setAttribute('data-dragging', 'true');
+
       // Lower Ship Container Opacity
       shipContainerElement.classList.add('lower-opacity');
 
@@ -783,6 +787,9 @@ export class PlayerGameboardComponent {
       const cellFeedbackClass: string = isValidDropTarget
         ? 'placement-is-valid'
         : 'placement-is-invalid';
+      
+      // Set dragging attribute to false
+      shipContainerElement.setAttribute('data-dragging', 'false');
 
       // Lower grid cell validation pseudo-element opacity
       currentDragOverCell.classList.remove(cellFeedbackClass);
