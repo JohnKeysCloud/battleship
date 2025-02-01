@@ -1,4 +1,3 @@
-
 interface DialogState {
   isDialogOpen: boolean;
   isEscapeKeyListenerAttached: boolean;
@@ -9,16 +8,16 @@ interface DialogState {
  * Lightbox by Cyclone Studios 💭
  * 
  * A class that manages a modal dialog, allowing it to be opened, closed, and interacted with.
- * It handles aria attributes, keyboard interactions (Escape key), and close button events.
+ * It handles keyboard interactions (Escape key), and close button events. 
  * 
  * @example
  * const dialogElement = document.querySelector('dialog');
  * const lightbox = new LightBox(dialogElement);
- * lightbox.openDialog();
+ * lightbox.openLightbox();
  * 
  * @class
  */
-class LightBox {
+export class CycloneLightboxController {
   /**
    * The current state of the dialog (open/close and event listener attachment status).
    * @private
@@ -74,28 +73,26 @@ class LightBox {
       throw new Error('Dialog element must have an id.');
 
     this.dialogId = this.dialogElement.id;
-    this.dsAddDialogAria(this.dialogElement);
     this.dialogCloseButton = this.dsGetCloseButton(
       this.dialogCloseButtonID,
       this.dialogId
     );
     this.dsAddCloseButtonAria(this.dialogCloseButton);
 
-    this.closeButtonListener = this.closeDialog.bind(this);
+    this.closeButtonListener = this.closeLightbox.bind(this);
     this.escapeKeyListener = this.dsHandleEscapeKey.bind(this);
 
     this.observeDialogRemoval();
   }
 
   /**
-   * Opens the dialog and sets the necessary aria attributes.
+   * Opens the dialog.
    * Adds event listeners for closing the dialog.
    */
-  public openDialog() {
+  public openLightbox() {
     if (this.dialogState.isDialogOpen) return;
 
     this.dialogElement.showModal();
-    this.dsToggleDialogAriaStates(true);
     this.dsAddListeners();
     this.dialogState.isDialogOpen = true;
   }
@@ -103,7 +100,7 @@ class LightBox {
   /**
    * Closes the dialog with an animation and removes event listeners.
    */
-  public closeDialog() {
+  public closeLightbox() {
     requestAnimationFrame(() => {
       this.dialogElement.classList.add('closing');
     });
@@ -113,7 +110,6 @@ class LightBox {
       () => {
         this.dialogElement.classList.remove('closing');
         this.dialogElement.close();
-        this.dsToggleDialogAriaStates(false);
         this.dsRemoveListeners();
         this.dialogState.isDialogOpen = false;
       },
@@ -164,16 +160,6 @@ class LightBox {
   }
 
   /**
-   * Toggles the aria-hidden and aria-modal attributes based on the dialog's state.
-   * @private
-   * @param {boolean} isOpen - Whether the dialog is open or closed.
-   */
-  private dsToggleDialogAriaStates(isOpen: boolean) {
-    this.dialogElement.setAttribute('aria-hidden', (!isOpen).toString());
-    this.dialogElement.setAttribute('aria-modal', isOpen.toString());
-  }
-
-  /**
    * Retrieves the close button element inside the dialog.
    * @private
    * @param {string} closeButtonId - The ID of the close button.
@@ -199,17 +185,7 @@ class LightBox {
   }
 
   /**
-   * Adds aria attributes to the dialog element.
-   * @private
-   * @param {HTMLDialogElement} dialogElement - The dialog element to update.
-   */
-  private dsAddDialogAria(dialogElement: HTMLDialogElement): void {
-    dialogElement.setAttribute('aria-modal', 'false');
-    dialogElement.setAttribute('aria-hidden', 'true');
-  }
-
-  /**
-   * Adds aria attributes to the close button.
+   * Adds aria attribute to the close button.
    * @private
    * @param {HTMLButtonElement} closeButton - The close button element to update.
    */
@@ -225,7 +201,7 @@ class LightBox {
   private dsHandleEscapeKey(event: KeyboardEvent) {
     if (event.key === 'Escape' && this.dialogState.isDialogOpen) {
       event.preventDefault();
-      this.closeDialog();
+      this.closeLightbox();
     }
   }
 
@@ -254,8 +230,14 @@ class LightBox {
 
 // 💭 --------------------------------------------------------------
 
-// 💡 Fun fact:
+// <--- 💡 Fun facts:
 // Lightboxes are named after the lightbox that photographers use to view slides.
-// Ok… maybe it's not that fun.
 
-// Lightbox by Cyclone Studios 💭
+// The HTML <dialog> element didn't become a web standard until 2022, when Chrome, 
+// Firefox and Safari added support for the element.
+
+// Ok… maybe not that fun.
+
+// ---> Kizu Kuraudo
+
+// 💭 --------------------------------------------------------------

@@ -1,4 +1,5 @@
 import { createElement } from "../../../utilities/random-utilities";
+import { instructionsLightboxController } from "../../lightboxes/instructions-dialog";
 
 // 💭 Main Container One Parabellum: Heading and Help Button
 
@@ -14,8 +15,12 @@ export function createMainOneParabellumFragment(): DocumentFragment {
   // ? to open instructions modal
   const informationButton: HTMLButtonElement = createElement('button', [], {
     id: 'information-button',
+    type: 'button'
   });
   informationButton.appendChild(informationImage);
+  informationButton.addEventListener('click', () => {
+    instructionsLightboxController.openLightbox();
+  });
 
   const informationButtonContainer: HTMLDivElement = createElement('div', [], {
     id: 'information-button-container'

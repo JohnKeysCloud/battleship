@@ -1,4 +1,3 @@
-import './player-gameboard-component.scss';
 import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
 import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
 import { GridPlacementValue } from '../../types/css-types';
@@ -30,6 +29,8 @@ import {
   DragState,
   ShipBorderValueSplit,
 } from '../component-types';
+import './player-gameboard-component.scss';
+import './player-gameboard-animations.scss';
 
 export class PlayerGameboardComponent {
   public id: string = 'player';
@@ -78,25 +79,6 @@ export class PlayerGameboardComponent {
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
-
-  // private appendFleetClonesToGameboard(fleetElements: Set<HTMLDivElement>) {
-  //   const gameboard: HTMLDivElement | null =
-  //     this.boardContainer.querySelector('.gameboard');
-
-  //   if (!gameboard) throw new Error('Gameboard not found');
-
-  //   fleetElements.forEach((shipElement) => {
-  //     const shipCloneElement: HTMLDivElement = createElement(
-  //       'div',
-  //       ['ship-container-clone'],
-  //       {
-  //         id: `${shipElement.getAttribute('id')}-clone`,
-  //       }
-  //     );
-
-  //     gameboard.appendChild(shipCloneElement);
-  //   });
-  // }
 
   private createDragImage(): HTMLImageElement {
     const invisibleImage = createElement(

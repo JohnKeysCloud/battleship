@@ -1,5 +1,3 @@
-@use '../../typescript/components/player-gameboard-component/player-gameboard-animations.scss';
-
 :root {
   --phase-of-war-color: var(--parabellum-heading-text-shadow-color);
   --parabellum-heading-text-shadow-color: #2121DE; // TODO: update cyclone reset to include `color-edible-ghost`
@@ -178,8 +176,6 @@ main {
 
         aspect-ratio: 13 / 9; // aspect ratio of inactive SVG
         color: ghostwhite;
-        filter: hue-rotate(140deg);
-
         height: auto;
         position: relative;
         width: var(--size);
@@ -229,96 +225,6 @@ main {
     // .post-bellum {
       // ?
     // } 
-  }
-}
-
-dialog {
-
-  &#instructions-dialog {
-    border: none;
-    border-radius: 5rem;
-    background-color: #111620;
-    color: ghostwhite;
-    box-shadow: inset 9px 9px 18px #080a0f, inset -9px -9px 18px #1a2231, 0 0 9px ghostwhite;
-    padding: 1.5rem 1.5rem;
-    overflow: visible;
-    position: relative;
-    place-items: center;
-
-    &::backdrop {
-      background-color: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(3px);
-      opacity: 0;
-      transition: opacity 10s ease-in; 
-    }
-
-    &[open] {
-
-      &::backdrop {
-        opacity: 1;
-      }
-    }
-
-    #instructions-dialog-close-button {
-      color: var(--color-binky);
-      cursor: pointer;
-      font-size: 2rem;
-      line-height: 0.5;
-      position: absolute;
-      right: 0;
-      text-shadow: 0 0 3px;
-      top: 0;
-    }
-
-    #instructions-content {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-
-      #instructions-list {
-        background: #111620;
-        border-radius: 3rem;
-        box-shadow: inset 6px 6px 17px #0b0e15,
-          inset -6px -6px 17px #171e2b;
-        padding: 1.5rem;
-      }
-
-      #visual-feedback-key-container {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-        gap: 0.1875rem;
-
-        #unanchored-ship-example {
-          --size: 2rem;
-
-          background-color: ghostwhite;
-          border: 6px solid #090909;
-          border-radius: 50%;
-          height: var(--size);
-          position: relative;
-          width: var(--size);
-
-          &::before {
-            animation: pulse 1s ease alternate infinite;
-            background-color: #2121DE;
-            box-shadow: inset 0 0 6px -2px ghostwhite;
-            border-radius: inherit;
-            content: '';
-            inset: 0;
-            position: absolute;
-            will-change: opacity;
-          }
-        }
-
-        #unanchored-ship-text {
-          text-shadow: 0 0 1px;
-        }
-      }
-
-
-    }
   }
 }
 
