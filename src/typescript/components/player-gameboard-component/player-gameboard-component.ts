@@ -34,14 +34,14 @@ import './player-gameboard-animations.scss';
 
 export class PlayerGameboardComponent {
   public id: string = 'player';
-  public boardContainer: HTMLElement;
+  public gameboardContainer: HTMLElement;
   private gameboard: DocumentFragment;
   private fleetElements: Set<HTMLDivElement> = new Set();
   private dragImage: HTMLImageElement;
   private shipDragClone: HTMLDivElement;
 
   constructor(public readonly playerState: PlayerState) {
-    this.boardContainer = this.generateBoardContainer(
+    this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
 
@@ -64,7 +64,7 @@ export class PlayerGameboardComponent {
       );
     }
 
-    this.boardContainer.append(
+    this.gameboardContainer.append(
       this.dragImage,
       this.shipDragClone,
       this.gameboard
@@ -74,7 +74,7 @@ export class PlayerGameboardComponent {
       this.fleetElements
     );
 
-    targetElement.appendChild(this.boardContainer);
+    targetElement.appendChild(this.gameboardContainer);
   }
 
   // 💭 --------------------------------------------------------------
@@ -290,7 +290,7 @@ export class PlayerGameboardComponent {
 
   private placeFleetOnGameboard(fleetElements: Set<HTMLDivElement>): void {
     const gameboard =
-      this.boardContainer.querySelector<HTMLDivElement>('.gameboard');
+      this.gameboardContainer.querySelector<HTMLDivElement>('.gameboard');
 
     if (!gameboard) {
       throw new Error('Gameboard container not found.');
@@ -344,15 +344,15 @@ export class PlayerGameboardComponent {
     if (!gameboard || !gameboardBackground)
       throw new Error('Missing gameboard and/or gameboard background elements');
 
-    this.boardContainer.removeChild(gameboard);
-    this.boardContainer.removeChild(gameboardBackground);
+    this.gameboardContainer.removeChild(gameboard);
+    this.gameboardContainer.removeChild(gameboardBackground);
     this.shipDragClone.classList.remove('visible');
 
     this.gameboard = this.generateBoardFragment(
       this.playerState.gameboardBuilder.boardSize
     );
 
-    this.boardContainer.appendChild(this.gameboard);
+    this.gameboardContainer.appendChild(this.gameboard);
 
     this.handleFleetPlacement(
       this.playerState.fleetBuilder,
@@ -622,7 +622,7 @@ export class PlayerGameboardComponent {
     setCloneDimensions(shipContainerElement, this.shipDragClone);
     setInitialDragStyles(shipContainerElement);
     classifyValidCellCoordinates(
-      this.boardContainer,
+      this.gameboardContainer,
       shipContainerElement,
       orientation,
       this.playerState.gameboardController
@@ -748,7 +748,7 @@ export class PlayerGameboardComponent {
     });
 
     // Re-renders board with new ship placement
-    this.updateGameboard(this.boardContainer);
+    this.updateGameboard(this.gameboardContainer);
 
     // Reset valid drop target state
     dragState.isValidDropTarget = false;
@@ -835,7 +835,7 @@ export class PlayerGameboardComponent {
     cloneSnapOffset: CloneSnapOffset
   ): void {
     const gameboardClientRect: DOMRect =
-      this.boardContainer.getBoundingClientRect();
+      this.gameboardContainer.getBoundingClientRect();
     const gameboardOffsetX: number = gameboardClientRect.left;
     const gameboardOffsetY: number = gameboardClientRect.top;
 
@@ -882,7 +882,15 @@ export class PlayerGameboardComponent {
     const ship = this.playerState.fleetBuilder.getShip(shipType);
 
     this.playerState.gameboardController.rotatePiece(ship);
-    this.updateGameboard(this.boardContainer);
+    this.updateGameboard(this.gameboardContainer);
+  }
+
+  // 💭 -------------------------------------------------------------
+  // 💭 Remove all listeners bitch
+
+  private removeAllEventListeners() {
+    this.gameboardContainer
+
   }
 
   // 💭 --------------------------------------------------------------

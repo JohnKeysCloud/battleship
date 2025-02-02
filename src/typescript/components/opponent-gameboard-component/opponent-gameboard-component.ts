@@ -10,12 +10,12 @@ import { PlayerState } from '../../types/state-types';
 
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';
-  private boardContainer: HTMLDivElement;
+  private gameboardContainer: HTMLDivElement;
 
   constructor(
     public readonly playerState: PlayerState
   ) {
-    this.boardContainer = this.generateBoardContainer(
+    this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
   }
@@ -31,9 +31,9 @@ export class OpponentGameboardComponent {
       this.playerState.gameboardBuilder.boardSize
     );
 
-    this.boardContainer.appendChild(gameboard);
+    this.gameboardContainer.appendChild(gameboard);
     
-    targetElement.appendChild(this.boardContainer);
+    targetElement.appendChild(this.gameboardContainer);
   }
 
   // 💭 --------------------------------------------------------------

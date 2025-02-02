@@ -12,14 +12,14 @@ export function createMainThreeParabellumFragment(
 ): DocumentFragment {
   const shipShufflerButton = new ShipShufflerButtonComponent(
     playerGameboardComponent.id,
-    playerGameboardComponent.boardContainer,
+    playerGameboardComponent.gameboardContainer,
     gameboardController,
     fleet
   );
   
   const lockShipsButton = new ReadyUpButton(
     playerGameboardComponent.id,
-    playerGameboardComponent.boardContainer,
+    playerGameboardComponent.gameboardContainer,
     gameboardController,
     fleet
   );
