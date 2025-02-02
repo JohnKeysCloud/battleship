@@ -276,3 +276,66 @@ console.table(board);
 const value = getCell(board, 1, 2);
 console.log(`Value at cell (1, 2): ${value}`);
 ```
+
+### 2/1/25 `readyUp()` (...and beyond) Roadmap
+
+#### Iteration 1
+1. This component needs to lock the gameboard
+  a. On fleet lock, stop animation and remove event listeners.
+
+2. Move to next phase of game
+  a. On fleet lock, show either "finding an opponent" or, if
+     playing a bot show a shuffler animation that 
+     randomize who will go first and show user an animation of 
+     the shuffler (finding an opponent will lead to the same 
+     animation). Make it last precisely 3 seconds. 
+     If opponent goes first, leave position of gameboards in UI
+     If player goes first, move player gameboard down as 
+     opponent gameboard moves up [use translate 3d combined with 
+     precise opacity transitions with z-index swap to make        
+     opponent board click-able ( on attack)].
+     
+ b. Create the above mentioned 'opponent turn' UI state and 
+    depending on turn state, toggle between the two with a 
+    smooth animation (i,e, player to opponent turn and vice
+    vice versa).
+
+#### Iteration 2
+Methods of public `readyUp()` method which will call other methods
+private methods such as:
+ 1. `lockGameBoard()`;
+ 2. `randomizeTurnState()`;
+ 3. `animateTurnState()`; 
+   a. If player goes first, animate to: `playerTurnState: 'player'`;
+    Initial state is opponent turn state, so no animation needed if
+    opponent goes first.
+ 4. Attach listeners to opponent gameboard
+   a. Toggle board pointer events (key in `bellumState`). This toggle 
+      will remove/add the classes to the gameboard elements that move 
+      active board up and down (or however I decided to animate it).
+
+ If opponent goes first, show "Your `opp(osition)` is preparing  
+ to fire...". This animation should show for `x` seconds if playing a 
+ bot or until the opposition makes a selection of a grid to attack.
+
+ This will be in the `bellum` fragment of the main container one hot 
+ swap container.
+
+ After selection is made (or 3 seconds have passed), the gameboard
+ UI will update to reflect the attack [dot if empty grid cell or 
+ add `cooked` class to ship unit that was hit (and increment its hit counter)].
+
+Toggle event listeners depending on the turn state.
+Animate ship opacity to 0 if fully cooked (sunk):
+``` typescript
+interface GameState {
+ playerTurnState: 'null' | 'player' |'opponent'; // null initially
+ gamePhase: 'parabellum' | 'bellum' | 'postBellum', // `parabellum` initially
+ . . .
+}
+```
+
+ **Note:** Some of the above is out of scope for this component, such as
+ gameboard updates and animations. This component will only handle
+ the locking of the gameboard and the transition to the next phase of the game.
+

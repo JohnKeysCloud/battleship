@@ -1,8 +1,7 @@
 import { BattleshipBoardController } from "../../logic/bs-gameboard-controller/bs-gameboard-controller";
 import { createElement } from "../../utilities/random-utilities";
 import { Fleet } from "../../types/logic-types";
-import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
-import GlobalEventBus from "../../utilities/event-bus";
+import GlobalEventBus from "../../utilities/event-bus"; // ? do i need this?
 import './ready-up-component.scss';
 
 export class ReadyUpButton {
@@ -13,9 +12,13 @@ export class ReadyUpButton {
 
   constructor(
     private id: string,
-    private gameboardContainer: HTMLElement,
+    private gameboardContainer: HTMLElement, 
+    // ? can use gameboard container to lock gameboard
     private gameboardController: BattleshipBoardController,
+    // ? can initialize gameboard controller to lock gameboard
+    // ? and proceed to next phase of game.
     private fleet: Fleet // do i need this for this button?
+    // ? can initialize ships and prepare to give and accept taps. (and also maybe can use fleet to lock ships)
   ) {
     // ! check for constructor errors
 
@@ -78,7 +81,7 @@ export class ReadyUpButton {
     return container;
   }
 
-  private readyUp() {
+  public readyUp() {
     console.log('Ready up button clicked');
 
     // handle component
