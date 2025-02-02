@@ -1,4 +1,4 @@
-import { CycloneLightboxController } from "../../utilities/cyclone-lightbox";
+import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import { InstructionsDialogComponent } from "../../components/instructions-dialog-component/instructions-dialog-component";
 
 export const instructionsDialog = new InstructionsDialogComponent();

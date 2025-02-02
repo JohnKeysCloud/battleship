@@ -1,4 +1,4 @@
-import { CycloneLightboxController } from "../../utilities/cyclone-lightbox";
+import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import { createElement, generateListFragment } from "../../utilities/random-utilities";
 import instructionsListItemTextContentArray from '../../../json/instructions-list-item-text-content.json';
 import './instructions-dialog-component.scss';
