@@ -138,11 +138,21 @@
 .ship-container {
   border: var(--ship-container-border-size) solid black;
   border-radius: 10vw;
-  cursor: auto;
+  cursor: pointer;
   display: grid;
   overflow: hidden;
   pointer-events: auto;
   position: relative;
+
+  &:not(.adrift):hover {
+    transition: transform 380ms ease-out;
+    transform: scale(1.05);
+  }
+
+  &:not(.adrift):active {
+    transition: transform 380ms ease-in-out;
+    transform: scale(1);
+  }
 
   &.adrift {
     cursor: grab;

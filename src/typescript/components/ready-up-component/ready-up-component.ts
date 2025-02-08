@@ -1,8 +1,12 @@
-import { BattleshipBoardController } from "../../logic/bs-gameboard-controller/bs-gameboard-controller";
 import { createElement } from "../../utilities/random-utilities";
-import { Fleet } from "../../types/logic-types";
-import GlobalEventBus from "../../utilities/event-bus"; // ? do i need this?
+import { PlayerGameboardComponent } from "../player-gameboard-component/player-gameboard-component";
+import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';
+
+interface GameState {
+  playerTurn: 'player' | 'opponent'; 
+  gamePhase: 'parabellum' | 'bellum' | 'postBellum';
+}
 
 export class ReadyUpButton {
   private readonly readyUpButton: HTMLButtonElement;
@@ -11,14 +15,8 @@ export class ReadyUpButton {
   private readonly buttonClass: string = 'ready-up-button';
 
   constructor(
-    private id: string,
-    private gameboardContainer: HTMLElement, 
-    // ? can use gameboard container to lock gameboard
-    private gameboardController: BattleshipBoardController,
-    // ? can initialize gameboard controller to lock gameboard
-    // ? and proceed to next phase of game.
-    private fleet: Fleet // do i need this for this button?
-    // ? can initialize ships and prepare to give and accept taps. (and also maybe can use fleet to lock ships)
+    private playerGameboardComponent: PlayerGameboardComponent,
+    private shipShufflerButton: ShipShufflerButtonComponent
   ) {
     // ! check for constructor errors
 
@@ -34,7 +32,6 @@ export class ReadyUpButton {
   private addEventListener(readyUpButton: HTMLButtonElement) {
     readyUpButton.addEventListener('click', () => {
       this.readyUp(); 
-      // this.updateGameboard(this.gameboardContainer); // ? this.lockGameBoard?
     });
   }
 
@@ -81,11 +78,19 @@ export class ReadyUpButton {
     return container;
   }
 
-  public readyUp() {
+  public async readyUp(): Promise<any> {
     console.log('Ready up button clicked');
 
-    // handle component
+    this.lockGameboard();
     // remove drag and click listeners from player gameboard
+    // remove `adrift` class from gameboard
+
+    // await this.randomizeTurnState(); // return Math.random() > 0.5 ? 'player' : 'opponent';
+
+    this.transitionToPhaseTwo();
+
+    // adjust game state
+
     // ? do i need this?
     // this.gameboardController.lockShips();
   }
@@ -104,7 +109,27 @@ export class ReadyUpButton {
   // 💭 --------------------------------------------------------------
   // 💭 Utilities
 
-  public getId() {
-    return this.id;
+  private lockGameboard() {
+    // remove event listners from gameboard
+    this.playerGameboardComponent.toggleGameboardContainerEventListeners();
+
+    // remove draggable attr from ships
+    this.playerGameboardComponent.toggleShipsDraggable();
+
+    // remove `adrift` class from gameboard
+    this.playerGameboardComponent.toggleShipAdriftClass();
+
+    this.shipShufflerButton.toggleEventListener();
+
+    // what else bitch?
+    // remove listener from shuffle button 
   }
+
+  private transitionToPhaseTwo() {
+    // change game phase state to bellum
+    //
+
+  }
+
+
 }

@@ -9,13 +9,18 @@ export class ShipShufflerButtonComponent {
   private readonly shipShufflerButton: HTMLButtonElement;
   private readonly shipShufflerButtonContainer: HTMLDivElement;
   private readonly shipShufflerButtonTextContent: string = 'Shuffle';
-  private readonly buttonClass: string = 'ship-shuffler-button'
+  private readonly buttonClass: string = 'ship-shuffler-button';
+  #listenerAttached: boolean = false;
+  private readonly shuffleShips: () => void = () => {
+    this.randomizeGameboard();
+    this.updateGameboard(this.gameboardContainer);
+  };
 
   constructor(
     private id: string,
     private gameboardContainer: HTMLElement,
     private gameboardController: BattleshipBoardController,
-    private fleet: Fleet,
+    private fleet: Fleet
   ) {
     this.shipShufflerButton = this.createshipShufflerButton(
       `${this.id}-${this.buttonClass}`,
@@ -23,7 +28,7 @@ export class ShipShufflerButtonComponent {
     );
     this.shipShufflerButton.classList.add(this.buttonClass);
     this.shipShufflerButton.textContent = this.shipShufflerButtonTextContent;
-    this.addEventListener(this.shipShufflerButton);
+    this.toggleEventListener();
 
     this.shipShufflerButtonContainer = this.createshipShufflerButtonContainer();
     this.shipShufflerButtonContainer.appendChild(this.shipShufflerButton);
@@ -37,15 +42,18 @@ export class ShipShufflerButtonComponent {
     targetElement.appendChild(this.shipShufflerButtonContainer);
   }
 
+  public toggleEventListener() {
+    if (this.#listenerAttached === true) {
+      this.shipShufflerButton.removeEventListener('click', this.shuffleShips)
+      this.#listenerAttached = false;
+    } else {
+      this.shipShufflerButton.addEventListener('click', this.shuffleShips);
+      this.#listenerAttached = true;
+    }
+  }
+
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
-
-  private addEventListener(shipShufflerButton: HTMLButtonElement) {
-    shipShufflerButton.addEventListener('click', () => {
-      this.randomizeGameboard();
-      this.updateGameboard(this.gameboardContainer);
-    });
-  }
 
   private createshipShufflerButton(
     id: string,

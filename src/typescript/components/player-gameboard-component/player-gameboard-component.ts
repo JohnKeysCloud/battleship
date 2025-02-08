@@ -32,13 +32,40 @@ import {
 import './player-gameboard-component.scss';
 import './player-gameboard-animations.scss';
 
+
 export class PlayerGameboardComponent {
   public id: string = 'player';
+
+  // 💭 Elements
   public gameboardContainer: HTMLElement;
   private gameboard: DocumentFragment;
   private fleetElements: Set<HTMLDivElement> = new Set();
   private dragImage: HTMLImageElement;
   private shipDragClone: HTMLDivElement;
+
+  // 💭 Event listeners
+  private listenersAdded: boolean = false;
+  private dragState: DragState = {
+    currentShipInstance: null,
+    initialPlacementConfigurations: null,
+    isValidDropTarget: false,
+    currentDragOverCell: null,
+    cloneSnapOffset: null,
+    shipBorderValueSplit: null,
+  };
+
+  private dragEventCallbacks: Record<string, (e: DragEvent) => void> = {
+    dragstart: (e: DragEvent) => this.handleShipDragStart(e, this.dragState),
+    drag: (e: DragEvent) => this.handleShipDrag(e, this.dragState),
+    dragenter: (e: DragEvent) => this.handleShipDragEnter(e),
+    dragleave: (e: DragEvent) => this.handleShipDragLeave(e),
+    dragover: (e: DragEvent) => this.handleShipDragOver(e, this.dragState),
+    drop: (e: DragEvent) => this.handleShipDrop(e, this.dragState),
+    dragend: (e: DragEvent) => this.handleShipDragEnd(e, this.dragState),
+  };
+  private rotateShipOnClick = (e: MouseEvent): void => {
+    this.handleShipRotation(e);
+  };
 
   constructor(public readonly playerState: PlayerState) {
     this.gameboardContainer = this.generateBoardContainer(
@@ -73,9 +100,41 @@ export class PlayerGameboardComponent {
       this.playerState.fleetBuilder,
       this.fleetElements
     );
+    this.toggleGameboardContainerEventListeners();
 
     targetElement.appendChild(this.gameboardContainer);
   }
+  
+  public toggleGameboardContainerEventListeners(): void {
+    if (!this.gameboardContainer) return;
+
+    const method = this.listenersAdded
+    ? 'removeEventListener'
+    : 'addEventListener';
+    
+    Object.entries(this.dragEventCallbacks).forEach(([event, callback]) => {
+      this.gameboardContainer[method](event, callback as EventListener);
+    });
+
+    // Toggle ship rotation event
+    this.gameboardContainer[method]('click', this.rotateShipOnClick as EventListener);
+
+    this.listenersAdded = !this.listenersAdded;
+  }
+  
+  public toggleShipsDraggable(): void {    
+    this.fleetElements.forEach((shipElement) => {
+      shipElement.removeAttribute('draggable');
+    });
+  }
+
+  public toggleShipAdriftClass(): void {
+    this.fleetElements.forEach((shipElement) => {
+      console.log(shipElement);
+      shipElement.classList.remove('adrift');
+    });
+  }
+
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
@@ -195,9 +254,6 @@ export class PlayerGameboardComponent {
     );
 
     gameboardContainer.style.setProperty('--grid-size', boardSize.toString());
-
-    this.handleDragListeners(gameboardContainer);
-    this.handleClickListeners(gameboardContainer);
 
     return gameboardContainer;
   }
@@ -362,40 +418,6 @@ export class PlayerGameboardComponent {
 
   // 💭 --------------------------------------------------------------
   // 💭 HTML Drag and Drop API (Repositioning)
-
-  private handleDragListeners(gameboardContainer: HTMLElement) {
-    const dragState: DragState = {
-      currentShipInstance: null,
-      initialPlacementConfigurations: null,
-      isValidDropTarget: false,
-      currentDragOverCell: null,
-      cloneSnapOffset: null,
-      shipBorderValueSplit: null,
-    };
-
-    // Save each as function
-    gameboardContainer.addEventListener('dragstart', (e: DragEvent) => {
-      this.handleShipDragStart(e, dragState);
-    });
-    gameboardContainer.addEventListener('drag', (e: DragEvent) => {
-      this.handleShipDrag(e, dragState);
-    });
-    gameboardContainer.addEventListener('dragenter', (e: DragEvent) => {
-      this.handleShipDragEnter(e);
-    });
-    gameboardContainer.addEventListener('dragleave', (e: DragEvent) => {
-      this.handleShipDragLeave(e);
-    });
-    gameboardContainer.addEventListener('dragover', (e: DragEvent) => {
-      this.handleShipDragOver(e, dragState);
-    });
-    gameboardContainer.addEventListener('drop', (e: DragEvent) => {
-      this.handleShipDrop(e, dragState);
-    });
-    gameboardContainer.addEventListener('dragend', (e: DragEvent) => {
-      this.handleShipDragEnd(e, dragState);
-    });
-  }
 
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
     if (
@@ -787,7 +809,7 @@ export class PlayerGameboardComponent {
       const cellFeedbackClass: string = isValidDropTarget
         ? 'placement-is-valid'
         : 'placement-is-invalid';
-      
+
       // Set dragging attribute to false
       shipContainerElement.setAttribute('data-dragging', 'false');
 
@@ -858,12 +880,6 @@ export class PlayerGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 Handle Ship Click (Rotation)
 
-  private handleClickListeners(gameboardContainer: HTMLElement) {
-    gameboardContainer.addEventListener('click', (e: MouseEvent) => {
-      this.handleShipRotation(e);
-    });
-  }
-
   private handleShipRotation(e: MouseEvent) {
     if (
       !(e.target instanceof HTMLDivElement) ||
@@ -886,12 +902,7 @@ export class PlayerGameboardComponent {
   }
 
   // 💭 -------------------------------------------------------------
-  // 💭 Remove all listeners bitch
-
-  private removeAllEventListeners() {
-    this.gameboardContainer
-
-  }
+  // -
 
   // 💭 --------------------------------------------------------------
   // 💭 Utilities

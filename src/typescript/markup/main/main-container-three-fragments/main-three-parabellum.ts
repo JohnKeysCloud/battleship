@@ -17,11 +17,9 @@ export function createMainThreeParabellumFragment(
     fleet
   );
   
-  const lockShipsButton = new ReadyUpButton(
-    playerGameboardComponent.id,
-    playerGameboardComponent.gameboardContainer,
-    gameboardController,
-    fleet
+  const readyUpButton = new ReadyUpButton(
+    playerGameboardComponent,
+    shipShufflerButton
   );
   
   const mainContainerThreeParabellumWrapper: HTMLDivElement = createElement(
@@ -32,7 +30,7 @@ export function createMainThreeParabellumFragment(
     }
   );
   shipShufflerButton.render(mainContainerThreeParabellumWrapper);
-  lockShipsButton.render(mainContainerThreeParabellumWrapper);
+  readyUpButton.render(mainContainerThreeParabellumWrapper);
 
   const parabellumFragment = new DocumentFragment();
   parabellumFragment.appendChild(mainContainerThreeParabellumWrapper);
