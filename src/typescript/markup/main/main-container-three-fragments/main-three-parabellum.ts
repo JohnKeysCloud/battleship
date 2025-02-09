@@ -2,8 +2,8 @@ import { PlayerGameboardComponent } from "../../../components/player-gameboard-c
 import { BattleshipBoardController } from "../../../logic/bs-gameboard-controller/bs-gameboard-controller";
 import { Fleet } from "../../../types/logic-types";
 import { createElement } from "../../../utilities/random-utilities";
-import { ShipShufflerButtonComponent } from "../../../components/ship-shuffler-component/ship-shuffler-component";
-import { ReadyUpButton } from "../../../components/ready-up-component/ready-up-component";
+import { ShipShufflerButtonComponent } from "../../../components/buttons/ship-shuffler-component/ship-shuffler-component";
+import { ReadyUpButton } from "../../../components/buttons/ready-up-component/ready-up-component";
 
 export function createMainThreeParabellumFragment(
   playerGameboardComponent: PlayerGameboardComponent,
