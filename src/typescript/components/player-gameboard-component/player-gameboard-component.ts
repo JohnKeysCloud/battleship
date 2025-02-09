@@ -130,7 +130,6 @@ export class PlayerGameboardComponent {
 
   public toggleShipAdriftClass(): void {
     this.fleetElements.forEach((shipElement) => {
-      console.log(shipElement);
       shipElement.classList.remove('adrift');
     });
   }

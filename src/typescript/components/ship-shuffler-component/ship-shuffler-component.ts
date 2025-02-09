@@ -10,8 +10,9 @@ export class ShipShufflerButtonComponent {
   private readonly shipShufflerButtonContainer: HTMLDivElement;
   private readonly shipShufflerButtonTextContent: string = 'Shuffle';
   private readonly buttonClass: string = 'ship-shuffler-button';
+
   #listenerAttached: boolean = false;
-  private readonly shuffleShips: () => void = () => {
+  private shuffleShips: () => void = () => {
     this.randomizeGameboard();
     this.updateGameboard(this.gameboardContainer);
   };
