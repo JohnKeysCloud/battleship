@@ -9,7 +9,7 @@ export function createMainOneParabellumFragment(): DocumentFragment {
 
   const informationImage = createElement('img', [], {
     id: 'information-image',
-    src: 'https://cdn-icons-png.flaticon.com/512/63/63830.png',
+    src: 'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/information-icon.png',
   });
 
   // ? to open instructions modal
