@@ -13,7 +13,7 @@ export class ReadyUpButton {
   private readonly readyUpButton: HTMLButtonElement;
   private readonly readyUpButtonContainer: HTMLDivElement;
   private readonly readyUpButtonTextContent: string = 'Ready Up';
-  private readonly buttonClass: string = 'ready-up-button';
+  private readonly buttonId: string = 'ready-up-button';
 
   #listenerAttached: boolean = false;
 
@@ -30,9 +30,8 @@ export class ReadyUpButton {
     private playerGameboardComponent: PlayerGameboardComponent,
     private shipShufflerButton: ShipShufflerButtonComponent
   ) {
-    this.readyUpButton = this.createReadyUpButton(this.buttonClass);
+    this.readyUpButton = this.createReadyUpButton(this.buttonId);
 
-    this.readyUpButton.classList.add(this.buttonClass);
     this.toggleEventListener();
 
     this.readyUpButtonContainer = this.createReadyUpButtonContainer();

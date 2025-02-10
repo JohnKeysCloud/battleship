@@ -1,8 +1,8 @@
-.ready-up-button {
+#ready-up-button {
   --size: 75px;
 
   aspect-ratio: 13 / 9; // aspect ratio of inactive SVG
-  color: ghostwhite;
+  color: #f8f8ff;
   height: auto;
   position: relative;
   width: var(--size);
