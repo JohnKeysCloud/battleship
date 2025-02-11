@@ -1,4 +1,3 @@
-import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import { createElement, generateListFragment } from "../../utilities/random-utilities";
 import instructionsListItemTextContentArray from '../../../json/instructions-list-item-text-content.json';
 import './instructions-dialog-component.scss';
@@ -104,10 +103,3 @@ export class InstructionsDialogComponent {
     targetElement.appendChild(this.instructionsDialog);
   }
 }
-
-export const instructionsDialog = new InstructionsDialogComponent();
-
-export const instructionsLightboxController = new CycloneLightboxController(
-  instructionsDialog.element,
-  'instructions-dialog-close-button'
-);

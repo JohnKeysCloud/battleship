@@ -99,17 +99,6 @@ main {
       display: flex;
       gap: 1.5rem;
       justify-content: center;
-      
-      #information-button-container {
-        display: grid;
-        place-items: center;
-
-        #information-button {
-          filter: invert(1);
-          height: 1.5rem;
-          width: 1.5rem;
-        }
-      }
     }
 
     // .bellum {

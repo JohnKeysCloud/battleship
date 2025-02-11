@@ -1,0 +1,10 @@
+#instructions-button-container {
+  display: grid;
+  place-items: center;
+
+  #instructions-button {
+    filter: invert(1);
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+}
