@@ -1,15 +1,16 @@
 import { createElement } from "../../../utilities/random-utilities";
 import { PlayerGameboardComponent } from "../../player-gameboard-component/player-gameboard-component";
+import { InstructionsComponent } from "../instructions-component/instructions-component";
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';
 
-// move to `state` folder
+// TODO: move to `state` folder and implement
 interface GameState {
   playerTurn: 'player' | 'opponent'; 
   gamePhase: 'parabellum' | 'bellum' | 'postBellum';
 }
 
-export class ReadyUpButton {
+export class ReadyUpButtonComponent {
   private readonly readyUpButton: HTMLButtonElement;
   private readonly readyUpButtonContainer: HTMLDivElement;
   private readonly readyUpButtonTextContent: string = 'Ready Up';
@@ -28,7 +29,8 @@ export class ReadyUpButton {
 
   constructor(
     private playerGameboardComponent: PlayerGameboardComponent,
-    private shipShufflerButton: ShipShufflerButtonComponent
+    private shipShufflerButton: ShipShufflerButtonComponent,
+    private instructionsButton: InstructionsComponent
   ) {
     this.readyUpButton = this.createReadyUpButton(this.buttonId);
 
@@ -112,10 +114,11 @@ export class ReadyUpButton {
 
   private removeParabellumButtonListeners() {
     // TODO:
-    // create instructions button component
-    // import into main container one parabellum fragment and render
+    // create instructions button component ✅
+    // import into main container one parabellum fragment and render ✅
     // access instructions button component & remove instructions button listener
     this.shipShufflerButton.toggleEventListener();
+    this.instructionsButton.toggleEventListener();
     this.toggleEventListener();
   }
 

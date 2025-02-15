@@ -1,14 +1,13 @@
 import { InstructionsComponent } from "../../../components/buttons/instructions-component/instructions-component";
 import { createElement } from "../../../utilities/random-utilities";
-import { instructionsLightboxController } from "../../lightboxes/instructions-dialog";
 
 // 💭 Main Container One Parabellum: Heading and Help Button
 
-export function createMainOneParabellumFragment(): DocumentFragment {
+export function createMainOneParabellumFragment(
+  instructionsButton: InstructionsComponent
+): DocumentFragment {
   const parabellumHeading = createElement('h2');
   parabellumHeading.textContent = 'Parabellum';
-
-  const instructionsButton = new InstructionsComponent(instructionsLightboxController);
 
   const mainContainerOneParabellumWrapper: HTMLDivElement = createElement(
     'div',
