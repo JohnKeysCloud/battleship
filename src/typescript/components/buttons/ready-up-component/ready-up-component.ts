@@ -4,12 +4,6 @@ import { InstructionsComponent } from "../instructions-component/instructions-co
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';
 
-// TODO: move to `state` folder and implement
-interface GameState {
-  playerTurn: 'player' | 'opponent'; 
-  gamePhase: 'parabellum' | 'bellum' | 'postBellum';
-}
-
 export class ReadyUpButtonComponent {
   private readonly readyUpButton: HTMLButtonElement;
   private readonly readyUpButtonContainer: HTMLDivElement;
@@ -23,7 +17,7 @@ export class ReadyUpButtonComponent {
     this.removeParabellumButtonListeners();
 
     // TODO:
-    await this.randomizeTurnState(); // return Math.random() > 0.5 ? 'player' : 'opponent';
+    await this.randomizeTurnState(); 
     await this.transitionToBellum(); 
   };
 
@@ -109,14 +103,11 @@ export class ReadyUpButtonComponent {
   }
 
   private async randomizeTurnState() {
-    console.log('buttpoop');
+    // return Math.random() > 0.5 ? 'player' : 'opponent';
+    console.log(Math.random() > 0.5);
   }
 
   private removeParabellumButtonListeners() {
-    // TODO:
-    // create instructions button component ✅
-    // import into main container one parabellum fragment and render ✅
-    // access instructions button component & remove instructions button listener
     this.shipShufflerButton.toggleEventListener();
     this.instructionsButton.toggleEventListener();
     this.toggleEventListener();
@@ -125,5 +116,15 @@ export class ReadyUpButtonComponent {
   private async transitionToBellum() {
     // change game phase state to bellum
     console.log('poopbutt');
+
+    // HotSwap mainContainerOne to bellum
+    // HotSwap mainContainerThree to bellum
+
+
+    // if (gameState.currentPlayer === 'opponent') {
+    //  add `opponent-turn` class to mainContainerTwo
+    // (this class will be toggled on and off as the turn changes)
+    // }
+    //
   }
 }

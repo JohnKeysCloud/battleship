@@ -1,16 +1,30 @@
 import { initApp } from './typescript/meta/init-app';
-import { createDOM } from './typescript/meta/create-dom';
+import { DOMController } from './typescript/meta/dom-controller';
 
-function pressStart() {
-  console.time('initApp');
-  initApp();
-  console.timeEnd('initApp');
+class App {
+  public readonly domController: DOMController;
 
-  console.time('createDOM');
-  createDOM();
-  console.timeEnd('createDOM');
+  private constructor() {
+    this.domController = new DOMController();
+  }
+
+  public static powerOn() {
+    console.time('Loading');
+    initApp(); 
+    console.timeEnd('Loading');
+
+    return new App();
+  }
+
+  public pressStart() {
+    this.domController.render();
+  }
 }
 
+console.time('powerOn');
+const app = App.powerOn();
+console.timeEnd('powerOn');
+
 console.time('pressStart');
-pressStart();
+app.pressStart();
 console.timeEnd('pressStart');
