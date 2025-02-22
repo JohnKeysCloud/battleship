@@ -1,6 +1,6 @@
-import { BattleshipFleetBuilder } from '../../logic/bs-fleet-builder/bs-fleet-builder';
-import { BattleshipBoardController } from '../../logic/bs-gameboard-controller/bs-gameboard-controller';
-import { GridPlacementValue } from '../../types/css-types';
+import { BattleshipFleetBuilder } from '../../../logic/bs-fleet-builder/bs-fleet-builder';
+import { BattleshipBoardController } from '../../../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { GridPlacementValue } from '../../../types/css-types';
 import {
   Coordinates,
   CoordinatesArray,
@@ -11,19 +11,19 @@ import {
   ShipSymbolValue,
   ShipSymbolValueArray,
   ShipType,
-} from '../../types/logic-types';
-import { PlayerState } from '../../types/state-types';
-import GlobalEventBus from '../../utilities/event-bus';
+} from '../../../types/logic-types';
+import { PlayerState } from '../../../types/state-types';
+import GlobalEventBus from '../../../utilities/event-bus';
 import {
   isOrientation,
   isShipLength,
   isShipType,
-} from '../../utilities/logic-utilities';
+} from '../../../utilities/logic-utilities';
 import {
   areArraysEqual,
   createElement,
   getConvertedTypeFromAttr,
-} from '../../utilities/random-utilities';
+} from '../../../utilities/random-utilities';
 import {
   CloneSnapOffset,
   DragState,

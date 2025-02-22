@@ -115,13 +115,31 @@ main {
     place-items: center;
     position: relative;
 
+    &.opponent-turn {
+      #player-gameboard-container {
+        opacity: 0.5;
+        pointer-events: none;
+        // position: absolute;
+        transform: scale(0.8) translateY(60px);
+        z-index: -1;
+      }
+
+      #opponent-gameboard-container {
+        opacity: 1;
+        pointer-events: auto;
+        position: absolute;
+        transform: scale(1) translateY(0);
+        z-index: 1;
+      }
+    }
     #opponent-gameboard-container {
       opacity: 0.5;
       pointer-events: none;
       position: absolute;
-      transform: scale(0.8) translateY(8vh);
+      transform: scale(0.8) translateY(60px);
       z-index: -1;
     }
+
   }
 
   #main-container-three {

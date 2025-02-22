@@ -2,11 +2,11 @@ import {
   Gameboard,
   ShipSymbolValue,
   ShipSymbolValueArray
-} from '../../types/logic-types';
+} from '../../../types/logic-types';
 import {
   createElement
-} from '../../utilities/random-utilities';
-import { PlayerState } from '../../types/state-types';
+} from '../../../utilities/random-utilities';
+import { PlayerState } from '../../../types/state-types';
 
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';

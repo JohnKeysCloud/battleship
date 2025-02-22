@@ -1,11 +1,14 @@
 import { initApp } from './typescript/meta/init-app';
 import { DOMController } from './typescript/meta/dom-controller';
+import { GameState } from './typescript/state/game-state';
 
 class App {
   public readonly domController: DOMController;
+  public readonly gameState: GameState;
 
   private constructor() {
-    this.domController = new DOMController();
+    this.gameState = new GameState();
+    this.domController = new DOMController(this.gameState);
   }
 
   public static powerOn() {
@@ -22,7 +25,7 @@ class App {
 }
 
 console.time('powerOn');
-const app = App.powerOn();
+export const app = App.powerOn();
 console.timeEnd('powerOn');
 
 console.time('pressStart');

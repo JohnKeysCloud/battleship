@@ -9,3 +9,6 @@ export interface PlayerState {
   gameboardRepository: BattleshipBoardRepository;
   fleetBuilder: BattleshipFleetBuilder;
 };
+
+export type CurrentPlayer = 'player' | 'opponent' | null;
+export type GamePhase = 'parabellum' | 'bellum' | 'postBellum';

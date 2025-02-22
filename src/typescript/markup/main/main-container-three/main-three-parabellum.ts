@@ -1,6 +1,6 @@
 import { createElement } from "../../../utilities/random-utilities";
-import { ShipShufflerButtonComponent } from "../../../components/buttons/ship-shuffler-component/ship-shuffler-component";
-import { ReadyUpButtonComponent } from "../../../components/buttons/ready-up-component/ready-up-component";
+import { ShipShufflerButtonComponent } from "../../components/buttons/ship-shuffler-component/ship-shuffler-component";
+import { ReadyUpButtonComponent } from "../../components/buttons/ready-up-component/ready-up-component";
 
 export function createMainThreeParabellumFragment(
   shipShufflerButton: ShipShufflerButtonComponent,

@@ -1,4 +1,4 @@
-import { InstructionsComponent } from "../../../components/buttons/instructions-component/instructions-component";
+import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";
 import { createElement } from "../../../utilities/random-utilities";
 
 // 💭 Main Container One Parabellum: Heading and Help Button

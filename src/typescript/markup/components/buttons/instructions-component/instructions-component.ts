@@ -1,6 +1,6 @@
 //  get details from main one parabellum fragment and render
-import { createElement } from "../../../utilities/random-utilities";
-import { CycloneLightboxController } from "../../../utilities/cycloneLightbox.ts/cyclone-lightbox";
+import { createElement } from "../../../../utilities/random-utilities";
+import { CycloneLightboxController } from "../../../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import './instructions-component.scss';
 
 export class InstructionsComponent {

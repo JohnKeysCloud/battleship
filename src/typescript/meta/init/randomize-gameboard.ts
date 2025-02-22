@@ -1,5 +1,5 @@
-import { randomizeBSGameboard } from "../setup/randomize-bs-gameboard";
-import { players } from "../state/player-state";
+import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
+import { players } from "../../state/player-state";
 
 export const randomizeBSGameboards = () => {
   randomizeBSGameboard(

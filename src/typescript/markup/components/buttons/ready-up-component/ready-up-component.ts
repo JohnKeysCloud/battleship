@@ -1,4 +1,4 @@
-import { createElement } from "../../../utilities/random-utilities";
+import { createElement } from "../../../../utilities/random-utilities";
 import { PlayerGameboardComponent } from "../../player-gameboard-component/player-gameboard-component";
 import { InstructionsComponent } from "../instructions-component/instructions-component";
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
@@ -12,19 +12,17 @@ export class ReadyUpButtonComponent {
 
   #listenerAttached: boolean = false;
 
-  private readonly readyUp: () => Promise<any> = async () => { // TODO: replace any with GameState?
+  private readonly readyUp: () => void = () => { // TODO: replace any with GameState?
     this.anchorShips();
     this.removeParabellumButtonListeners();
-
-    // TODO:
-    await this.randomizeTurnState(); 
-    await this.transitionToBellum(); 
+    this.transitionToBellum(); 
   };
 
   constructor(
     private playerGameboardComponent: PlayerGameboardComponent,
     private shipShufflerButton: ShipShufflerButtonComponent,
-    private instructionsButton: InstructionsComponent
+    private instructionsButton: InstructionsComponent,
+    private transitionToNextPhase: () => void
   ) {
     this.readyUpButton = this.createReadyUpButton(this.buttonId);
 
@@ -102,29 +100,13 @@ export class ReadyUpButtonComponent {
     return container;
   }
 
-  private async randomizeTurnState() {
-    // return Math.random() > 0.5 ? 'player' : 'opponent';
-    console.log(Math.random() > 0.5);
-  }
-
   private removeParabellumButtonListeners() {
     this.shipShufflerButton.toggleEventListener();
     this.instructionsButton.toggleEventListener();
     this.toggleEventListener();
   }
 
-  private async transitionToBellum() {
-    // change game phase state to bellum
-    console.log('poopbutt');
-
-    // HotSwap mainContainerOne to bellum
-    // HotSwap mainContainerThree to bellum
-
-
-    // if (gameState.currentPlayer === 'opponent') {
-    //  add `opponent-turn` class to mainContainerTwo
-    // (this class will be toggled on and off as the turn changes)
-    // }
-    //
+  private transitionToBellum() {
+    this.transitionToNextPhase();
   }
 }

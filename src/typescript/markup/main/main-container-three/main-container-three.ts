@@ -2,21 +2,22 @@ import { players } from "../../../state/player-state";
 
 import { FragmentKey } from "../../../types/markup-types";
 
-import { PlayerGameboardComponent } from "../../../components/player-gameboard-component/player-gameboard-component";
-import { InstructionsComponent } from "../../../components/buttons/instructions-component/instructions-component";
-import { ShipShufflerButtonComponent } from "../../../components/buttons/ship-shuffler-component/ship-shuffler-component";
-import { ReadyUpButtonComponent } from "../../../components/buttons/ready-up-component/ready-up-component";
+import { PlayerGameboardComponent } from "../../components/player-gameboard-component/player-gameboard-component";
+import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";
+import { ShipShufflerButtonComponent } from "../../components/buttons/ship-shuffler-component/ship-shuffler-component";
+import { ReadyUpButtonComponent } from "../../components/buttons/ready-up-component/ready-up-component";
 
 import { createMainThreeParabellumFragment } from "./main-three-parabellum";
 import { createMainThreeBellumFragment } from "./main-three-bellum";
 import { createMainThreePostBellumFragment } from "./main-three-post-bellum";
 
-import { HotSwapContainer } from "../../../utilities/create-hot-swap-container";
+import { CycloneHotSwapContainer } from "../../../utilities/cycloneHotSwapContainer";
 
 export function createMainContainerThree(
   playerGameboardComponent: PlayerGameboardComponent,
-  instructionsButton: InstructionsComponent
-): HotSwapContainer {
+  instructionsButton: InstructionsComponent,
+  transitionToNextPhase: () => void
+): CycloneHotSwapContainer {
   const playerGameboardController = players.player.gameboardController;
   const playerFleet = players.player.fleetBuilder.fleet;
 
@@ -30,7 +31,8 @@ export function createMainContainerThree(
   const readyUpButton = new ReadyUpButtonComponent(
     playerGameboardComponent,
     shipShufflerButton,
-    instructionsButton
+    instructionsButton,
+    transitionToNextPhase,
   );
 
   const mainThreeFragments: { [key in FragmentKey]: DocumentFragment } = {
@@ -41,7 +43,7 @@ export function createMainContainerThree(
     bellum: createMainThreeBellumFragment(),
     postBellum: createMainThreePostBellumFragment(),
   };
-  const mainContainerThree = new HotSwapContainer(
+  const mainContainerThree = new CycloneHotSwapContainer(
     'section',
     mainThreeFragments,
     'parabellum',
