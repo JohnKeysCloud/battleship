@@ -10,5 +10,6 @@ export interface PlayerState {
   fleetBuilder: BattleshipFleetBuilder;
 };
 
-export type CurrentPlayer = 'player' | 'opponent' | null;
+export type PlayerType = 'player' | 'opponent';
+export type CurrentPlayer = PlayerType | null;
 export type GamePhase = 'parabellum' | 'bellum' | 'postBellum';

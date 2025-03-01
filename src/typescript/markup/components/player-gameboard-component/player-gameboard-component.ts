@@ -18,7 +18,7 @@ import {
   isOrientation,
   isShipLength,
   isShipType,
-} from '../../../utilities/logic-utilities';
+} from '../../../types/type-guards';
 import {
   areArraysEqual,
   createElement,

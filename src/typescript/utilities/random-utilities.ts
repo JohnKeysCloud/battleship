@@ -3,6 +3,8 @@ export const areArraysEqual = <T>(arrayOne: T[], arrayTwo: T[]) =>
   &&
   arrayOne.every((value, index) => value === arrayTwo[index]);
 
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
 export const getConvertedTypeFromAttr = <T extends string>(
   element: HTMLElement,
   attribute: string,

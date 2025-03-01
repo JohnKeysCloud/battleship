@@ -14,7 +14,7 @@ import {
 } from '../utilities/random-utilities';
 import { BattleshipBuilder } from '../logic/bs-ship-builder/bs-ship-builder';
 import { BattleshipBoardController } from '../logic/bs-gameboard-controller/bs-gameboard-controller';
-import { isShipType } from '../utilities/logic-utilities';
+import { isShipType } from '../types/type-guards';
 
 export function randomizeBSGameboard(
   gameboardController: BattleshipBoardController, fleet: Fleet

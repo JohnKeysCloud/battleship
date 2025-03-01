@@ -31,14 +31,15 @@ import {
   arePositionsEqual,
   createAxisArrayKey,
   createPositionObject,
+  isPositionInBounds,
+} from '../../utilities/logic-utilities';
+import {
   isAngleOfRotation,
   isOutOfBounds,
   isPlacePieceParams,
-  isPositionInBounds,
   isPositionsArray,
   isShipSymbolDescription,
-  isShipType
-} from '../../utilities/logic-utilities';
+} from '../../types/type-guards';
 import { getValidShipPositions } from './abstracted-method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './abstracted-method-callbacks/place-ship/place-ship';
 

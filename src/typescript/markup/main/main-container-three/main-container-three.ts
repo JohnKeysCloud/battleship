@@ -46,7 +46,7 @@ export function createMainContainerThree(
   const mainContainerThree = new CycloneHotSwapContainer(
     'section',
     mainThreeFragments,
-    'parabellum',
+    'bellum', // ? revert to 'parabellum' when ready
     ['main-container'],
     {
       id: 'main-container-three',
