@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'Cyclone';
+  font-family: 'cyclone';
   src: url('https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_cyclone-studios/fonts/cyclone/cyclone.woff2') format('woff2');
 }
 
@@ -23,6 +23,7 @@
   --color-sue: #9d199d;
   --color-funky: #7fff00;
   --color-pacman: #ffea54;
+  --color-edible-ghost: #2121DE;
 }
 
 *,
@@ -161,26 +162,6 @@ img {
   image-rendering: crisp-edges;
 }
 
-button:focus,
-dialog:focus {
-  outline: none;
-}
-
-button:focus-visible,
-dialog:focus-visible {
-  outline: revert;
-}
-
-/* Remove outline from buttons inside dialog when focused */
-dialog:focus button,
-dialog:focus-visible button {
-  outline: none;
-
-  &:focus-visible {
-    outline: revert; /* Restore outline for keyboard navigation */
-  }
-}
-
 button {
   background-color: transparent;
   border: none;
@@ -192,6 +173,7 @@ picture img {
   object-fit: contain;
 }
 
+/* change colours to suit your needs */
 ins {
   background-color: #ff9;
   color: #000;
@@ -244,6 +226,15 @@ em {
   font-style: italic;
 }
 
+.accessibility {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -267,20 +258,11 @@ input:-webkit-autofill:active {
   }
 }
 
-/* * UTILITIES */
-
-.accessibility {
-  position: absolute;
-  left: -9999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
 .cyclone-font {
   padding-left: 0.5rem;
 }
+
+/* * UTILITIES */
 
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */

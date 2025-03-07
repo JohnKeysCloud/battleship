@@ -25,12 +25,6 @@ export function createMainThreeBellumFragment(): DocumentFragment {
     fleetStatusContainer.appendChild(fleetStatusHeading);
 
     Object.values(fleet).forEach((ship) => {
-      const shipHitCounterLabel = createElement('span', [
-        'hit-counter-label',
-        `${playerType}-hit-counter-label`,
-      ]);
-      shipHitCounterLabel.textContent = `${ship.type}:`;
-
       const hitCounterContainer: HTMLDivElement = createElement(
         'div',
         ['hit-counter-container', `${ship.type}-hit-counter-container`],
@@ -49,13 +43,7 @@ export function createMainThreeBellumFragment(): DocumentFragment {
         hitCounterContainer.append(hitCounterElement);
       }
 
-      const shipStatusContainer: HTMLDivElement = createElement('div', [
-        'ship-status-container',
-        `${ship.type}-status-container`,
-      ]);
-      shipStatusContainer.append(shipHitCounterLabel, hitCounterContainer);
-
-      fleetStatusContainer.appendChild(shipStatusContainer);
+      fleetStatusContainer.appendChild(hitCounterContainer);
     });
 
     return fleetStatusContainer
@@ -72,10 +60,27 @@ export function createMainThreeBellumFragment(): DocumentFragment {
     }
   );
 
+  const shipLabelListItemsFragment = new DocumentFragment();
+  Object.values(players.player.fleetBuilder.fleet).map(ship => {
+    const shipLabelListElement = createElement('li', ['ship-hit-counter-label'], { id: `${ship.type}-hit-counter-label` });
+    shipLabelListElement.textContent = ship.type;
+    
+    shipLabelListItemsFragment.appendChild(shipLabelListElement);
+  });
+
+  const shipLabelList = createElement('div', [], { id: 'ship-label-list' });
+  shipLabelList.appendChild(shipLabelListItemsFragment);
+
   const mainContainerThreeBellumWrapper = createElement('div', ['bellum'], {
     id: 'main-container-three-bellum',
   });
-  mainContainerThreeBellumWrapper.append(...fleetStatusContainers);
+
+  const [playerOneFleetStatusContainer, playerTwoFleetStatusContainer] = fleetStatusContainers;
+  mainContainerThreeBellumWrapper.append(
+    playerOneFleetStatusContainer,
+    shipLabelList,
+    playerTwoFleetStatusContainer
+  );
 
   const bellumFragment = new DocumentFragment();
   bellumFragment.appendChild(mainContainerThreeBellumWrapper);
