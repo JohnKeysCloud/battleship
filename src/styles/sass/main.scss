@@ -91,11 +91,10 @@ main {
   gap: 2rem;
 
   // .main-container {
-    // ?
+  // ?
   // }
 
   #main-container-one {
-
     .parabellum {
       align-items: center;
       display: flex;
@@ -104,34 +103,39 @@ main {
     }
 
     // .bellum {
-      // ?
+    // ?
     // }
 
     // .post-bellum {
-      // ?
-    // } 
+    // ?
+    // }
   }
 
   #main-container-two {
     display: grid;
     place-items: center;
     position: relative;
-    
+
+    #player-gameboard-container {
+      position: relative;
+      z-index: 1;
+    }
+
     #opponent-gameboard-container {
-      opacity: 0.5;
+      opacity: 1;
       pointer-events: none;
       position: absolute;
       transform: scale(0.8) translateY(60px);
-      z-index: -1;
+      z-index: 0;
     }
 
     &.opponent-turn {
       #player-gameboard-container {
         opacity: 0.5;
         pointer-events: none;
-        // position: absolute;
+        position: absolute;
         transform: scale(0.8) translateY(60px);
-        z-index: -1;
+        z-index: 0;
       }
 
       #opponent-gameboard-container {
@@ -175,7 +179,6 @@ main {
       }
 
       .fleet-status-container {
-
         // .fleet-status-heading {
         // }
 
@@ -187,7 +190,7 @@ main {
             --size: clamp(1rem, 5vw, 1.25rem);
 
             box-shadow: inset 3px 3px 6px rgb(22, 22, 22),
-                        inset -3px -3px 6px rgb(33, 33, 33);
+              inset -3px -3px 6px rgb(33, 33, 33);
             border-radius: 50%;
             height: var(--size);
             position: relative;
@@ -195,14 +198,16 @@ main {
 
             &::before {
               animation: 2s rotate linear infinite;
-              background: radial-gradient(circle at 30% 30%,   
-                          #6f3d3d 10%, /* Light red highlight */
-                          #471f1f 50%, /* Mid red */
-                          #330303 100% /* Dark red shadow */);
+              background: radial-gradient(
+                circle at 30% 30%,
+                #6f3d3d 10%,
+                /* Light red highlight */ #471f1f 50%,
+                /* Mid red */ #330303 100% /* Dark red shadow */
+              );
               border: 1px solid rgba(192, 192, 192, 0.5);
               border-radius: inherit;
-              box-shadow: inset -8px -8px 16px rgba(255, 0, 0, 0.5), 
-                          inset 10px 10px 20px rgba(40, 24, 24, 0.3);
+              box-shadow: inset -8px -8px 16px rgba(255, 0, 0, 0.5),
+                inset 10px 10px 20px rgba(40, 24, 24, 0.3);
               content: '';
               inset: 3px;
               opacity: 0;
@@ -225,7 +230,7 @@ main {
               z-index: -1;
             }
 
-            // ! for testing 
+            // ! for testing
             &:hover::before,
             &:hover::after {
               opacity: 1;
@@ -248,7 +253,7 @@ main {
           }
 
           &::before {
-            display: none;  
+            display: none;
           }
 
           // ? Will I use this?
@@ -269,8 +274,8 @@ main {
     }
 
     // .post-bellum {
-      // ?
-    // } 
+    // ?
+    // }
   }
 }
 
