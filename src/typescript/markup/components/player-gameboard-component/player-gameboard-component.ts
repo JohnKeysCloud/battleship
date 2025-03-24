@@ -53,7 +53,6 @@ export class PlayerGameboardComponent {
     cloneSnapOffset: null,
     shipBorderValueSplit: null,
   };
-
   private dragEventCallbacks: Record<string, (e: DragEvent) => void> = {
     dragstart: (e: DragEvent) => this.handleShipDragStart(e, this.dragState),
     drag: (e: DragEvent) => this.handleShipDrag(e, this.dragState),
@@ -62,9 +61,6 @@ export class PlayerGameboardComponent {
     dragover: (e: DragEvent) => this.handleShipDragOver(e, this.dragState),
     drop: (e: DragEvent) => this.handleShipDrop(e, this.dragState),
     dragend: (e: DragEvent) => this.handleShipDragEnd(e, this.dragState),
-  };
-  private rotateShipOnClick = (e: MouseEvent): void => {
-    this.handleShipRotation(e);
   };
 
   constructor(public readonly playerState: PlayerState) {
@@ -104,25 +100,28 @@ export class PlayerGameboardComponent {
 
     targetElement.appendChild(this.gameboardContainer);
   }
-  
+
   public toggleGameboardContainerEventListeners(): void {
     if (!this.gameboardContainer) return;
 
     const method = this.listenersAdded
-    ? 'removeEventListener'
-    : 'addEventListener';
-    
+      ? 'removeEventListener'
+      : 'addEventListener';
+
     Object.entries(this.dragEventCallbacks).forEach(([event, callback]) => {
       this.gameboardContainer[method](event, callback as EventListener);
     });
 
     // Toggle ship rotation event
-    this.gameboardContainer[method]('click', this.rotateShipOnClick as EventListener);
+    this.gameboardContainer[method](
+      'click',
+      this.handleShipRotation as EventListener
+    );
 
     this.listenersAdded = !this.listenersAdded;
   }
-  
-  public toggleShipsDraggable(): void {    
+
+  public toggleShipsDraggable(): void {
     this.fleetElements.forEach((shipElement) => {
       shipElement.removeAttribute('draggable');
     });
@@ -133,7 +132,6 @@ export class PlayerGameboardComponent {
       shipElement.classList.remove('adrift');
     });
   }
-
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
@@ -416,7 +414,7 @@ export class PlayerGameboardComponent {
   }
 
   // 💭 --------------------------------------------------------------
-  // 💭 HTML Drag and Drop API (Repositioning)
+  // 💭 Ship Repositioning 
 
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
     if (
@@ -851,6 +849,27 @@ export class PlayerGameboardComponent {
     }
   }
 
+  private handleShipRotation = (e: MouseEvent) => {
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !e.target.matches('.ship-container')
+    )
+      return;
+
+    const shipContainerElement: HTMLDivElement = e.target;
+
+    const shipType: ShipType = getConvertedTypeFromAttr(
+      shipContainerElement,
+      'data-shiptype',
+      isShipType
+    );
+
+    const ship = this.playerState.fleetBuilder.getShip(shipType);
+
+    this.playerState.gameboardController.rotatePiece(ship);
+    this.updateGameboard(this.gameboardContainer);
+  };
+
   private snapCloneToCursor(
     e: DragEvent,
     cloneSnapOffset: CloneSnapOffset
@@ -874,30 +893,6 @@ export class PlayerGameboardComponent {
       '--ship-clone-top',
       `${cursorY - gameboardOffsetY - offsetY}px`
     );
-  }
-
-  // 💭 --------------------------------------------------------------
-  // 💭 Handle Ship Click (Rotation)
-
-  private handleShipRotation(e: MouseEvent) {
-    if (
-      !(e.target instanceof HTMLDivElement) ||
-      !e.target.matches('.ship-container')
-    )
-      return;
-
-    const shipContainerElement: HTMLDivElement = e.target;
-
-    const shipType: ShipType = getConvertedTypeFromAttr(
-      shipContainerElement,
-      'data-shiptype',
-      isShipType
-    );
-
-    const ship = this.playerState.fleetBuilder.getShip(shipType);
-
-    this.playerState.gameboardController.rotatePiece(ship);
-    this.updateGameboard(this.gameboardContainer);
   }
 
   // 💭 -------------------------------------------------------------
