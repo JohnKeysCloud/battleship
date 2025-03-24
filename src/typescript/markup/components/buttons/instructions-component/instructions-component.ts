@@ -6,8 +6,6 @@ import './instructions-component.scss';
 export class InstructionsComponent {
   private readonly instructionsButton: HTMLButtonElement;
   private readonly instructionsButtonContainer: HTMLDivElement;
-  private readonly instructionsImageSrc: string =
-    'https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_misc-images/information-icon.png';
   private readonly buttonId: string = 'instructions-button';
   private readonly buttonImageId: string = 'instructions-image';
 
@@ -47,17 +45,10 @@ export class InstructionsComponent {
   // 💭 --------------------------------------------------------------
   
   private createInstructionsButton(): HTMLButtonElement {
-    const instructionsImage: HTMLImageElement = createElement('img', [], {
-      id: this.buttonImageId,
-      src: this.instructionsImageSrc,
-    });
-
     const instructionsButton: HTMLButtonElement = createElement('button', [], {
       id: this.buttonId,
       type: 'button',
     });
-
-    instructionsButton.appendChild(instructionsImage);
 
     return instructionsButton;
   }

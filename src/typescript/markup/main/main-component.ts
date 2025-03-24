@@ -1,4 +1,3 @@
-
 import { PlayerState } from "../../types/state-types";
 import { createElement } from "../../utilities/random-utilities";
 
@@ -9,33 +8,51 @@ import { InstructionsComponent } from "../components/buttons/instructions-compon
 
 import { CycloneHotSwapContainer } from "../../utilities/cycloneHotSwapContainer";
 import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
+import { CycloneSitRepScroller } from "../../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller";
 
 export class MainComponent {
-  private readonly mainElement: HTMLElement;
+  private readonly mainElement: HTMLElement = createElement('main');
+
   public readonly mainContainerOne: CycloneHotSwapContainer;
   public readonly mainContainerTwo: MainContainerTwo;
   public readonly mainContainerThree: CycloneHotSwapContainer;
+
   private readonly instructionsButton: InstructionsComponent;
 
   constructor(
     private readonly players: { player: PlayerState; opponent: PlayerState },
     private readonly instructionsLightboxController: CycloneLightboxController,
+    private readonly sitRepScrollerController: CycloneSitRepScroller,
     private readonly transitionToNextPhase: () => void
   ) {
-    this.mainElement = createElement('main');
-
     this.instructionsButton = new InstructionsComponent(
       this.instructionsLightboxController
     );
+    this.sitRepScrollerController = sitRepScrollerController;
 
-    this.mainContainerOne = createMainContainerOne(this.instructionsButton);
+    this.mainContainerOne = this.createMainContainerOne();
     this.mainContainerTwo = new MainContainerTwo(this.players);
-    this.mainContainerThree = createMainContainerThree(
+    this.mainContainerThree = this.createMainContainerThree();
+
+    this.renderMainContainers();
+  }
+
+  private createMainContainerOne(): CycloneHotSwapContainer {
+    return createMainContainerOne(
+      this.instructionsButton,
+      this.sitRepScrollerController
+    );
+  }
+
+  private createMainContainerThree(): CycloneHotSwapContainer {
+    return createMainContainerThree(
       this.mainContainerTwo.playerGameboard,
       this.instructionsButton,
       this.transitionToNextPhase
     );
+  }
 
+  private renderMainContainers(): void {
     this.mainContainerOne.render(this.mainElement);
     this.mainContainerTwo.render(this.mainElement);
     this.mainContainerThree.render(this.mainElement);

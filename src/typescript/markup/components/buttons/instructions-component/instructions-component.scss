@@ -3,8 +3,43 @@
   place-items: center;
 
   #instructions-button {
-    filter: invert(1);
-    height: 1.5rem;
-    width: 1.5rem;
+    border-radius: 50%;
+    border: 2px solid #090909;
+    background-color: transparent;
+    background: linear-gradient(145deg, #19202f, #0d0f16);
+    box-shadow: inset 1px 1px 0 #1e2841, inset -1px -1px 0px #1c1c1c;
+    border-radius: 50%;
+    height: 2.5rem;
+    position: relative;
+    transition: transform 7s ease-in-out;
+    width: 2.5rem;
+
+    &::before {
+      background-color: white;
+      border-radius: 3px;
+      content: "";
+      position: absolute;
+      height: 30%;
+      inset: 0;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -30%);
+      width: 10%;
+      z-index: 1;
+    }
+
+    &::after {
+      background-color: white;
+      border-radius: 50%;
+      content: "";
+      position: absolute;
+      height: 10%;
+      inset: 0;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -250%);
+      width: 10%;
+      z-index: 1;
+    }
   }
 }

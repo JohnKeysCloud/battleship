@@ -1,4 +1,5 @@
 .DS_Store
+.markdownlint.json
 todo.md
 tsconfig.json
 /_shells
