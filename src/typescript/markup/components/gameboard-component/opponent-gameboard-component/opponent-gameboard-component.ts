@@ -1,4 +1,5 @@
 import {
+  Coordinates,
   Gameboard,
   ShipSymbolValue,
   ShipSymbolValueArray
@@ -32,6 +33,8 @@ export class OpponentGameboardComponent {
     const gameboard: DocumentFragment = this.generateBoardFragment(
       this.playerState.gameboardBuilder.boardSize
     );
+
+    this.toggleGameboardContainerEventListeners();
 
     this.gameboardContainer.appendChild(gameboard);
 
@@ -124,14 +127,27 @@ export class OpponentGameboardComponent {
   private handleCellClick = (e: MouseEvent): void => {
     if (
       !(e.target instanceof HTMLDivElement) ||
-      !e.target.matches('.grid-cell-container')
+      !e.target.matches('.grid-cell')
     ) return;
 
-    const gridCellContainer: HTMLDivElement = e.target;
-    console.log(gridCellContainer);
-    
-    
+    const gridCell: HTMLDivElement = e.target;
 
+    const dataX = gridCell.getAttribute('data-x');
+    const dataY = gridCell.getAttribute('data-y');
+
+    if (dataX === null || dataY === null) {
+      throw new Error('Man wtf');
+    }
+
+    const coordinates: Coordinates = [+dataX, +dataY];
+    
+    // !
+    this.playerState.gameboardController.receiveAttack(coordinates);
+    // ? does this return whether or not a ship is sunk?
+    // ? if so, then I can use that to update the UI
+    // ? if not, then I need to update the UI to show a miss
+    // ? if a ship is sunk, then I need to update the UI to show a sunken ship
+    // ? check if the player has won too bitch
   };
 
   // 💭 --------------------------------------------------------------
