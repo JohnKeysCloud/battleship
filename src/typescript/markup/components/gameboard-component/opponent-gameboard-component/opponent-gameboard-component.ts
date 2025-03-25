@@ -7,8 +7,8 @@ import {
   createElement
 } from '../../../../utilities/random-utilities';
 import { PlayerState } from '../../../../types/state-types';
-import '../player-gameboard-component.scss';
-import '../player-gameboard-animations.scss';
+import '../gameboard-component.scss';
+import '../gameboard-animations.scss';
 
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';

@@ -29,8 +29,8 @@ import {
   DragState,
   ShipBorderValueSplit,
 } from '../../component-types';
-import '../player-gameboard-component.scss';
-import '../player-gameboard-animations.scss';
+import '../gameboard-component.scss';
+import '../gameboard-animations.scss';
 
 
 export class PlayerGameboardComponent {
