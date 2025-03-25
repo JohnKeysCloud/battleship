@@ -2,19 +2,21 @@ import {
   Gameboard,
   ShipSymbolValue,
   ShipSymbolValueArray
-} from '../../../types/logic-types';
+} from '../../../../types/logic-types';
 import {
   createElement
-} from '../../../utilities/random-utilities';
-import { PlayerState } from '../../../types/state-types';
+} from '../../../../utilities/random-utilities';
+import { PlayerState } from '../../../../types/state-types';
+import '../player-gameboard-component.scss';
+import '../player-gameboard-animations.scss';
 
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';
   private gameboardContainer: HTMLDivElement;
 
-  constructor(
-    public readonly playerState: PlayerState
-  ) {
+  private listenersAdded: boolean = false;
+
+  constructor(public readonly playerState: PlayerState) {
     this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
@@ -32,8 +34,18 @@ export class OpponentGameboardComponent {
     );
 
     this.gameboardContainer.appendChild(gameboard);
-    
+
     targetElement.appendChild(this.gameboardContainer);
+  }
+
+  public toggleGameboardContainerEventListeners(): void {
+    if (!this.gameboardContainer) return;
+
+    const method = this.listenersAdded
+      ? 'removeEventListener'
+      : 'addEventListener';
+    
+    this.gameboardContainer[method]('click', this.handleCellClick as EventListener);
   }
 
   // 💭 --------------------------------------------------------------
@@ -109,6 +121,19 @@ export class OpponentGameboardComponent {
     return boardFragment;
   }
 
+  private handleCellClick = (e: MouseEvent): void => {
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !e.target.matches('.grid-cell-container')
+    ) return;
+
+    const gridCellContainer: HTMLDivElement = e.target;
+    console.log(gridCellContainer);
+    
+    
+
+  };
+
   // 💭 --------------------------------------------------------------
   // 💭 Utilities
 
@@ -117,3 +142,6 @@ export class OpponentGameboardComponent {
     return this.id;
   }
 }
+
+
+// TODO: add click listener that receieves an attack, toggles the state (updating main container one), etc.

@@ -1,5 +1,5 @@
 import { createElement } from "../../../../utilities/random-utilities";
-import { PlayerGameboardComponent } from "../../player-gameboard-component/player-gameboard-component";
+import { PlayerGameboardComponent } from "../../gameboard-component/player-gameboard-component/player-gameboard-component";
 import { InstructionsComponent } from "../instructions-component/instructions-component";
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';

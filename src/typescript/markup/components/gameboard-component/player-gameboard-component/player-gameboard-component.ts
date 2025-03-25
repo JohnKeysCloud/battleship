@@ -1,6 +1,6 @@
-import { BattleshipFleetBuilder } from '../../../logic/bs-fleet-builder/bs-fleet-builder';
-import { BattleshipBoardController } from '../../../logic/bs-gameboard-controller/bs-gameboard-controller';
-import { GridPlacementValue } from '../../../types/css-types';
+import { BattleshipFleetBuilder } from '../../../../logic/bs-fleet-builder/bs-fleet-builder';
+import { BattleshipBoardController } from '../../../../logic/bs-gameboard-controller/bs-gameboard-controller';
+import { GridPlacementValue } from '../../../../types/css-types';
 import {
   Coordinates,
   CoordinatesArray,
@@ -11,26 +11,26 @@ import {
   ShipSymbolValue,
   ShipSymbolValueArray,
   ShipType,
-} from '../../../types/logic-types';
-import { PlayerState } from '../../../types/state-types';
-import GlobalEventBus from '../../../utilities/event-bus';
+} from '../../../../types/logic-types';
+import { PlayerState } from '../../../../types/state-types';
+import GlobalEventBus from '../../../../utilities/event-bus';
 import {
   isOrientation,
   isShipLength,
   isShipType,
-} from '../../../types/type-guards';
+} from '../../../../types/type-guards';
 import {
   areArraysEqual,
   createElement,
   getConvertedTypeFromAttr,
-} from '../../../utilities/random-utilities';
+} from '../../../../utilities/random-utilities';
 import {
   CloneSnapOffset,
   DragState,
   ShipBorderValueSplit,
-} from '../component-types';
-import './player-gameboard-component.scss';
-import './player-gameboard-animations.scss';
+} from '../../component-types';
+import '../player-gameboard-component.scss';
+import '../player-gameboard-animations.scss';
 
 
 export class PlayerGameboardComponent {
@@ -108,11 +108,12 @@ export class PlayerGameboardComponent {
       ? 'removeEventListener'
       : 'addEventListener';
 
+    // Drag Events
     Object.entries(this.dragEventCallbacks).forEach(([event, callback]) => {
       this.gameboardContainer[method](event, callback as EventListener);
     });
 
-    // Toggle ship rotation event
+    // Rotation Event
     this.gameboardContainer[method](
       'click',
       this.handleShipRotation as EventListener

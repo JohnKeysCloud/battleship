@@ -1,7 +1,7 @@
 import { createElement } from "../../../utilities/random-utilities";
 
-import { PlayerGameboardComponent } from "../../components/player-gameboard-component/player-gameboard-component";
-import { OpponentGameboardComponent } from "../../components/opponent-gameboard-component/opponent-gameboard-component";
+import { PlayerGameboardComponent } from "../../components/gameboard-component/player-gameboard-component/player-gameboard-component";
+import { OpponentGameboardComponent } from "../../components/gameboard-component/opponent-gameboard-component/opponent-gameboard-component";
 
 import { PlayerState } from "../../../types/state-types";
 

@@ -2,7 +2,7 @@ import { players } from "../../../state/player-state";
 
 import { FragmentKey } from "../../../types/markup-types";
 
-import { PlayerGameboardComponent } from "../../components/player-gameboard-component/player-gameboard-component";
+import { PlayerGameboardComponent } from "../../components/gameboard-component/player-gameboard-component/player-gameboard-component";
 import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";
 import { ShipShufflerButtonComponent } from "../../components/buttons/ship-shuffler-component/ship-shuffler-component";
 import { ReadyUpButtonComponent } from "../../components/buttons/ready-up-component/ready-up-component";
