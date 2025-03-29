@@ -21,11 +21,10 @@
 
     &::before {
       animation: rotate 3s linear infinite;
-      animation-delay: 0.3s;
       animation-play-state: paused;
-      border: 6px ridge var(--color-funky);
+      border: 6px ridge var(--color-edible-ghost);
       border-radius: inherit;
-      box-shadow: inset 0 0 8px var(--color-funky);
+      box-shadow: inset 0 0 8px var(--color-edible-ghost);
       content: '';
       display: grid;
       height: 100%;
@@ -33,10 +32,10 @@
       opacity: 0;
       place-items: center;
       position: absolute;
-      transition: opacity 100ms ease-out;
+      transition: opacity 380ms ease-in;
       visibility: hidden;
       width: 100%;
-      will-change: opacity;
+      will-change: opacity, transform;
     }
 
     &:has(.grid-cell:hover)::before {
