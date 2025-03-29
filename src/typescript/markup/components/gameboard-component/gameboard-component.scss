@@ -15,6 +15,43 @@
   --ship-clone-top: auto;
 }
 
+#opponent-gameboard-container {
+  .grid-cell-container {
+    position: relative;
+
+    &::before {
+      animation: rotate 3s linear infinite;
+      animation-delay: 0.3s;
+      animation-play-state: paused;
+      border: 6px ridge var(--color-funky);
+      border-radius: inherit;
+      box-shadow: inset 0 0 8px var(--color-funky);
+      content: '';
+      display: grid;
+      height: 100%;
+      inset: 0;
+      opacity: 0;
+      place-items: center;
+      position: absolute;
+      transition: opacity 100ms ease-out;
+      visibility: hidden;
+      width: 100%;
+      will-change: opacity;
+    }
+
+    &:has(.grid-cell:hover)::before {
+      animation-play-state: running;
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  .grid-cell {
+    cursor: crosshair;
+    position: relative;
+  
+  }  
+}
+
 .gameboard-container {
   background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
   -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
@@ -60,6 +97,7 @@
         inset -3px -3px 6px rgb(33, 33, 33);
 
         .grid-cell {
+          border-radius: inherit;
           height: 100%;
           position: relative;
           width: 100%;
