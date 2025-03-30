@@ -7,10 +7,12 @@ import {
 import {
   createElement
 } from '../../../../utilities/random-utilities';
-import { PlayerState } from '../../../../types/state-types';
+import { AttackResult, PlayerState } from '../../../../types/state-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
 
+// !
+import { app } from '../../../../../app';
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';
   private gameboardContainer: HTMLDivElement;
@@ -140,14 +142,26 @@ export class OpponentGameboardComponent {
     }
 
     const coordinates: Coordinates = [+dataX, +dataY];
+
+    if (this.playerState.gameboardRepository.isCoordinatesAttacked(coordinates)) {
+      alert('already attacked this cell, you cun\'t');
+      return;
+    }
+
+    this.playerState.gameboardRepository.updateAttackedCoordinates(coordinates);
     
-    // !
-    this.playerState.gameboardController.receiveAttack(coordinates);
-    // ? does this return whether or not a ship is sunk?
-    // ? if so, then I can use that to update the UI
-    // ? if not, then I need to update the UI to show a miss
-    // ? if a ship is sunk, then I need to update the UI to show a sunken ship
+    const attackResult: AttackResult = this.playerState.gameboardController.receiveAttack(coordinates);
+
+    // TODO: inject as dependency
+    app.domController.cycloneSitRepScroller.setAndScrollToNextSitRep(attackResult);
+
+    // ? using attack result update the UI:
+    // ? if hit, apply hit styles
+    // ? if miss, apply miss styles
+    // ? if sunk, apply sunken ship styles
     // ? check if the player has won too bitch
+
+    // ? toggle player turn state
   };
 
   // 💭 --------------------------------------------------------------

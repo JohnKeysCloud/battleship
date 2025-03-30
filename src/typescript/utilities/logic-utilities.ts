@@ -1,22 +1,11 @@
 import {
-  AnglesOfRotation,
   AxisArrayKey,
   Coordinates,
-  OccupiedCoordinatesSet,
-  OccupiedCoordinatesSetMemberKey,
-  FleetCoordinates,
-  IPlacePieceParams,
   IPosition,
   IShipPlacementConfigurations,
   Orientation,
-  OutOfBounds,
-  RotatedCoordinatesValue,
   ShipLength,
-  ShipType,
-  PositionArray,
-  ShipSymbolDescription
 } from "../types/logic-types";
-import { PlayerType } from "../types/state-types";
 import { areArraysEqual } from "./random-utilities";
 
 // 💭 --------------------------------------------------------------

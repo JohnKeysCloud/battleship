@@ -25,7 +25,7 @@ import {
   ShipSymbolValue,
   ShipSymbolDescription,
 } from '../../types/logic-types';
-import { PlayerState } from '../../types/state-types';
+import { AttackResult, PlayerState } from '../../types/state-types';
 import {
   areCoordinatesInBounds,
   arePositionsEqual,
@@ -189,27 +189,21 @@ export class BattleshipBoardController implements IBattleshipGameboardController
 
   // TODO: Finish ⤵️ 
   // ? add return signature
-  public receiveAttack(coordinates: Coordinates) {
-
+  public receiveAttack(coordinates: Coordinates): AttackResult {
     // ? create set in repository for `attackedCells`
     // ? if `attackedCells` has `coordinates`, warn that the cell has already been attacked and return gracefully
     // ? else, add `coordinates` to `attackedCells` set
 
-    const attackedShip: BattleshipBuilder | null = this.getShipAt(coordinates);
-    
-    if (!attackedShip) {
-      // TODO: create switch to generate random miss messages? (use JSON?)
-      console.warn('Missed me with that bitch!');
-      return;
-    }
+    const attackedShip = this.getShipAt(coordinates);
+    if (attackedShip === null) return { hit: false };
 
     attackedShip.hit();
 
-    if (!attackedShip.isSeaworthy()) {
-      console.log(`You sunk the ${attackedShip.type} fam!`);
+    return {
+      hit: true,
+      isSunk: !attackedShip.isSeaworthy(), 
+      type: attackedShip.type,
     };
-
-    return attackedShip;
   }
 
   public removePiece(

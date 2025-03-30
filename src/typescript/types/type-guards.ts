@@ -2,7 +2,7 @@ import {
   AnglesOfRotation,
   Coordinates,
   OccupiedCoordinatesSet,
-  OccupiedCoordinatesSetMemberKey,
+  CoordinatesToString,
   FleetCoordinates,
   IPlacePieceParams,
   IPosition,
@@ -31,7 +31,7 @@ export const isOccupiedCoordinatesSet = (
   if (!(value instanceof Set)) return false;
 
   for (const member of value) {
-    if (!isOccupiedCoordinatesSetMemberKey(member)) {
+    if (!isCoordinatesToString(member)) {
       return false;
     }
   }
@@ -101,9 +101,9 @@ export const isPositionsArray = (value: unknown): value is PositionArray => {
 
   return value.every((position) => isPosition(position));
 };
-export const isOccupiedCoordinatesSetMemberKey = (
+export const isCoordinatesToString = (
   value: unknown
-): value is OccupiedCoordinatesSetMemberKey => {
+): value is CoordinatesToString => {
   if (typeof value !== 'string') return false;
 
   const match = value.match(/^\[\d{1}, \d{1}\]$/);

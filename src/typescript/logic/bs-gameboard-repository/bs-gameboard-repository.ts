@@ -2,7 +2,7 @@ import { BattleshipBuilder } from "../bs-ship-builder/bs-ship-builder";
 import {
   Coordinates,
   CoordinatesArray,
-  OccupiedCoordinatesSetMemberKey,
+  CoordinatesToString,
   FleetCoordinates,
   InBoundRotationalPlacePieceParamsForFleet,
   ShipType,
@@ -10,17 +10,19 @@ import {
 } from "../../types/logic-types";
 
 export class BattleshipBoardRepository {
-  private readonly _fleetCoordinates: FleetCoordinates = {};
-  private readonly _inBoundRotationalPlacePieceParamsForFleet: InBoundRotationalPlacePieceParamsForFleet = {};
+  readonly #fleetCoordinates: FleetCoordinates = {};
+  readonly #inBoundRotationalPlacePieceParamsForFleet: InBoundRotationalPlacePieceParamsForFleet = {};
+  readonly #attackedCoordinates: Set<CoordinatesToString> = new Set();
 
   // 💭 --------------------------------------------------------------
 
   public get fleetCoordinates(): FleetCoordinates {
-    return this._fleetCoordinates;
+    return this.#fleetCoordinates;
   }
 
   public get inBoundRotationalPlacePieceForFleet(): InBoundRotationalPlacePieceParamsForFleet {
-    return this._inBoundRotationalPlacePieceParamsForFleet;
+    console.log(this.#inBoundRotationalPlacePieceParamsForFleet);
+    return this.#inBoundRotationalPlacePieceParamsForFleet;
   }
 
   public addShipToFleetCoordinates(
@@ -33,7 +35,7 @@ export class BattleshipBoardRepository {
 
     placementCoordinates.forEach((coordinates: Coordinates) => {
       const [x, y]: Coordinates = coordinates;
-      const setMemberTemplate: OccupiedCoordinatesSetMemberKey = `[${x}, ${y}]`;
+      const setMemberTemplate: CoordinatesToString = `[${x}, ${y}]`;
       this.fleetCoordinates[shipType]!.add(setMemberTemplate);
     });
   }
@@ -49,13 +51,23 @@ export class BattleshipBoardRepository {
   public nullifyShipValidRotationalParams(shipType: ShipType): void {
     this.inBoundRotationalPlacePieceForFleet[shipType] = null;
   }
-  
+
   public setShipValidRotationalParams(
     ship: BattleshipBuilder,
     validRotatedPlacePieceParams: RotationalPositionMap
   ): void {
-    if (!this._inBoundRotationalPlacePieceParamsForFleet[ship.type])
-      this._inBoundRotationalPlacePieceParamsForFleet[ship.type] =
+    if (!this.#inBoundRotationalPlacePieceParamsForFleet[ship.type])
+      this.#inBoundRotationalPlacePieceParamsForFleet[ship.type] =
         validRotatedPlacePieceParams;
+  }
+
+  public updateAttackedCoordinates(coordinates: Coordinates): void {
+    this.#attackedCoordinates.add(`[${coordinates[0]}, ${coordinates[1]}]`);
+  }
+
+  public isCoordinatesAttacked(coordinates: Coordinates): boolean {
+    return this.#attackedCoordinates.has(
+      `[${coordinates[0]}, ${coordinates[1]}]`
+    );
   }
 }

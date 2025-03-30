@@ -120,20 +120,6 @@ export class DOMController {
     }
 
     this.cycloneSitRepScroller.initialize(firstPlayer);
-
-    this.cycloneSitRepScroller.element.addEventListener('click', () => {
-      console.log('fuck');
-      // export type AttackResult = {
-      //   hit: boolean;
-      //   isSunk?: boolean;
-      //   type?: ShipType;
-      // };
-      this.cycloneSitRepScroller.setAndScrollToNextSitRep({
-        hit: false,
-      });
-    });
-
-    console.log('element:', this.cycloneSitRepScroller.element);
   };
 
   private resetGame = () => {
