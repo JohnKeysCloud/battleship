@@ -32,18 +32,19 @@
 
     &::before {
       background: #292f36;
-      box-shadow: inset 5px 5px 10px #101316,
-                  inset -5px -5px 10px #424b56;
-      transition: opacity 150ms ease-in;
+      box-shadow: inset 7px 7px 14px #101316,
+                  inset -7px -7px 14px #424b56;
+      transition: opacity 200ms ease-in;
       will-change: opacity;
     }
 
     &::after {
       animation-play-state: paused;
       animation: rotate 3s linear infinite;
-      border: 3px ridge ghostwhite;
+      border: 2px ridge var(--color-binky);
+      box-shadow: 0 0 8px var(--color-binky);
       scale: 1.25;
-      transition: opacity 380ms ease-in 150ms;
+      transition: opacity 380ms ease-in 250ms;
       will-change: opacity, transform;
     }
 
@@ -58,7 +59,7 @@
     }
   }
   .grid-cell {
-    cursor: crosshair;
+    cursor: pointer;
     position: relative;
     z-index: 1;
   }  
