@@ -11,8 +11,10 @@ import {
 
 export class BattleshipBoardRepository {
   readonly #fleetCoordinates: FleetCoordinates = {};
-  readonly #inBoundRotationalPlacePieceParamsForFleet: InBoundRotationalPlacePieceParamsForFleet = {};
+  readonly #inBoundRotationalPlacePieceParamsForFleet: InBoundRotationalPlacePieceParamsForFleet =
+    {};
   readonly #attackedCoordinates: Set<CoordinatesToString> = new Set();
+  readonly #sunkShips: Set<ShipType> = new Set();
 
   // 💭 --------------------------------------------------------------
 
@@ -23,6 +25,10 @@ export class BattleshipBoardRepository {
   public get inBoundRotationalPlacePieceForFleet(): InBoundRotationalPlacePieceParamsForFleet {
     console.log(this.#inBoundRotationalPlacePieceParamsForFleet);
     return this.#inBoundRotationalPlacePieceParamsForFleet;
+  }
+
+  public addAttackedCoordinates(coordinates: Coordinates): void {
+    this.#attackedCoordinates.add(`[${coordinates[0]}, ${coordinates[1]}]`);
   }
 
   public addShipToFleetCoordinates(
@@ -38,6 +44,14 @@ export class BattleshipBoardRepository {
       const setMemberTemplate: CoordinatesToString = `[${x}, ${y}]`;
       this.fleetCoordinates[shipType]!.add(setMemberTemplate);
     });
+  }
+
+  public addSunkenShip(shipType: ShipType) {
+    this.#sunkShips.add(shipType);
+  }
+
+  public areAllShipsSunk(): boolean {
+    return this.#sunkShips.size === Object.keys(this.fleetCoordinates).length;
   }
 
   public isShipPlaced(shipType: ShipType): boolean {
@@ -61,11 +75,7 @@ export class BattleshipBoardRepository {
         validRotatedPlacePieceParams;
   }
 
-  public updateAttackedCoordinates(coordinates: Coordinates): void {
-    this.#attackedCoordinates.add(`[${coordinates[0]}, ${coordinates[1]}]`);
-  }
-
-  public isCoordinatesAttacked(coordinates: Coordinates): boolean {
+  public hasTargetBeenAttacked(coordinates: Coordinates): boolean {
     return this.#attackedCoordinates.has(
       `[${coordinates[0]}, ${coordinates[1]}]`
     );

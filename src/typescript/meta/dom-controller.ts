@@ -40,7 +40,8 @@ export class DOMController {
       players,
       this.instructionsLightboxController,
       this.cycloneSitRepScroller,
-      this.transitionToNextPhase
+      this.togglePlayerTurn,
+      this.transitionToNextPhase,
     );
 
     // this.initializeSitRepScroller('player');
@@ -53,6 +54,23 @@ export class DOMController {
     this.mainComponent.render(this.content);
     this.instructionsDialog.render(document.body);
     // append footer via here
+  }
+
+  // ? initializes player turn state (I like this name better 😎). {TIMELESS ARTIFACT 💭}
+  private readyPlayerOne = () => {
+    if (this.gameState.currentPlayer === 'player') {
+      this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
+    }
+  }
+
+  private togglePlayerTurn = () => {
+    const nextPlayer: PlayerType = this.gameState.toggleCurrentPlayer();
+
+    if (nextPlayer === 'player') {
+      this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
+    } else {
+      this.mainComponent.mainContainerTwo.element.classList.remove('player-turn');
+    }
   }
 
   private transitionToNextPhase = async () => {
@@ -78,7 +96,6 @@ export class DOMController {
     }
 
     if (this.gameState.currentGamePhase === 'bellum') {
-      // use game state to
       const mainContainerTwo = this.mainComponent.mainContainerTwo.element;
 
       // TODO: Add turn randomization animation
@@ -86,9 +103,8 @@ export class DOMController {
       // ? so we need to await the completion of the animation before
       // ? potentially swapping the active board and continuing the game
 
-      console.log(gameState.currentPlayer);
-      if (gameState.currentPlayer === 'player')
-        mainContainerTwo.classList.add('player-turn');
+      // ? controls board animations on turn change
+      this.readyPlayerOne();
     }
 
     if (this.gameState.currentGamePhase === 'postBellum') {

@@ -1,4 +1,4 @@
-import { CurrentPlayer, GamePhase } from "../types/state-types";
+import { CurrentPlayer, GamePhase, PlayerType } from "../types/state-types";
 
 export class GameState {
   public currentGamePhase: GamePhase = 'parabellum';
@@ -24,9 +24,10 @@ export class GameState {
     }
   }
 
-  public toggleCurrentPlayer = (): void => {
+  public toggleCurrentPlayer = (): PlayerType => {
     this.currentPlayer =
       this.currentPlayer === 'player' ? 'opponent' : 'player';
+    return this.currentPlayer;
   }
 
   public resetGameState = (): void => {

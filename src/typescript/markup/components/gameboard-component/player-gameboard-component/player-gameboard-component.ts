@@ -137,6 +137,25 @@ export class PlayerGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
+  private applyGridPlacementValue(
+    gridPlacementValue: GridPlacementValue,
+    gridCrossAxis: number,
+    shipElement: HTMLDivElement,
+    orientation: Orientation,
+    shipLength: ShipLength
+  ): void {
+    const isHorizontal: boolean = orientation === 'horizontal';
+    if (isHorizontal) {
+      shipElement.style.gridColumn = gridPlacementValue;
+      shipElement.style.gridRow = gridCrossAxis.toString();
+      shipElement.style.gridTemplateColumns = `repeat(${shipLength}, 1fr)`;
+    } else {
+      shipElement.style.gridRow = gridPlacementValue;
+      shipElement.style.gridColumn = gridCrossAxis.toString();
+      shipElement.style.gridTemplateRows = `repeat(${shipLength}, 1fr)`;
+    } 
+  }
+
   private createDragImage(): HTMLImageElement {
     const invisibleImage = createElement(
       'img',
@@ -202,7 +221,7 @@ export class PlayerGameboardComponent {
   private createShipElement(
     shipType: ShipType,
     shipLength: ShipLength,
-    gridPlacementValue: string,
+    gridPlacementValue: GridPlacementValue,
     gridCrossAxis: number,
     orientation: Orientation
   ): HTMLDivElement {
@@ -228,17 +247,14 @@ export class PlayerGameboardComponent {
 
     shipContainerElement.appendChild(shipUnitFragment);
 
-    const isHorizontal: boolean = orientation === 'horizontal';
-    if (isHorizontal) {
-      shipContainerElement.style.gridColumn = gridPlacementValue;
-      shipContainerElement.style.gridRow = gridCrossAxis.toString();
-      shipContainerElement.style.gridTemplateColumns = `repeat(${shipLength}, 1fr)`;
-    } else {
-      shipContainerElement.style.gridRow = gridPlacementValue;
-      shipContainerElement.style.gridColumn = gridCrossAxis.toString();
-      shipContainerElement.style.gridTemplateRows = `repeat(${shipLength}, 1fr)`;
-    }
-
+    this.applyGridPlacementValue(
+      gridPlacementValue,
+      gridCrossAxis,
+      shipContainerElement,
+      orientation,
+      shipLength
+    );
+    
     return shipContainerElement;
   }
 
@@ -353,6 +369,24 @@ export class PlayerGameboardComponent {
     fleetElements.forEach((shipElement) => gameboard.appendChild(shipElement));
   }
 
+  private setFleetElements = (
+    shipType: ShipType,
+    shipLength: ShipLength,
+    gridPlacementValue: GridPlacementValue,
+    gridCrossAxis: number,
+    orientation: Orientation
+  ) => {
+      const shipElement: HTMLDivElement = this.createShipElement(
+        shipType,
+        shipLength,
+        gridPlacementValue,
+        gridCrossAxis,
+        orientation
+      );
+
+      this.fleetElements.add(shipElement);
+  }
+
   private updateFleetElements = (fleetBuilder: BattleshipFleetBuilder) => {
     if (this.fleetElements.size) this.fleetElements.clear();
 
@@ -373,19 +407,17 @@ export class PlayerGameboardComponent {
         continue;
       }
 
-      const [x, y]: Coordinates = coordinatesArray[0];
+      const bowCoordinates: Coordinates = coordinatesArray[0];
       const [gridPlacementValue, gridCrossAxis]: [GridPlacementValue, number] =
-        this.getGridPlacementValue([x, y], orientation, shipLength);
+        this.getGridPlacementValue(bowCoordinates, orientation, shipLength);
 
-      const shipElement: HTMLDivElement = this.createShipElement(
+      this.setFleetElements(
         shipType,
         shipLength,
         gridPlacementValue,
         gridCrossAxis,
         orientation
       );
-
-      this.fleetElements.add(shipElement);
     }
   };
 

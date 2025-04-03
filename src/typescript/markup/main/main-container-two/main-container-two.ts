@@ -3,7 +3,7 @@ import { createElement } from "../../../utilities/random-utilities";
 import { PlayerGameboardComponent } from "../../components/gameboard-component/player-gameboard-component/player-gameboard-component";
 import { OpponentGameboardComponent } from "../../components/gameboard-component/opponent-gameboard-component/opponent-gameboard-component";
 
-import { PlayerState } from "../../../types/state-types";
+import { AttackResult, PlayerState } from "../../../types/state-types";
 
 export class MainContainerTwo {
   private readonly mainContainerTwo: HTMLElement;
@@ -12,10 +12,19 @@ export class MainContainerTwo {
   private readonly opponentGameboardComponent: OpponentGameboardComponent;
   
   constructor(
-    players: { player: PlayerState; opponent: PlayerState }
+    players: { player: PlayerState; opponent: PlayerState },
+    private readonly setAndScrollToNextSitRep: (attackResult: AttackResult) => void,
+    private readonly togglePlayerTurn: () => void,
+    private readonly transitionToNextPhase: () => void
+
   ) {
     this.playerGameboardComponent = new PlayerGameboardComponent(players.player);
-    this.opponentGameboardComponent = new OpponentGameboardComponent(players.opponent);
+    this.opponentGameboardComponent = new OpponentGameboardComponent(
+      players.opponent,
+      this.setAndScrollToNextSitRep,
+      this.togglePlayerTurn,
+      this.transitionToNextPhase
+    );
 
     this.mainContainerTwo = createElement('section', ['main-container'], {
       id: 'main-container-two',

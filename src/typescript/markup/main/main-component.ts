@@ -23,6 +23,8 @@ export class MainComponent {
     private readonly players: { player: PlayerState; opponent: PlayerState },
     private readonly instructionsLightboxController: CycloneLightboxController,
     private readonly sitRepScrollerController: CycloneSitRepScroller,
+    private readonly togglePlayerTurn: () => void,
+    // ? maybe set to return string used to update ui via the css-class `player-turn` || `opponent-turn`
     private readonly transitionToNextPhase: () => void
   ) {
     this.instructionsButton = new InstructionsComponent(
@@ -31,7 +33,12 @@ export class MainComponent {
     this.sitRepScrollerController = sitRepScrollerController;
 
     this.mainContainerOne = this.createMainContainerOne();
-    this.mainContainerTwo = new MainContainerTwo(this.players);
+    this.mainContainerTwo = new MainContainerTwo(
+      this.players,
+      this.sitRepScrollerController.setAndScrollToNextSitRep,
+      this.togglePlayerTurn,
+      this.transitionToNextPhase
+    );
     this.mainContainerThree = this.createMainContainerThree();
 
     this.renderMainContainers();

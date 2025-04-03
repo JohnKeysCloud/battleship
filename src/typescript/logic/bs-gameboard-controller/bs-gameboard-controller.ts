@@ -39,6 +39,7 @@ import {
   isPlacePieceParams,
   isPositionsArray,
   isShipSymbolDescription,
+  isShipType,
 } from '../../types/type-guards';
 import { getValidShipPositions } from './abstracted-method-callbacks/get-valid-ship-positions/get-valid-ship-positions';
 import { placeShip } from './abstracted-method-callbacks/place-ship/place-ship';
@@ -187,23 +188,25 @@ export class BattleshipBoardController implements IBattleshipGameboardController
     );
   }
 
-  // TODO: Finish ⤵️ 
-  // ? add return signature
   public receiveAttack(coordinates: Coordinates): AttackResult {
-    // ? create set in repository for `attackedCells`
-    // ? if `attackedCells` has `coordinates`, warn that the cell has already been attacked and return gracefully
-    // ? else, add `coordinates` to `attackedCells` set
-
     const attackedShip = this.getShipAt(coordinates);
     if (attackedShip === null) return { hit: false };
 
     attackedShip.hit();
 
-    return {
+    const attackResult: AttackResult = {
       hit: true,
       isSunk: !attackedShip.isSeaworthy(), 
       type: attackedShip.type,
     };
+
+    if (!isShipType(attackResult.type)) throw new Error('Invalid ship type');
+
+    if (attackResult.hit && attackResult.isSunk) {
+      this.playerState.gameboardRepository.addSunkenShip(attackResult.type);
+    }
+
+    return attackResult;
   }
 
   public removePiece(
