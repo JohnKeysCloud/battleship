@@ -14,6 +14,7 @@
     "minifyhtml": "./_shells/minifyhtml.sh",
     "nodetsc": "tsc -p config/tsconfig.json",
     "push": "git push origin main && npm run update-gh-page",
+    "send-to-prod": "rizz && git add . && git commit -m 'chore(dist): update dist files' && yeet",
     "serve": "webpack serve --progress --config config/webpack/webpack.dev.js",
     "test": "jest --config=config/jest.config.js",
     "update-gh-page": "git subtree push --prefix dist origin gh-pages",
