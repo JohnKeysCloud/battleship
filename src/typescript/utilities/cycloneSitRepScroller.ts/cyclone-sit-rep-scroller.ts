@@ -81,7 +81,7 @@ export class CycloneSitRepScroller {
     this.setInitialTextContent(firstPlayer);
   }
 
-  public readonly setAndScrollToNextSitRep = (attackResult?: AttackResult) => {
+  public readonly setAndScrollToNextSitRep = (attackResult?: AttackResult): void => {
     this.nextSitRep = attackResult
       ? this.getNextSitRep(attackResult)
       : this.getNextSitRep();

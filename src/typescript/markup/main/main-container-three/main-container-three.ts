@@ -12,11 +12,12 @@ import { createMainThreeBellumFragment } from "./main-three-bellum";
 import { createMainThreePostBellumFragment } from "./main-three-post-bellum";
 
 import { CycloneHotSwapContainer } from "../../../utilities/cycloneHotSwapContainer";
+import { GameState } from "../../../state/game-state";
 
 export function createMainContainerThree(
   playerGameboardComponent: PlayerGameboardComponent,
   instructionsButton: InstructionsComponent,
-  transitionToNextPhase: () => void
+  gameState: GameState
 ): CycloneHotSwapContainer {
   const playerGameboardController = players.player.gameboardController;
   const playerFleet = players.player.fleetBuilder.fleet;
@@ -25,14 +26,15 @@ export function createMainContainerThree(
     playerGameboardComponent.id,
     playerGameboardComponent.gameboardContainer,
     playerGameboardController,
-    playerFleet
+    playerFleet,
+    gameState
   );
 
   const readyUpButton = new ReadyUpButtonComponent(
     playerGameboardComponent,
     shipShufflerButton,
     instructionsButton,
-    transitionToNextPhase,
+    gameState.transitionToNextPhase,
   );
 
   const mainThreeFragments: { [key in FragmentKey]: DocumentFragment } = {

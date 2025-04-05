@@ -31,6 +31,7 @@ import {
 } from '../../component-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
+import EventBus from '../../../../utilities/event-bus';
 
 
 export class PlayerGameboardComponent {
@@ -63,7 +64,10 @@ export class PlayerGameboardComponent {
     dragend: (e: DragEvent) => this.handleShipDragEnd(e, this.dragState),
   };
 
-  constructor(public readonly playerState: PlayerState) {
+  constructor(
+    public readonly playerState: PlayerState,
+    private readonly eventBus: EventBus
+  ) {
     this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
     );
@@ -74,10 +78,7 @@ export class PlayerGameboardComponent {
     this.dragImage = this.createDragImage();
     this.shipDragClone = this.createShipDragClone();
 
-    // ! add ID to this ? or create event bus for each player gameboard instance?
-    GlobalEventBus.on('updateGameboard', (boardContainer: HTMLDivElement) => {
-      this.updateGameboard(boardContainer);
-    });
+    this.eventBus.on('updateGameboard', this.updateGameboardWrapper);
   }
 
   public render(targetElement: HTMLElement): void {
@@ -444,6 +445,10 @@ export class PlayerGameboardComponent {
       this.playerState.fleetBuilder,
       this.fleetElements
     );
+  }
+
+  private updateGameboardWrapper = () => {
+    this.updateGameboard(this.gameboardContainer);
   }
 
   // 💭 --------------------------------------------------------------

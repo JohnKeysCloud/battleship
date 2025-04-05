@@ -21,6 +21,8 @@ import { isShipType } from '../../../../types/type-guards';
 import { BattleshipBuilder } from '../../../../logic/bs-ship-builder/bs-ship-builder';
 import { GridPlacementValue } from '../../../../types/css-types';
 import { BattleshipFleetBuilder } from '../../../../logic/bs-fleet-builder/bs-fleet-builder';
+import EventBus from '../../../../utilities/event-bus';
+import { GameState } from '../../../../state/game-state';
 
 export class OpponentGameboardComponent {
   private readonly id: string = 'opponent';
@@ -32,11 +34,7 @@ export class OpponentGameboardComponent {
 
   constructor(
     public readonly playerState: PlayerState,
-    private readonly setAndScrollToNextSitRep: (
-      attackResult: AttackResult
-    ) => void,
-    private readonly togglePlayerTurn: () => void,
-    private readonly transitionToNextPhase: () => void
+    private readonly gameState: GameState
   ) {
     this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
@@ -73,7 +71,7 @@ export class OpponentGameboardComponent {
 
     this.gameboardContainer[method](
       'click',
-      this.handleCellClick as EventListener
+      this.handleCellClickAsyncWrapper as EventListener
     );
   }
 
@@ -329,7 +327,7 @@ export class OpponentGameboardComponent {
     }
   }
 
-  private handleCellClick = (e: MouseEvent): void => {
+  private handleCellClick = async (e: MouseEvent): Promise<void> => {
     if (
       !(e.target instanceof HTMLDivElement) ||
       !e.target.matches('.grid-cell')
@@ -354,33 +352,16 @@ export class OpponentGameboardComponent {
 
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(coordinates);
+    
+    this.gameState.eventBus.emit('setAndScrollToNextSitRep', attackResult);
 
-    this.setAndScrollToNextSitRep(attackResult);
-    this.updateGameboardPostAttack(attackResult, gridCell);
-
-    // 💭 --------------------------------------------------------------
-    // 💭 toggleTurnState
-
-    const { hit, isSunk, type } = attackResult;
-
-    if ((hit && !isSunk) || !hit) {
-      // GameState
-
-      // return;
-    }
-
-    // a ship has been sunk at this point
-    if (
-      this.playerState.gameboardRepository.areAllShipsSunk()
-    ) {
-      // ? get winner
-      this.transitionToNextPhase();
-      // return;
-    }
-
-    // ? toggle player turn state
-    // 💭 --------------------------------------------------------------
+    await this.updateGameboardPostAttack(attackResult, gridCell); // make this async...resolve on animation end plus a second or two
+    this.togglePlayerTurn(attackResult); 
   };
+
+  private handleCellClickAsyncWrapper = (e: MouseEvent): void => {
+    this.handleCellClick(e).catch(console.error);
+  }
 
   private handleShipUnitCooked(e: AnimationEvent): void {
     const shipContainerElement = e.target as HTMLDivElement;
@@ -419,15 +400,38 @@ export class OpponentGameboardComponent {
     return alreadyAttacked;
   }
 
-  private updateGameboardPostAttack({ hit, isSunk, type }: AttackResult, gridCell: HTMLDivElement): void {
+  private checkForWin(): void {
+    if (this.playerState.gameboardRepository.areAllShipsSunk()) {
+
+      // TODO: Do something fun with this value.. set winner in repository ?
+      alert(`${this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'} mother fucker! #TYPESHIT`);
+
+      this.gameState.transitionToNextPhase();
+    }
+  }
+
+  private togglePlayerTurn(attackResult: AttackResult): void {
+    const { hit, isSunk } = attackResult;
+
+    if ((hit && !isSunk) || !hit) {
+      this.gameState.togglePlayerTurn();
+      return;
+    }
+
+    if (hit && isSunk) {
+      this.checkForWin();
+    }
+  }
+
+  private async updateGameboardPostAttack(attackResult: AttackResult, gridCell: HTMLDivElement): Promise<void> {
+    const { hit, isSunk, type } = attackResult;
+
     if (!hit) {
       gridCell.classList.add('miss');
-      this.togglePlayerTurn();
     }
 
     if (hit && !isSunk) {
       gridCell.classList.add('hit');
-      this.togglePlayerTurn();
     }
 
     if (hit && isSunk) {
@@ -463,7 +467,16 @@ export class OpponentGameboardComponent {
       // ? after the is cooked animation check for win
       // ? if no win, trigger player turn state
       // ? if win, trigger post-bellum state
+
+      // ? refactor to make more compliant with SRP
     }
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // TODO: use sit rep scroller to resolve on animation end rather than using a timeout
+        resolve();
+      }, 3000);
+    });
   }
 
   private sinkShip(shipContainerElement: HTMLDivElement): void {

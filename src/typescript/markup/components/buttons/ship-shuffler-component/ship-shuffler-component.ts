@@ -2,8 +2,8 @@ import { BattleshipBoardController } from "../../../../logic/bs-gameboard-contro
 import { createElement } from "../../../../utilities/random-utilities";
 import { Fleet } from "../../../../types/logic-types";
 import { randomizeBSGameboard } from "../../../../setup/randomize-bs-gameboard";
-import GlobalEventBus from "../../../../utilities/event-bus";
 import './ship-shuffler-component.scss';
+import { GameState } from "../../../../state/game-state";
 
 export class ShipShufflerButtonComponent {
   private readonly shipShufflerButton: HTMLButtonElement;
@@ -14,14 +14,15 @@ export class ShipShufflerButtonComponent {
   #listenerAttached: boolean = false;
   private readonly shuffleShips: () => void = () => {
     this.randomizeGameboard();
-    this.updateGameboard(this.gameboardContainer);
+    this.updateGameboard();
   };
 
   constructor(
     private id: string,
     private gameboardContainer: HTMLElement,
     private gameboardController: BattleshipBoardController,
-    private fleet: Fleet
+    private fleet: Fleet,
+    private gameState: GameState
   ) {
     this.shipShufflerButton = this.createshipShufflerButton(
       `${this.id}-${this.buttonClass}`,
@@ -78,8 +79,8 @@ export class ShipShufflerButtonComponent {
     randomizeBSGameboard(this.gameboardController, this.fleet);
   }
 
-  private updateGameboard(gameboardContainer: HTMLElement) {
-    GlobalEventBus.emit('updateGameboard', gameboardContainer);
+  private updateGameboard(): void {
+    this.gameState.eventBus.emit('updateGameboard');
   }
 
   // 💭 --------------------------------------------------------------

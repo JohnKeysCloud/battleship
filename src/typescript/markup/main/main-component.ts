@@ -9,6 +9,8 @@ import { InstructionsComponent } from "../components/buttons/instructions-compon
 import { CycloneHotSwapContainer } from "../../utilities/cycloneHotSwapContainer";
 import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import { CycloneSitRepScroller } from "../../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller";
+import EventBus from "../../utilities/event-bus";
+import { GameState } from "../../state/game-state";
 
 export class MainComponent {
   private readonly mainElement: HTMLElement = createElement('main');
@@ -22,22 +24,18 @@ export class MainComponent {
   constructor(
     private readonly players: { player: PlayerState; opponent: PlayerState },
     private readonly instructionsLightboxController: CycloneLightboxController,
-    private readonly sitRepScrollerController: CycloneSitRepScroller,
-    private readonly togglePlayerTurn: () => void,
+    private readonly cycloneSitRepScroller: CycloneSitRepScroller,
     // ? maybe set to return string used to update ui via the css-class `player-turn` || `opponent-turn`
-    private readonly transitionToNextPhase: () => void
+    private readonly gameState: GameState
   ) {
     this.instructionsButton = new InstructionsComponent(
       this.instructionsLightboxController
     );
-    this.sitRepScrollerController = sitRepScrollerController;
 
     this.mainContainerOne = this.createMainContainerOne();
     this.mainContainerTwo = new MainContainerTwo(
       this.players,
-      this.sitRepScrollerController.setAndScrollToNextSitRep,
-      this.togglePlayerTurn,
-      this.transitionToNextPhase
+      this.gameState
     );
     this.mainContainerThree = this.createMainContainerThree();
 
@@ -47,7 +45,7 @@ export class MainComponent {
   private createMainContainerOne(): CycloneHotSwapContainer {
     return createMainContainerOne(
       this.instructionsButton,
-      this.sitRepScrollerController
+      this.cycloneSitRepScroller
     );
   }
 
@@ -55,7 +53,7 @@ export class MainComponent {
     return createMainContainerThree(
       this.mainContainerTwo.playerGameboard,
       this.instructionsButton,
-      this.transitionToNextPhase
+      this.gameState
     );
   }
 

@@ -2,7 +2,7 @@
 
 type Listener<T = any> = (data: T) => void;
 
-class EventBus {
+export default class EventBus {
   private events: Record<string, Array<Listener>> = {};
 
   /**
@@ -39,7 +39,3 @@ class EventBus {
     }
   }
 }
-
-const GlobalEventBus = new EventBus();
-
-export default GlobalEventBus;

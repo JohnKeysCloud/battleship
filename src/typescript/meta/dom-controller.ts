@@ -9,7 +9,7 @@ import { createHeader } from '../markup/header/header';
 import { MainComponent } from '../markup/main/main-component';
 import { InstructionsDialogComponent } from '../markup/components/instructions-dialog-component/instructions-dialog-component';
 import { CycloneSitRepScroller } from '../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller';
-import { PlayerType } from '../types/state-types';
+import { AttackResult, PlayerType } from '../types/state-types';
 
 // 💭 --------------------------------------------------------------
 
@@ -25,7 +25,9 @@ export class DOMController {
     new InstructionsDialogComponent();
   // private readonly footer: HTMLElement;
 
-  constructor(private readonly gameState: GameState) {
+  constructor(
+    private readonly gameState: GameState,
+  ) {
     if (!document) throw new Error('Fuck!');
 
     const content = document.getElementById('content');
@@ -40,11 +42,12 @@ export class DOMController {
       players,
       this.instructionsLightboxController,
       this.cycloneSitRepScroller,
-      this.togglePlayerTurn,
-      this.transitionToNextPhase,
+      this.gameState, 
     );
 
-    // this.initializeSitRepScroller('player');
+    this.gameState.eventBus.on('transitionToNextPhase', this.transitionToNextPhase);
+    this.gameState.eventBus.on('togglePlayerTurn', this.togglePlayerTurn);
+    this.gameState.eventBus.on('setAndScrollToNextSitRep', this.cycloneSitRepScroller.setAndScrollToNextSitRep);
 
     // this.footer = createFooter();
   }
@@ -56,29 +59,24 @@ export class DOMController {
     // append footer via here
   }
 
-  // ? initializes player turn state (I like this name better 😎). {TIMELESS ARTIFACT 💭}
-  private readyPlayerOne = () => {
+  // ? sets initial turn state styles (I like this name better 😎). {TIMELESS ARTIFACT 💭}
+  private readyPlayerOne = (): void => {
     if (this.gameState.currentPlayer === 'player') {
       this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
     }
   }
 
-  private togglePlayerTurn = () => {
-    const nextPlayer: PlayerType = this.gameState.toggleCurrentPlayer();
-
-    if (nextPlayer === 'player') {
+  private togglePlayerTurn = (): void => {    
+    if (this.gameState.currentPlayer === 'player') {
       this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
     } else {
       this.mainComponent.mainContainerTwo.element.classList.remove('player-turn');
     }
   }
 
-  private transitionToNextPhase = async () => {
-    this.gameState.setNextPhase();
-
+  private transitionToNextPhase = async (): Promise<void> => {
     this.mainComponent.mainContainerOne.swapByOrder();
 
-  
     if (this.gameState.currentGamePhase === 'bellum') {
       this.gameState.setInitialPlayer();
       if (!this.gameState.currentPlayer) throw new Error('Current player must be set in game state.');
@@ -87,33 +85,29 @@ export class DOMController {
 
     this.mainComponent.mainContainerThree.swapByOrder();
 
-    await this.updateGameboardContainer(this.gameState);
+    await this.updateGameboardOnTransition(this.gameState);
   };
 
-  private updateGameboardContainer = async (gameState: GameState) => {
+  private updateGameboardOnTransition = async (gameState: GameState): Promise<void> => {
     if (this.gameState.currentGamePhase === 'parabellum') {
+      // TODO: reset gamePhase SCSS color 
       this.resetGame();
     }
 
-    if (this.gameState.currentGamePhase === 'bellum') {
-      const mainContainerTwo = this.mainComponent.mainContainerTwo.element;
-
-      // TODO: Add turn randomization animation
-      // ? Randomzation animation and potential board swap will be async
-      // ? so we need to await the completion of the animation before
-      // ? potentially swapping the active board and continuing the game
-
-      // ? controls board animations on turn change
+    if (this.gameState.currentGamePhase === 'bellum') {  
       this.readyPlayerOne();
+      // TODO: change gamePhase SCSS color 
+      const mainContainerTwo = this.mainComponent.mainContainerTwo.element;
+      // ? Do I want to manipulate the gameboard in anyway on transition to bellum
     }
-
+    
     if (this.gameState.currentGamePhase === 'postBellum') {
+      // TODO: change gamePhase SCSS color 
       // ? do something fun ?
     }
   };
 
-  // TODO: 
-  private initializeSitRepScroller = (firstPlayer: PlayerType) => {
+  private initializeSitRepScroller = (firstPlayer: PlayerType): void => {
     /*
     ┌─────────────────────────────────────────────────────────────────────────────┐
     │   The event listener is dynamically triggered whenever a grid cell          │

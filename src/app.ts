@@ -1,13 +1,15 @@
 import { initApp } from './typescript/meta/init-app';
 import { DOMController } from './typescript/meta/dom-controller';
 import { GameState } from './typescript/state/game-state';
-
+import EventBus from './typescript/utilities/event-bus';
 class App {
-  public readonly domController: DOMController;
+  public readonly eventBus: EventBus;
   public readonly gameState: GameState;
+  public readonly domController: DOMController;
 
   private constructor() {
-    this.gameState = new GameState();
+    this.eventBus = new EventBus();
+    this.gameState = new GameState(this.eventBus);
     this.domController = new DOMController(this.gameState);
   }
 
