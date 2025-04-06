@@ -4,6 +4,9 @@ import { InstructionsComponent } from "../instructions-component/instructions-co
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';
 
+// ! for testing
+import { app } from "../../../../../app";
+
 export class ReadyUpButtonComponent {
   private readonly readyUpButton: HTMLButtonElement;
   private readonly readyUpButtonContainer: HTMLDivElement;
@@ -61,6 +64,9 @@ export class ReadyUpButtonComponent {
 
     // remove `adrift` class from ship containers
     this.playerGameboardComponent.toggleShipAdriftClass();
+
+    // ! for testing
+    this.playerGameboardComponent.gameboardContainer.addEventListener('click', () => app.gameState.togglePlayerTurn());
   }
 
   private createReadyUpButton(id: string): HTMLButtonElement {

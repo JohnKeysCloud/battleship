@@ -5,6 +5,10 @@ export const areArraysEqual = <T>(arrayOne: T[], arrayTwo: T[]) =>
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
+export const delay = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const getConvertedTypeFromAttr = <T extends string>(
   element: HTMLElement,
   attribute: string,
@@ -26,12 +30,6 @@ export const isEmptyObject = (obj: Record<PropertyKey, unknown>): boolean => {
     Object.getOwnPropertySymbols(obj).length === 0
   );
 };
-
-export type Range<N extends number, Acc extends number[] = []> =
-  Acc['length'] extends N
-    ? Acc[number]
-    : Range<N, [...Acc, Acc['length']]>;
-    
 
 export const createElement = <K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -74,3 +72,43 @@ export const generateListFragment = (
   
   return listFragment;
 };
+
+export const waitForAnimationEnd = (element: HTMLElement): Promise<void> => {
+  return new Promise((resolve) => {
+    const handler = () => {
+      element.removeEventListener('animationend', handler);
+      resolve();
+    };
+    element.addEventListener('animationend', handler);
+  });
+}
+export const waitForTransitionEnd = (element: HTMLElement, callback?: () => void): Promise<void> => {
+  return new Promise((resolve) => {
+    const handler = () => {
+      element.removeEventListener('transitionend', handler);
+      resolve();
+      if (callback) callback();
+    };
+    element.addEventListener('transitionend', handler);
+  });
+}
+
+export const waitForEvent = <K extends keyof HTMLElementEventMap>(
+  element: HTMLElement,
+  eventType: K,
+  callback?: () => void
+): Promise<HTMLElementEventMap[K]> => {
+  return new Promise((resolve) => {
+    const handler = (event: HTMLElementEventMap[K]) => {
+      element.removeEventListener(eventType, handler as EventListener);
+      resolve(event);
+      if (callback) callback();
+    };
+    element.addEventListener(eventType, handler as EventListener);
+  });
+};
+
+export type Range<
+  N extends number,
+  Acc extends number[] = []
+> = Acc['length'] extends N ? Acc[number] : Range<N, [...Acc, Acc['length']]>;

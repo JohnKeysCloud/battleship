@@ -1,6 +1,6 @@
-// 💭 Pub-sub/Mediator Pattern
+// 💭 Pub-sub/Mediator Pattern with Async Support
 
-type Listener<T = any> = (data: T) => void;
+type Listener<T = any> = (data: T) => void | Promise<void>;
 
 export default class EventBus {
   private events: Record<string, Array<Listener>> = {};
@@ -30,12 +30,15 @@ export default class EventBus {
 
   /**
    * Emit an event, calling all listeners registered for it.
+   * Supports awaiting asynchronous listeners.
    * @param eventName - The name of the event.
    * @param data - The data to pass to the listeners (optional).
+   * @returns A promise that resolves when all listeners have finished.
    */
-  emit<T>(eventName: string, data?: T): void {
+  async emit<T>(eventName: string, data?: T): Promise<void> {
     if (this.events[eventName]) {
-      this.events[eventName].forEach((fn) => fn(data));
+      // Await all listener executions (in parallel)
+      await Promise.all(this.events[eventName].map((fn) => fn(data)));
     }
   }
 }

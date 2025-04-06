@@ -248,6 +248,7 @@
 .ship-unit {
   position: relative;
   pointer-events: none;
+  transition: opacity 380ms ease-in;
   z-index: 0;
 
   // ? cooked styles
@@ -262,7 +263,7 @@
     opacity: 0;
     position: absolute;
     pointer-events: none;
-    transition: opacity 380ms ease-in;
+    transition: inherit;
     z-index: 1;
   }
 

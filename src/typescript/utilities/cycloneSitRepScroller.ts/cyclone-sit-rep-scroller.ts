@@ -5,7 +5,7 @@ import {
   MessageType,
   PlayerType,
 } from '../../types/state-types';
-import { createElement } from '../random-utilities';
+import { createElement, delay, waitForTransitionEnd } from '../random-utilities';
 /* 
   ┌─────────────────────────────────────────────────────────────────────────┐
   │ TODO: Make more reusable by enabling custom messages and adding         │
@@ -62,7 +62,7 @@ export class CycloneSitRepScroller {
   constructor() {
     const { container, current, next }: ControlledSitRepElements =
       this.getControlledSitRepElements();
-    
+
     console.log(container, current, next);
 
     this.sitRepContainer = container;
@@ -79,20 +79,26 @@ export class CycloneSitRepScroller {
   public initialize = (firstPlayer: PlayerType): void => {
     this.currentPlayer = firstPlayer;
     this.setInitialTextContent(firstPlayer);
-  }
+  };
 
-  public readonly setAndScrollToNextSitRep = (attackResult?: AttackResult): void => {
+  public readonly setAndScrollToNextSitRep = async (
+    attackResult?: AttackResult
+  ): Promise<void> => {
+    const DELAY_AFTER_TRANSITION_SECONDS: number = 0.5;
+
     this.nextSitRep = attackResult
       ? this.getNextSitRep(attackResult)
       : this.getNextSitRep();
 
     this.sitRepTextElements.next.textContent = this.nextSitRep;
-
     this.sitRepContainer.classList.add('scrolling');
-    this.sitRepContainer.addEventListener(
-      'transitionend',
-      this.resetSitRepContainer
-    );
+
+    // pauses execution until the transition ends
+    await waitForTransitionEnd(this.sitRepContainer);
+
+    this.resetSitRepContainer();
+
+    await delay(DELAY_AFTER_TRANSITION_SECONDS * 1000); 
   };
 
   // 💭 --------------------------------------------------------------
@@ -175,12 +181,12 @@ export class CycloneSitRepScroller {
   // 💭 --------------------------------------------------------------
 
   private readonly getControlledSitRepElements = (): ControlledSitRepElements => {
-    const sitRepContainerTypes: SitRepType[] = ['current', 'next'];
-    const sitRepContainer = createElement('div', [], {
-      id: 'sit-rep-container',
-    });
+      const sitRepContainerTypes: SitRepType[] = ['current', 'next'];
+      const sitRepContainer = createElement('div', [], {
+        id: 'sit-rep-container',
+      });
 
-    /* 
+      /* 
     ┌─────────────────────────────────────────────────────────────────────────────┐
     │  We're using `null as unknown as HTMLDivElement` instead of a               │
     │  non-null assertion (`!`) to initialize the variables as `null`             │
@@ -203,47 +209,47 @@ export class CycloneSitRepScroller {
     │  in time. This reduces the risk of potential runtime errors.                │
     └─────────────────────────────────────────────────────────────────────────────┘
   */
-    let currentTextContentElement: HTMLDivElement =
-      null as unknown as HTMLDivElement;
-    let nextTextContentElement: HTMLDivElement =
-      null as unknown as HTMLDivElement;
-    let currentSitRepContainer: HTMLDivElement =
-      null as unknown as HTMLDivElement;
-    let nextSitRepContainer: HTMLDivElement =
-      null as unknown as HTMLDivElement;
+      let currentTextContentElement: HTMLDivElement =
+        null as unknown as HTMLDivElement;
+      let nextTextContentElement: HTMLDivElement =
+        null as unknown as HTMLDivElement;
+      let currentSitRepContainer: HTMLDivElement =
+        null as unknown as HTMLDivElement;
+      let nextSitRepContainer: HTMLDivElement =
+        null as unknown as HTMLDivElement;
 
-    sitRepContainerTypes.forEach((type) => {
-      const textContentElement: HTMLDivElement = createElement(
-        'div',
-        ['sit-rep-text-content'],
-        {
-          id: `${type}-sit-rep-text-content`,
-        }
-      );
-      type === 'current'
-        ? (currentTextContentElement = textContentElement)
-        : (nextTextContentElement = textContentElement);
+      sitRepContainerTypes.forEach((type) => {
+        const textContentElement: HTMLDivElement = createElement(
+          'div',
+          ['sit-rep-text-content'],
+          {
+            id: `${type}-sit-rep-text-content`,
+          }
+        );
+        type === 'current'
+          ? (currentTextContentElement = textContentElement)
+          : (nextTextContentElement = textContentElement);
 
-      const sitRepContentContainer: HTMLDivElement = createElement(
-        'div',
-        ['sit-rep-slot'],
-        {
-          id: `${type}-update-container`,
-        }
-      );
-      type === 'current'
-        ? (currentSitRepContainer = sitRepContentContainer)
-        : (nextSitRepContainer = sitRepContentContainer);
+        const sitRepContentContainer: HTMLDivElement = createElement(
+          'div',
+          ['sit-rep-slot'],
+          {
+            id: `${type}-update-container`,
+          }
+        );
+        type === 'current'
+          ? (currentSitRepContainer = sitRepContentContainer)
+          : (nextSitRepContainer = sitRepContentContainer);
 
-      sitRepContentContainer.appendChild(textContentElement);
-    });
+        sitRepContentContainer.appendChild(textContentElement);
+      });
 
-    sitRepContainer.append(nextSitRepContainer, currentSitRepContainer);
+      sitRepContainer.append(nextSitRepContainer, currentSitRepContainer);
 
-    return {
-      container: sitRepContainer,
-      current: currentTextContentElement,
-      next: nextTextContentElement,
+      return {
+        container: sitRepContainer,
+        current: currentTextContentElement,
+        next: nextTextContentElement,
+      };
     };
-  };
 }
