@@ -24,7 +24,7 @@ export function createMainContainerThree(
 
   const shipShufflerButton = new ShipShufflerButtonComponent(
     playerGameboardComponent.id,
-    playerGameboardComponent.gameboardContainer,
+    // playerGameboardComponent.gameboardContainer, // TODO: do i need this?
     playerGameboardController,
     playerFleet,
     gameState

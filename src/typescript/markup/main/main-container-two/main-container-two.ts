@@ -3,8 +3,7 @@ import { createElement } from "../../../utilities/random-utilities";
 import { PlayerGameboardComponent } from "../../components/gameboard-component/player-gameboard-component/player-gameboard-component";
 import { OpponentGameboardComponent } from "../../components/gameboard-component/opponent-gameboard-component/opponent-gameboard-component";
 
-import { AttackResult, PlayerState } from "../../../types/state-types";
-import EventBus from "../../../utilities/event-bus";
+import { PlayerState } from "../../../types/state-types";
 import { GameState } from "../../../state/game-state";
 
 export class MainContainerTwo {
@@ -18,7 +17,10 @@ export class MainContainerTwo {
     private readonly gameState: GameState 
 
   ) {
-    this.playerGameboardComponent = new PlayerGameboardComponent(players.player, this.gameState.eventBus);
+    this.playerGameboardComponent = new PlayerGameboardComponent(
+      players.player,
+      this.gameState
+    );
     this.opponentGameboardComponent = new OpponentGameboardComponent(
       players.opponent,
       this.gameState

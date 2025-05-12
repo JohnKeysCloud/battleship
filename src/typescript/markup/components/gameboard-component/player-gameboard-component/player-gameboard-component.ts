@@ -12,8 +12,7 @@ import {
   ShipSymbolValueArray,
   ShipType,
 } from '../../../../types/logic-types';
-import { PlayerState } from '../../../../types/state-types';
-import GlobalEventBus from '../../../../utilities/event-bus';
+import { AttackResult, CurrentPlayer, PlayerState } from '../../../../types/state-types';
 import {
   isOrientation,
   isShipLength,
@@ -31,7 +30,7 @@ import {
 } from '../../component-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
-import EventBus from '../../../../utilities/event-bus';
+import { GameState } from '../../../../state/game-state';
 
 
 export class PlayerGameboardComponent {
@@ -66,7 +65,7 @@ export class PlayerGameboardComponent {
 
   constructor(
     public readonly playerState: PlayerState,
-    private readonly eventBus: EventBus
+    private readonly gameState: GameState
   ) {
     this.gameboardContainer = this.generateBoardContainer(
       this.playerState.gameboardBuilder.boardSize
@@ -78,7 +77,8 @@ export class PlayerGameboardComponent {
     this.dragImage = this.createDragImage();
     this.shipDragClone = this.createShipDragClone();
 
-    this.eventBus.on('updateGameboard', this.updateGameboardWrapper);
+    this.gameState.eventBus.on('updateGameboard', this.updateGameboardWrapper);
+    this.gameState.eventBus.on('toggleActiveGameboard', this.toggleActive);
   }
 
   public render(targetElement: HTMLElement): void {
@@ -97,30 +97,49 @@ export class PlayerGameboardComponent {
       this.playerState.fleetBuilder,
       this.fleetElements
     );
-    this.toggleGameboardContainerEventListeners();
+    this.toggleParabellumListeners();
 
     targetElement.appendChild(this.gameboardContainer);
   }
 
-  public toggleGameboardContainerEventListeners(): void {
+  public toggleParabellumListeners(): void {
     if (!this.gameboardContainer) return;
 
     const method = this.listenersAdded
       ? 'removeEventListener'
       : 'addEventListener';
 
-    // Drag Events
+    // * Toggle Drag Events
     Object.entries(this.dragEventCallbacks).forEach(([event, callback]) => {
       this.gameboardContainer[method](event, callback as EventListener);
     });
 
-    // Rotation Event
+    // * Toggle Rotation Event
     this.gameboardContainer[method](
       'click',
       this.handleShipRotation as EventListener
     );
 
     this.listenersAdded = !this.listenersAdded;
+  }
+
+  private togglePlayerTurn(attackResult: AttackResult): void {
+    const { hit, isSunk } = attackResult;
+
+    if ((hit && !isSunk) || !hit) {
+      this.gameState.togglePlayerTurn();
+      return;
+    }
+
+    if (hit && isSunk) {
+      const gameOver = this.checkForWin();
+      if (!gameOver) {
+        this.gameState.togglePlayerTurn();
+        return;
+      }
+
+      // ? if it is game over, do some shit
+    }
   }
 
   public toggleShipsDraggable(): void {
@@ -154,7 +173,23 @@ export class PlayerGameboardComponent {
       shipElement.style.gridRow = gridPlacementValue;
       shipElement.style.gridColumn = gridCrossAxis.toString();
       shipElement.style.gridTemplateRows = `repeat(${shipLength}, 1fr)`;
-    } 
+    }
+  }
+
+  // TODO: move this to game state
+  private checkForWin(): boolean {
+    if (!this.playerState.gameboardRepository.areAllShipsSunk()) return false;
+
+    // TODO: Do something fun with this value.. set winner in repository ?
+    alert(
+      `${
+        this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
+      } mother fucker! #TYPESHIT`
+    );
+
+    this.gameState.transitionToNextPhase();
+
+    return true;
   }
 
   private createDragImage(): HTMLImageElement {
@@ -255,7 +290,7 @@ export class PlayerGameboardComponent {
       orientation,
       shipLength
     );
-    
+
     return shipContainerElement;
   }
 
@@ -359,6 +394,17 @@ export class PlayerGameboardComponent {
     this.placeFleetOnGameboard(fleetElements);
   }
 
+  private hasTargetBeenAttacked(coordinates: Coordinates): boolean {
+    const alreadyAttacked =
+      this.playerState.gameboardRepository.hasTargetBeenAttacked(coordinates);
+
+    if (!alreadyAttacked) {
+      this.playerState.gameboardRepository.addAttackedCoordinates(coordinates);
+    }
+
+    return alreadyAttacked;
+  }
+
   private placeFleetOnGameboard(fleetElements: Set<HTMLDivElement>): void {
     const gameboard =
       this.gameboardContainer.querySelector<HTMLDivElement>('.gameboard');
@@ -370,6 +416,19 @@ export class PlayerGameboardComponent {
     fleetElements.forEach((shipElement) => gameboard.appendChild(shipElement));
   }
 
+  // ! seat this bitch in the event bus
+  private receiveAttack(attackCoordinates: Coordinates): void {
+    if (this.hasTargetBeenAttacked(attackCoordinates)) {
+      // TODO: apply miss animation
+      return;
+    }
+
+    const attackResult: AttackResult =
+      this.playerState.gameboardController.receiveAttack(attackCoordinates);
+
+    this.togglePlayerTurn(attackResult);
+  }
+
   private setFleetElements = (
     shipType: ShipType,
     shipLength: ShipLength,
@@ -377,16 +436,22 @@ export class PlayerGameboardComponent {
     gridCrossAxis: number,
     orientation: Orientation
   ) => {
-      const shipElement: HTMLDivElement = this.createShipElement(
-        shipType,
-        shipLength,
-        gridPlacementValue,
-        gridCrossAxis,
-        orientation
-      );
+    const shipElement: HTMLDivElement = this.createShipElement(
+      shipType,
+      shipLength,
+      gridPlacementValue,
+      gridCrossAxis,
+      orientation
+    );
 
-      this.fleetElements.add(shipElement);
-  }
+    this.fleetElements.add(shipElement);
+  };
+
+  private toggleActive = (currentPlayer: CurrentPlayer): void => {
+    currentPlayer === 'opponent'
+      ? (this.gameboardContainer.style.pointerEvents = 'none')
+      : (this.gameboardContainer.style.pointerEvents = 'auto');
+  };
 
   private updateFleetElements = (fleetBuilder: BattleshipFleetBuilder) => {
     if (this.fleetElements.size) this.fleetElements.clear();
@@ -449,10 +514,10 @@ export class PlayerGameboardComponent {
 
   private updateGameboardWrapper = () => {
     this.updateGameboard(this.gameboardContainer);
-  }
+  };
 
   // 💭 --------------------------------------------------------------
-  // 💭 Ship Repositioning 
+  // 💭 Ship Repositioning
 
   private handleShipDragStart(e: DragEvent, dragState: DragState) {
     if (

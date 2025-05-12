@@ -15,7 +15,109 @@
   --ship-clone-top: auto;
 }
 
+.gameboard-container {
+  background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+  backdrop-filter: blur(10px); /* Glass blur effect */
+  border: 3px ridge silver;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Soft shadow */
+  display: grid;
+  grid-template: 1fr / 1fr;
+  height: min(380px, 90vw);
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+  transition: opacity 1s ease, transform 0.5s ease, z-index 0s ease;  // ? Transition test
+  width: min(380px, 90vw);
+
+    &:has(.ship-container.lower-opacity) .ship-container::before {
+      animation-play-state: paused;
+    }
+
+    .gameboard,
+    .gameboard-background {
+      display: grid;
+      gap: min(1.2vw, 0.75rem);
+      // ? row-start / column-start / row-span / column-span
+      grid-area: 1 / 1 / span 1 / span 1; 
+      grid-template: repeat(var(--grid-size), 1fr) / repeat(var(--grid-size), 1fr);
+    }
+
+    .gameboard {
+      border-radius: inherit;
+      pointer-events: none;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .gameboard-background {
+      border-radius: inherit;
+
+      .grid-cell-container {
+        border-radius: 50%;
+        box-shadow: inset 3px 3px 6px rgb(22, 22, 22),
+        inset -3px -3px 6px rgb(33, 33, 33);
+
+        .grid-cell {
+          border-radius: inherit;
+          height: 100%;
+          position: relative;
+          width: 100%;
+          z-index: 0;
+
+          &::before {
+            border-radius: 50%;
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background-color: var(--color-funky);
+            box-shadow: 0 0 8px var(--color-funky);
+            z-index: 1;
+          }
+
+          &::after {
+            border-radius: 50%;
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background-color: var(--color-binky);
+            box-shadow: 0 0 8px var(--color-binky);
+            z-index: 1;
+          }
+
+          &.placement-is-valid {
+            &::before {
+              opacity: 1;
+            }
+          }
+
+          &.placement-is-invalid {
+            &::after {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+}
+
+#player-gameboard-container {
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+} 
+
 #opponent-gameboard-container {
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transform: scale(0.8) translateY(60px);
+  z-index: 0;
+
   .grid-cell-container {
     position: relative;
 
@@ -108,95 +210,6 @@
       cursor: not-allowed;
     }
   }
-}
-
-.gameboard-container {
-  background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
-  -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
-  backdrop-filter: blur(10px); /* Glass blur effect */
-  border: 3px ridge silver;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Soft shadow */
-  display: grid;
-  grid-template: 1fr / 1fr;
-  height: min(380px, 90vw);
-  overflow: hidden;
-  padding: 1rem;
-  position: relative;
-  width: min(380px, 90vw);
-
-    &:has(.ship-container.lower-opacity) .ship-container::before {
-      animation-play-state: paused;
-    }
-
-    .gameboard,
-    .gameboard-background {
-      display: grid;
-      gap: min(1.2vw, 0.75rem);
-      // ? row-start / column-start / row-span / column-span
-      grid-area: 1 / 1 / span 1 / span 1; 
-      grid-template: repeat(var(--grid-size), 1fr) / repeat(var(--grid-size), 1fr);
-    }
-
-    .gameboard {
-      border-radius: inherit;
-      pointer-events: none;
-      width: 100%;
-      z-index: 1;
-    }
-
-    .gameboard-background {
-      border-radius: inherit;
-
-      .grid-cell-container {
-        border-radius: 50%;
-        box-shadow: inset 3px 3px 6px rgb(22, 22, 22),
-        inset -3px -3px 6px rgb(33, 33, 33);
-
-        .grid-cell {
-          border-radius: inherit;
-          height: 100%;
-          position: relative;
-          width: 100%;
-          z-index: 0;
-
-          &::before {
-            border-radius: 50%;
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background-color: var(--color-funky);
-            box-shadow: 0 0 8px var(--color-funky);
-            z-index: 1;
-          }
-
-          &::after {
-            border-radius: 50%;
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background-color: var(--color-binky);
-            box-shadow: 0 0 8px var(--color-binky);
-            z-index: 1;
-          }
-
-          &.placement-is-valid {
-            &::before {
-              opacity: 1;
-            }
-          }
-
-          &.placement-is-invalid {
-            &::after {
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
 }
 
 .ship-container {

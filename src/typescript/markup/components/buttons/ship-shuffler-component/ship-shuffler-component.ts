@@ -19,7 +19,7 @@ export class ShipShufflerButtonComponent {
 
   constructor(
     private id: string,
-    private gameboardContainer: HTMLElement,
+    // private gameboardContainer: HTMLElement, // TODO: do i need this?
     private gameboardController: BattleshipBoardController,
     private fleet: Fleet,
     private gameState: GameState

@@ -16,7 +16,7 @@ import {
   delay,
   waitForEvent,
 } from '../../../../utilities/random-utilities';
-import { AttackResult, PlayerState } from '../../../../types/state-types';
+import { AttackResult, CurrentPlayer, PlayerState } from '../../../../types/state-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
 
@@ -43,6 +43,8 @@ export class OpponentGameboardComponent {
     );
 
     this.updateFleetElements(this.playerState.fleetBuilder);
+
+    this.gameState.eventBus.on('toggleActiveGameboard', this.toggleActive);
   }
 
   public render(targetElement: HTMLElement): void {
@@ -59,12 +61,12 @@ export class OpponentGameboardComponent {
 
     this.placeFleetOnGameboard(this.fleetElements);
 
-    this.toggleGameboardContainerEventListeners();
+    this.toggleBellumListeners();
 
     targetElement.appendChild(this.gameboardContainer);
   }
 
-  public toggleGameboardContainerEventListeners(): void {
+  public toggleBellumListeners(): void {
     if (!this.gameboardContainer) return;
 
     const method = this.listenersAdded
@@ -73,8 +75,10 @@ export class OpponentGameboardComponent {
 
     this.gameboardContainer[method](
       'click',
-      this.handleCellClickAsyncWrapper as EventListener
+      this.handleCellClick as EventListener
     );
+
+    this.listenersAdded = !this.listenersAdded;
   }
 
   // 💭 --------------------------------------------------------------
@@ -256,6 +260,17 @@ export class OpponentGameboardComponent {
     );
   }
 
+  private getAttackCoordinates(gridCell: HTMLDivElement): Coordinates {
+    const dataX = gridCell.getAttribute('data-x');
+    const dataY = gridCell.getAttribute('data-y');
+
+    if (dataX == null || dataY == null) {
+      throw new Error('Could not retrieve coordinates from grid cell.');
+    }
+
+    return [+dataX, +dataY];
+  }
+
   private getGridPlacementValue(
     coordinates: Coordinates,
     orientation: Orientation,
@@ -297,7 +312,7 @@ export class OpponentGameboardComponent {
     };
   }
 
-  private handleCellClick = async (e: MouseEvent): Promise<void> => {
+  private async receiveAttack(e: MouseEvent): Promise<void> {
     if (
       !(e.target instanceof HTMLDivElement) ||
       !e.target.matches('.grid-cell')
@@ -306,30 +321,25 @@ export class OpponentGameboardComponent {
 
     const gridCell: HTMLDivElement = e.target;
 
-    const dataX = gridCell.getAttribute('data-x');
-    const dataY = gridCell.getAttribute('data-y');
+    const attackCoordinates: Coordinates = this.getAttackCoordinates(gridCell);
 
-    if (dataX === null || dataY === null) {
-      throw new Error('Could not retrieve coordinates from grid cell.');
-    }
-
-    const coordinates: Coordinates = [+dataX, +dataY];
-
-    if (this.hasTargetBeenAttacked(coordinates)) {
+    if (this.hasTargetBeenAttacked(attackCoordinates)) {
       // TODO: apply miss animation
       return;
     }
 
+    this.gameState.toggleActiveGameboard();
+
     const attackResult: AttackResult =
-      this.playerState.gameboardController.receiveAttack(coordinates);
+      this.playerState.gameboardController.receiveAttack(attackCoordinates);
 
     await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
 
     this.togglePlayerTurn(attackResult);
-  };
+  }
 
-  private handleCellClickAsyncWrapper = (e: MouseEvent): void => {
-    this.handleCellClick(e).catch(console.error);
+  private handleCellClick = (e: MouseEvent): void => {
+    this.receiveAttack(e).catch(console.error);
   };
 
   private async handleShipUnitCooked(
@@ -407,6 +417,14 @@ export class OpponentGameboardComponent {
     await this.handleShipUnitCooked(shipContainerElement);
 
     await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
+  };
+
+  private toggleActive = (currentPlayer: CurrentPlayer): void => {
+    this.toggleBellumListeners();
+
+    currentPlayer === 'player'
+      ? (this.gameboardContainer.style.pointerEvents = 'none')
+      : (this.gameboardContainer.style.pointerEvents = 'auto');
   };
 
   private togglePlayerTurn(attackResult: AttackResult): void {

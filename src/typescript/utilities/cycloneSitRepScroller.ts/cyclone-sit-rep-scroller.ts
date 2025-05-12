@@ -63,8 +63,6 @@ export class CycloneSitRepScroller {
     const { container, current, next }: ControlledSitRepElements =
       this.getControlledSitRepElements();
 
-    console.log(container, current, next);
-
     this.sitRepContainer = container;
     this.sitRepTextElements = {
       current,

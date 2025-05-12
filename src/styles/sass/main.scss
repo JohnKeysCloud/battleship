@@ -50,7 +50,9 @@ h3 {
   font-size: 1.25rem;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   text-shadow: 0 0 12px var(--phase-of-war-color);
 }
 
@@ -62,7 +64,7 @@ ul {
 
 li {
   list-style: none;
-  text-wrap:  balance;
+  text-wrap: balance;
   text-shadow: 0 0 1px ghostwhite;
   text-align: center;
 
@@ -99,7 +101,7 @@ main {
     place-items: center;
     height: 75px;
     margin-inline: auto;
-    
+
     .parabellum {
       align-items: center;
       display: flex;
@@ -155,24 +157,6 @@ main {
     display: grid;
     place-items: center;
     position: relative;
-
-    // TODO: make transition smooth af
-    .gameboard-container {
-      transition: opacity 1s ease, transform 0.5s ease, z-index 0s ease;  // ? Transition test
-    }
-
-    #player-gameboard-container {
-      position: relative;
-      z-index: 1;
-    }
-
-    #opponent-gameboard-container {
-      opacity: 1;
-      pointer-events: none;
-      position: absolute;
-      transform: scale(0.8) translateY(60px);
-      z-index: 0;
-    }
 
     &.player-turn {
       #player-gameboard-container {

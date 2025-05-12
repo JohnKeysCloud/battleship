@@ -29,9 +29,14 @@ export class GameState {
     this.eventBus.emit('transitionToNextPhase');
   };
 
+  public toggleActiveGameboard = (): void => {
+    this.eventBus.emit('toggleActiveGameboard', this.currentPlayer);
+  }
+
   public togglePlayerTurn = (): void => {
     this.currentPlayer =
       this.currentPlayer === 'player' ? 'opponent' : 'player';
+    
     // Emit the event with the new player
     this.eventBus.emit('togglePlayerTurn');
     this.eventBus.emit('setAndScrollToNextSitRep');
