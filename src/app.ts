@@ -14,9 +14,9 @@ class App {
   private constructor() {
     this.eventBus = new EventBus();
     this.gameState = new GameState(this.eventBus);
-    // ? if multiplayer
-    this.billowBot = new BillowBot();
+    this.billowBot = new BillowBot(this.gameState); // ? only instantiate if multiplayer
     this.domController = new DOMController(this.gameState, this.billowBot);
+    // ? do not pass in billowBot if multiplayer (make the parameter optional in DOMController)
   }
 
   public static powerOn() {
@@ -33,7 +33,7 @@ class App {
 }
 
 console.time('powerOn');
-export const app = App.powerOn();
+export const app = App.powerOn(); // ? pass in isMultiplayer as a parameter
 console.timeEnd('powerOn');
 
 console.time('pressStart');
