@@ -1,6 +1,6 @@
 import { players } from "../../../state/player-state";
 
-import { FragmentKey } from "../../../types/markup-types";
+import { FragmentKey } from "../../../types/dom-types";
 
 import { PlayerGameboardComponent } from "../../components/gameboard-component/player-gameboard-component/player-gameboard-component";
 import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";

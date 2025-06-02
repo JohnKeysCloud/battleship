@@ -1,5 +1,5 @@
 import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";
-import { FragmentKey } from "../../../types/markup-types";
+import { FragmentKey } from "../../../types/dom-types";
 import { createMainOneParabellumFragment } from "./main-one-parabellum";
 import { createMainOneBellumFragment } from "./main-one-bellum";
 import { createMainOnePostBellumFragment } from "./main-one-post-bellum";
