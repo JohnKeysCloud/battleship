@@ -324,7 +324,7 @@ export class OpponentGameboardComponent {
     const attackCoordinates: Coordinates = this.getAttackCoordinates(gridCell);
 
     if (this.hasTargetBeenAttacked(attackCoordinates)) {
-      // TODO: apply miss animation
+      // TODO: Add a flash animation to indicate "Cell already attacked".
       return;
     }
 
@@ -333,13 +333,17 @@ export class OpponentGameboardComponent {
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
 
-    await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
+    try {
+      await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
+    } catch (error) {
+      console.error('Animatiwhat on failed', error);
+    }
 
     this.togglePlayerTurn(attackResult);
   }
 
   private handleCellClick = (e: MouseEvent): void => {
-    this.receiveAttack(e).catch(console.error);
+    this.receiveAttack(e);
   };
 
   private async handleShipUnitCooked(
