@@ -9,7 +9,7 @@ import { createHeader } from '../markup/header/header';
 import { MainComponent } from '../markup/main/main-component';
 import { InstructionsDialogComponent } from '../markup/components/instructions-dialog-component/instructions-dialog-component';
 import { CycloneSitRepScroller } from '../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller';
-import { PlayerType } from '../types/state-types';
+import { AttackResult, PlayerType } from '../types/state-types';
 import { BillowBot } from '../services/billow';
 import { Coordinates } from '../types/logic-types';
 
@@ -80,46 +80,48 @@ export class DOMController {
   private transitionToNextPhase = async (): Promise<void> => {
     if (this.gameState.currentGamePhase === 'bellum') {
       this.gameState.setInitialPlayer();
-      if (!this.gameState.currentPlayer) throw new Error('Current player must be set in game state.');
-      this.initializeSitRepScroller(this.gameState.currentPlayer); // ? make dynamic 
-      
-      if (this.gameState.currentPlayer === 'opponent') {
-        // ? && playing against billow
-        const billowFirstAttackCoordinates: Coordinates =
-          this.billowBot.firstAttackCoordinates;
 
-        console.log(
-          'billowFirstAttackCoordinates',
-          billowFirstAttackCoordinates
-        );
+      if (!this.gameState.currentPlayer)
+        throw new Error('Current player must be set in game state.');
 
-        // 💭emit billowAttack
-        // TODO: receive the attack in the playergameboardcomponent.
-
-        // match coordinates with corresponding grid cell on player gameboard
-
-        // 💭 method on billowBot `ponderAttackCoordinates` called by `billowAttack` event listener.
-        // apply animation to multiple random unattacked grid cells one at a time.
-        // (start off fast, slow down as time goes on (2 second long animation?)
-        // selected grid cell gets 'selected cell' animation (1 second long animation?)
-        // at the end of selected cell animation, apply hit / miss styles to the selected grid cell.
-
-        // 💭 method on playerGameboardComponent `receiveAttack`? called by `billowAttack` event listener.
-        // await one of the following:
-        // if hit, add cooked to ship unit at that coordinate
-        // if miss, add miss styles to grid cell at that coordinate
-
-        // 💭 check end game state
-        // check if all player ships are sunk
-        // if yes, declare winner
-        // if no, toggle turn
-      }
+      // ? set initial sit rep scroller text content
+      this.initializeSitRepScroller(this.gameState.currentPlayer); // ? make dynamic
     }
 
     this.mainComponent.mainContainerOne.swapByOrder();
     this.mainComponent.mainContainerThree.swapByOrder();
 
     await this.updateGameboardOnTransition(this.gameState);
+
+    // TODO move this somewhere?
+    if (this.gameState.currentPlayer === 'opponent') {
+      // ? && playing against billow (if multiplayer is introduced)
+    
+      const billowAttackResult: AttackResult =
+        await this.billowBot.attack();
+    
+      console.log('billowAttackResult', billowAttackResult);
+    
+      // 💭emit billowAttack
+      // TODO: emit receive attack in the playergameboardcomponentin billowBot.ts
+      // match coordinates with corresponding grid cell on player gameboard
+    
+      // 💭 method on billowBot `ponderAttackCoordinates` called by `billowAttack` event listener.
+      // apply animation to multiple random unattacked grid cells one at a time.
+      // (start off fast, slow down as time goes on (2 second long animation?)
+      // selected grid cell gets 'selected cell' animation (1 second long animation?)
+      // at the end of selected cell animation, apply hit / miss styles to the selected grid cell.
+    
+      // 💭 method on playerGameboardComponent `receiveAttack`? called by `billowAttack` event listener.
+      // await one of the following:
+      // if hit, add cooked to ship unit at that coordinate
+      // if miss, add miss styles to grid cell at that coordinate
+    
+      // 💭 check end game state
+      // check if all player ships are sunk
+      // if yes, declare winner
+      // if no, toggle turn
+    }
   };
 
   private updateGameboardOnTransition = async (gameState: GameState): Promise<void> => {

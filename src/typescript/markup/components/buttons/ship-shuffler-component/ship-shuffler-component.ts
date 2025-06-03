@@ -80,7 +80,7 @@ export class ShipShufflerButtonComponent {
   }
 
   private updateGameboard(): void {
-    this.gameState.eventBus.emit('updateGameboard');
+    this.gameState.eventBus.emit('refreshGameboard');
   }
 
   // 💭 --------------------------------------------------------------
