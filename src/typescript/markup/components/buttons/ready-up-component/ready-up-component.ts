@@ -64,13 +64,6 @@ export class ReadyUpButtonComponent {
 
     // remove `adrift` class from ship containers
     this.playerGameboardComponent.toggleShipAdriftClass();
-
-    // TODO: REMOVE THIS AFTER IMPLEMENTING BILLOW BOT
-    // ! for testing: toggle in realistic way way
-    this.playerGameboardComponent.gameboardContainer.addEventListener('click', () => {
-      app.gameState.toggleActiveGameboard();
-      app.gameState.togglePlayerTurn();
-    });
   }
 
   private createReadyUpButton(id: string): HTMLButtonElement {
