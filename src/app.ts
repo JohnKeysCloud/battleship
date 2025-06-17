@@ -7,16 +7,15 @@ class App {
   public readonly eventBus: EventBus;
   public readonly gameState: GameState;
   public readonly domController: DOMController;
-  
-  // ? move elsewhere if multiplayer is implemented
-  public readonly billowBot: BillowBot; // ? or null if multiplayer
+  public readonly isMultiplayer: boolean = false; // ? move elsewhere if multiplayer is implemented
+  public readonly billowBot: BillowBot | null; 
 
   private constructor() {
     this.eventBus = new EventBus();
-    this.gameState = new GameState(this.eventBus);
-    this.billowBot = new BillowBot(this.gameState); // ? only instantiate if multiplayer
+    this.gameState = new GameState(this.isMultiplayer, this.eventBus);
+    this.billowBot = !this.isMultiplayer ? new BillowBot(this.gameState) : null; 
     this.domController = new DOMController(this.gameState, this.billowBot);
-    // ? do not pass in billowBot if multiplayer (make the parameter optional in DOMController)
+    // ? pass isMultiplayer to the DOMController so a multiplayer button can be rendered if multiplayer is implemented
   }
 
   public static powerOn() {

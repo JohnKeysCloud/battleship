@@ -44,7 +44,7 @@ export class OpponentGameboardComponent {
 
     this.updateFleetElements(this.playerState.fleetBuilder);
 
-    this.gameState.eventBus.on('toggleActiveGameboard', this.toggleActive);
+    this.gameState.eventBus.on('switchGameboardControls', this.toggleGameboardControls);
   }
 
   public render(targetElement: HTMLElement): void {
@@ -328,7 +328,7 @@ export class OpponentGameboardComponent {
       return;
     }
 
-    this.gameState.toggleActiveGameboard();
+    this.gameState.switchGameboardControls();
 
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
@@ -423,12 +423,10 @@ export class OpponentGameboardComponent {
     await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
-  private toggleActive = (currentPlayer: CurrentPlayer): void => {
+  private toggleGameboardControls = (currentPlayer: CurrentPlayer): void => {
     this.toggleBellumListeners();
-
-    currentPlayer === 'player'
-      ? (this.gameboardContainer.style.pointerEvents = 'none')
-      : (this.gameboardContainer.style.pointerEvents = 'auto');
+    this.gameboardContainer.style.pointerEvents =
+      currentPlayer === 'player' ? 'none' : 'auto';
   };
 
   private togglePlayerTurn(attackResult: AttackResult): void {

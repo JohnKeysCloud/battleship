@@ -7,11 +7,14 @@ export class GameState {
     return Math.random() > 0.5 ? 'player' : 'opponent';
   }
 
-  constructor(public readonly eventBus: EventBus) { }
-  
+  constructor(
+    public readonly isMultiplayer: boolean,
+    public readonly eventBus: EventBus
+  ) {}
+
   public setAndScrollToNextSitRep = (attackResult?: AttackResult): void => {
     this.eventBus.emit('setAndScrollToNextSitRep', attackResult);
-  }
+  };
 
   public transitionToNextPhase = (): void => {
     switch (this.currentGamePhase) {
@@ -29,17 +32,20 @@ export class GameState {
     this.eventBus.emit('transitionToNextPhase');
   };
 
-  public toggleActiveGameboard = (): void => {
-    this.eventBus.emit('toggleActiveGameboard', this.currentPlayer);
-  }
+  public switchGameboardControls = (): void => {
+    this.eventBus.emit('switchGameboardControls', this.currentPlayer);
+  };
 
   public togglePlayerTurn = (): void => {
     this.currentPlayer =
       this.currentPlayer === 'player' ? 'opponent' : 'player';
-    
-    // Emit the event with the new player
-    this.eventBus.emit('togglePlayerTurn');
+
     this.eventBus.emit('setAndScrollToNextSitRep');
+    this.eventBus.emit('updateUIActiveGameboard');
+
+    if (!this.isMultiplayer && this.currentPlayer === 'opponent') {
+      this.eventBus.emit('billowAttack');
+    }
   };
 
   // ! connect

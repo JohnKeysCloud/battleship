@@ -101,8 +101,8 @@ export class PlayerGameboardComponent {
       'refreshGameboard',
       this.refreshGameboardWrapper
     );
-    this.gameState.eventBus.on('toggleActiveGameboard', this.toggleActive);
-    this.gameState.eventBus.on('billowAttack', this.receiveAttack);
+    this.gameState.eventBus.on('switchGameboardControls', this.toggleGameboardControls);
+    this.gameState.eventBus.on('receiveBillowAttack', this.receiveAttack);
   }
 
   public render(targetElement: HTMLElement): void {
@@ -553,7 +553,9 @@ export class PlayerGameboardComponent {
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
     
-    this.gameState.toggleActiveGameboard();
+    // ! youAreHere
+    // ? this needs to come after togglePLayerTurn in this class but not in the opponent class; however, the method relies on the currentPlayer state.
+    this.gameState.switchGameboardControls();
 
     await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
 
@@ -568,16 +570,17 @@ export class PlayerGameboardComponent {
     return await this._receiveAttack(attackCoordinates);
   }
 
-  /* </💭>
-  ┌─────────────────────────────────────────────────────────────────────────────┐
-  │ [BACKLOG]                                                                   │
-  │ TODO: Refactor this method to remove only the ship being moved and          │
-  │ re-place it at the new position instead of resetting the entire board. This │
-  │ will improve performance, preserve other ship states, and reduce unnecessary│
-  │ operations.                                                                 │
-  └─────────────────────────────────────────────────────────────────────────────┘
- */
   private refreshGameboard(boardContainer: HTMLElement): void {
+    /* </💭>
+    ┌─────────────────────────────────────────────────────────────────────────────┐
+    │ [BACKLOG]                                                                   │
+    │ TODO: Refactor this method to remove only the ship being moved and          │
+    │ re-place it at the new position instead of resetting the entire board. This │
+    │ will improve performance, preserve other ship states, and reduce unnecessary│
+    │ operations.                                                                 │
+    └─────────────────────────────────────────────────────────────────────────────┘
+   */
+    
     const gameboard = boardContainer.querySelector(`#${this.id}-gameboard`);
     const gameboardBackground = boardContainer.querySelector(
       `#${this.id}-gameboard-background`
@@ -657,7 +660,7 @@ export class PlayerGameboardComponent {
     await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
-  private toggleActive = (currentPlayer: CurrentPlayer): void => {
+  private toggleGameboardControls = (currentPlayer: CurrentPlayer): void => {
     currentPlayer === 'opponent'
       ? (this.gameboardContainer.style.pointerEvents = 'none')
       : (this.gameboardContainer.style.pointerEvents = 'auto');
@@ -668,7 +671,10 @@ export class PlayerGameboardComponent {
     gridCell: HTMLDivElement
   ): Promise<void> => {
     if (attackResult.isSunk) {
-      this.gameState.eventBus.emit('setAndScrollToNextSitRep', attackResult);
+      this.gameState.eventBus.emit(
+        'setAndScrollToNextSitRep',
+        attackResult
+      );
       await this.updateGameboardPostAttack(attackResult, gridCell);
     } else {
       this.updateGameboardPostAttack(attackResult, gridCell);

@@ -13,6 +13,7 @@ export class BillowBot {
   ) {
     this.#possibleAttacks = new Set();
     this.populatepossibleAttacksSet();
+    this.gameState.eventBus.on('billowAttack', this.attack);
   }
 
   public attack = async (): Promise<AttackResult> => {
@@ -21,7 +22,7 @@ export class BillowBot {
 
       console.log('attackCoordinates', attackCoordinates);
 
-      const [attackResult]: AttackResult[] = await this.gameState.eventBus.emit('billowAttack', attackCoordinates);
+      const [attackResult]: AttackResult[] = await this.gameState.eventBus.emit('receiveBillowAttack', attackCoordinates);
     
       if (attackResult.hit) {
         this.rememberLastTargetHit(attackCoordinates);
@@ -38,9 +39,12 @@ export class BillowBot {
     lastAttackCoordinates: Coordinates | null,
     wasLastTargetHit: boolean | null
   ): Coordinates {
-    const coordinates: Coordinates = true // !wasLastTargetHit
-      ? this.getRandomCoordinates()
-      : this.getSmartCoordinates(lastAttackCoordinates);
+    // TODO: implement smart attack
+    // const coordinates: Coordinates = !wasLastTargetHit
+    //   ? this.getRandomCoordinates()
+    //   : this.getSmartCoordinates(lastAttackCoordinates);
+    
+    const coordinates: Coordinates = this.getRandomCoordinates();
     
     // ? use to make next attack more strategic
     this.#lastAttackCoordinates = coordinates;
@@ -91,7 +95,18 @@ export class BillowBot {
       [lastAttackX, lastAttackY - 1],
     ];
 
-    // ...
+    // TODO: If one adjacent square is free, `billowBot` will target it.
+    // If it registers a consecutive hit, it’ll keep attacking in that
+    // direction until the ship is `sunk` or it misses — then try the
+    // opposite direction. Once the ship is sunk, `billowBot` returns
+    // to random attacks.
+    //
+    // Possible future optimizations:
+    // - Parity-based optimization: Skip odd cells to maximize efficiency.
+    // - Probability density maps: Simulate likely ship placements based on
+    //   missed shots and remaining ships.
+    // - Ship orientation inference: Use consecutive hits to determine if a
+    //   ship is horizontal or vertical more quickly. 
 
     return [0, 0] as Coordinates; // ! temporary return
   }

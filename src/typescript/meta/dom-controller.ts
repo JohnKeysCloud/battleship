@@ -29,7 +29,7 @@ export class DOMController {
 
   constructor(
     private readonly gameState: GameState,
-    private readonly billowBot: BillowBot // make optional if multiplayer
+    private readonly billowBot: BillowBot | null // make optional if multiplayer
   ) {
     if (!document) throw new Error('Fuck!');
 
@@ -49,7 +49,7 @@ export class DOMController {
     );
 
     this.gameState.eventBus.on('transitionToNextPhase', this.transitionToNextPhase);
-    this.gameState.eventBus.on('togglePlayerTurn', this.togglePlayerTurn);
+    this.gameState.eventBus.on('updateUIActiveGameboard', this.updateUIActiveGameboard);
     this.gameState.eventBus.on('setAndScrollToNextSitRep', this.cycloneSitRepScroller.setAndScrollToNextSitRep);
 
     // this.footer = createFooter();
@@ -69,7 +69,7 @@ export class DOMController {
     }
   }
 
-  private togglePlayerTurn = (): void => {    
+  private updateUIActiveGameboard = (): void => {    
     if (this.gameState.currentPlayer === 'player') {
       this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
     } else {
@@ -93,34 +93,40 @@ export class DOMController {
 
     await this.updateGameboardOnTransition(this.gameState);
 
-    // TODO move this somewhere?
+    // TODO: move this somewhere?
+    // TODO: If multiplayer becomes the dominant mode, reverse this check to reduce conditionals
     if (this.gameState.currentPlayer === 'opponent') {
       // ? && playing against billow (if multiplayer is introduced)
-    
-      const billowAttackResult: AttackResult =
-        await this.billowBot.attack();
-    
-      console.log('billowAttackResult', billowAttackResult);
-    
-      // 💭emit billowAttack
-      // TODO: emit receive attack in the playergameboardcomponentin billowBot.ts
-      // match coordinates with corresponding grid cell on player gameboard
-    
-      // 💭 method on billowBot `ponderAttackCoordinates` called by `billowAttack` event listener.
-      // apply animation to multiple random unattacked grid cells one at a time.
-      // (start off fast, slow down as time goes on (2 second long animation?)
-      // selected grid cell gets 'selected cell' animation (1 second long animation?)
-      // at the end of selected cell animation, apply hit / miss styles to the selected grid cell.
-    
-      // 💭 method on playerGameboardComponent `receiveAttack`? called by `billowAttack` event listener.
-      // await one of the following:
-      // if hit, add cooked to ship unit at that coordinate
-      // if miss, add miss styles to grid cell at that coordinate
-    
-      // 💭 check end game state
-      // check if all player ships are sunk
-      // if yes, declare winner
-      // if no, toggle turn
+
+      console.log('billowBot', this.billowBot);
+
+      if (this.billowBot) {
+        const billowAttackResult: AttackResult = await this.billowBot.attack();
+
+        // 💭 ADD STUFF HERE? --------------------------------------------------------------
+        // * debugging
+        console.log('billowAttackResult', billowAttackResult);
+
+        // 💭 emit billowAttack
+        // TODO: emit receive attack in the playergameboardcomponentin billowBot.ts
+        // match coordinates with corresponding grid cell on player gameboard
+
+        // 💭 method on billowBot `ponderAttackCoordinates` called by `billowAttack` event listener.
+        // apply animation to multiple random unattacked grid cells one at a time.
+        // (start off fast, slow down as time goes on (2 second long animation?)
+        // selected grid cell gets 'selected cell' animation (1 second long animation?)
+        // at the end of selected cell animation, apply hit / miss styles to the selected grid cell.
+
+        // 💭 method on playerGameboardComponent `receiveAttack`? called by `billowAttack` event listener.
+        // await one of the following:
+        // if hit, add cooked to ship unit at that coordinate
+        // if miss, add miss styles to grid cell at that coordinate
+
+        // 💭 check end game state
+        // check if all player ships are sunk
+        // if yes, declare winner
+        // if no, toggle turn
+      }
     }
   };
 
