@@ -16,7 +16,7 @@ import {
   delay,
   waitForEvent,
 } from '../../../../utilities/random-utilities';
-import { AttackResult, CurrentPlayer, PlayerState } from '../../../../types/state-types';
+import { AttackResult, PlayerState, gameboardStateValue } from '../../../../types/state-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
 
@@ -32,8 +32,6 @@ export class OpponentGameboardComponent {
   private gameboardContainer: HTMLDivElement;
   private fleetElements: Map<ShipType, HTMLDivElement> = new Map();
 
-  private listenersAdded: boolean = false;
-
   constructor(
     public readonly playerState: PlayerState,
     private readonly gameState: GameState
@@ -44,7 +42,10 @@ export class OpponentGameboardComponent {
 
     this.updateFleetElements(this.playerState.fleetBuilder);
 
-    this.gameState.eventBus.on('switchGameboardControls', this.toggleGameboardControls);
+    this.gameState.eventBus.on(
+      'toggleOpponentGameboardControls',
+      this.toggleGameboardControls
+    );
   }
 
   public render(targetElement: HTMLElement): void {
@@ -61,15 +62,13 @@ export class OpponentGameboardComponent {
 
     this.placeFleetOnGameboard(this.fleetElements);
 
-    this.toggleBellumListeners();
-
     targetElement.appendChild(this.gameboardContainer);
   }
 
-  public toggleBellumListeners(): void {
+  public toggleBellumListeners = (newGameboardState: gameboardStateValue): void => {
     if (!this.gameboardContainer) return;
 
-    const method = this.listenersAdded
+    const method = newGameboardState === gameboardStateValue.inactive
       ? 'removeEventListener'
       : 'addEventListener';
 
@@ -77,9 +76,7 @@ export class OpponentGameboardComponent {
       'click',
       this.handleCellClick as EventListener
     );
-
-    this.listenersAdded = !this.listenersAdded;
-  }
+  };
 
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
@@ -163,7 +160,7 @@ export class OpponentGameboardComponent {
   private generateBoardContainer(boardSize: number): HTMLDivElement {
     const gameboardContainer: HTMLDivElement = createElement(
       'div',
-      ['gameboard-container'],
+      ['gameboard-container', 'locked'],
       {
         id: `${this.id}-gameboard-container`,
       }
@@ -312,36 +309,6 @@ export class OpponentGameboardComponent {
     };
   }
 
-  private async receiveAttack(e: MouseEvent): Promise<void> {
-    if (
-      !(e.target instanceof HTMLDivElement) ||
-      !e.target.matches('.grid-cell')
-    )
-      return;
-
-    const gridCell: HTMLDivElement = e.target;
-
-    const attackCoordinates: Coordinates = this.getAttackCoordinates(gridCell);
-
-    if (this.hasTargetBeenAttacked(attackCoordinates)) {
-      // TODO: Add a flash animation to indicate "Cell already attacked".
-      return;
-    }
-
-    this.gameState.switchGameboardControls();
-
-    const attackResult: AttackResult =
-      this.playerState.gameboardController.receiveAttack(attackCoordinates);
-
-    try {
-      await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
-    } catch (error) {
-      console.error('Animatiwhat on failed', error);
-    }
-
-    this.togglePlayerTurn(attackResult);
-  }
-
   private handleCellClick = (e: MouseEvent): void => {
     this.receiveAttack(e);
   };
@@ -390,6 +357,37 @@ export class OpponentGameboardComponent {
     fleetElements.forEach((shipElement) => gameboard.appendChild(shipElement));
   }
 
+  private async receiveAttack(e: MouseEvent): Promise<void> {
+    if (
+      !(e.target instanceof HTMLDivElement) ||
+      !e.target.matches('.grid-cell')
+    )
+      return;
+
+    const gridCell: HTMLDivElement = e.target;
+
+    const attackCoordinates: Coordinates = this.getAttackCoordinates(gridCell);
+
+    if (this.hasTargetBeenAttacked(attackCoordinates)) {
+      // TODO: Add a flash animation to indicate "Cell already attacked".
+      return;
+    }
+
+    this.toggleBellumListeners(gameboardStateValue.inactive);
+    this.toggleGameboardControls(gameboardStateValue.inactive);
+    
+    const attackResult: AttackResult =
+    this.playerState.gameboardController.receiveAttack(attackCoordinates);
+    
+    try {
+      await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
+    } catch (error) {
+      console.error('Animation failed', error);
+    }
+    
+    this.togglePlayerTurn(attackResult); 
+  }
+
   private setGridPlacementValue(
     gridPlacementValue: GridPlacementValue,
     gridCrossAxis: number,
@@ -423,10 +421,17 @@ export class OpponentGameboardComponent {
     await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
-  private toggleGameboardControls = (currentPlayer: CurrentPlayer): void => {
-    this.toggleBellumListeners();
-    this.gameboardContainer.style.pointerEvents =
-      currentPlayer === 'player' ? 'none' : 'auto';
+  private toggleGameboardControls = (
+    newGameboardState: gameboardStateValue
+  ): void => {
+    if (newGameboardState === gameboardStateValue.active) {
+      this.toggleBellumListeners(newGameboardState);
+    }
+
+    this.gameboardContainer.classList.toggle(
+      'locked',
+      newGameboardState === gameboardStateValue.inactive
+    );
   };
 
   private togglePlayerTurn(attackResult: AttackResult): void {

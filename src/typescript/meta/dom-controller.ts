@@ -9,9 +9,9 @@ import { createHeader } from '../markup/header/header';
 import { MainComponent } from '../markup/main/main-component';
 import { InstructionsDialogComponent } from '../markup/components/instructions-dialog-component/instructions-dialog-component';
 import { CycloneSitRepScroller } from '../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller';
-import { AttackResult, PlayerType } from '../types/state-types';
+import { AttackResult, PlayerType, gameboardStateValue } from '../types/state-types';
 import { BillowBot } from '../services/billow';
-import { Coordinates } from '../types/logic-types';
+import { waitForTransitionEnd } from '../utilities/random-utilities';
 
 // 💭 --------------------------------------------------------------
 
@@ -45,12 +45,21 @@ export class DOMController {
       players,
       this.instructionsLightboxController,
       this.cycloneSitRepScroller,
-      this.gameState, 
+      this.gameState
     );
 
-    this.gameState.eventBus.on('transitionToNextPhase', this.transitionToNextPhase);
-    this.gameState.eventBus.on('updateUIActiveGameboard', this.updateUIActiveGameboard);
-    this.gameState.eventBus.on('setAndScrollToNextSitRep', this.cycloneSitRepScroller.setAndScrollToNextSitRep);
+    this.gameState.eventBus.on(
+      'transitionToNextPhase',
+      this.transitionToNextPhase
+    );
+    this.gameState.eventBus.on(
+      'updateUIActiveGameboard',
+      this.updateUIActiveGameboard
+    );
+    this.gameState.eventBus.on(
+      'setAndScrollToNextSitRep',
+      this.cycloneSitRepScroller.setAndScrollToNextSitRep
+    );
 
     // this.footer = createFooter();
   }
@@ -63,19 +72,30 @@ export class DOMController {
   }
 
   // ? sets initial turn state styles (I like this name better 😎). {TIMELESS ARTIFACT 💭}
-  private readyPlayerOne = (): void => {
-    if (this.gameState.currentPlayer === 'player') {
-      this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
-    }
-  }
+  private readyPlayerOne = async (): Promise<void> => {
+    await this.updateUIActiveGameboard();
+    this.mainComponent.mainContainerTwo.opponentGameboard.toggleBellumListeners(
+      gameboardStateValue.active
+    );
+    this.gameState.eventBus.emit(
+      'togglePlayerGameboardControls',
+      gameboardStateValue.inactive
+    );
+    this.gameState.eventBus.emit(
+      'toggleOpponentGameboardControls',
+      gameboardStateValue.active
+    );
+  };
 
-  private updateUIActiveGameboard = (): void => {    
-    if (this.gameState.currentPlayer === 'player') {
-      this.mainComponent.mainContainerTwo.element.classList.add('player-turn');
-    } else {
-      this.mainComponent.mainContainerTwo.element.classList.remove('player-turn');
-    }
-  }
+  private updateUIActiveGameboard = async (): Promise<void> => {
+    const container = this.mainComponent.mainContainerTwo.element;
+    container.classList.toggle(
+      'player-turn',
+      this.gameState.currentPlayer === 'player'
+    );
+
+    await waitForTransitionEnd(container, 1000);
+  };
 
   private transitionToNextPhase = async (): Promise<void> => {
     if (this.gameState.currentGamePhase === 'bellum') {
@@ -93,7 +113,6 @@ export class DOMController {
 
     await this.updateGameboardOnTransition(this.gameState);
 
-    // TODO: move this somewhere?
     // TODO: If multiplayer becomes the dominant mode, reverse this check to reduce conditionals
     if (this.gameState.currentPlayer === 'opponent') {
       // ? && playing against billow (if multiplayer is introduced)
@@ -130,21 +149,26 @@ export class DOMController {
     }
   };
 
-  private updateGameboardOnTransition = async (gameState: GameState): Promise<void> => {
-    if (this.gameState.currentGamePhase === 'parabellum') {
-      // TODO: reset gamePhase SCSS color 
+  private updateGameboardOnTransition = async (
+    gameState: GameState
+  ): Promise<void> => {
+    if (gameState.currentGamePhase === 'parabellum') {
+      // TODO: reset gamePhase SCSS color
       this.resetGame();
     }
 
-    if (this.gameState.currentGamePhase === 'bellum') {  
-      this.readyPlayerOne();
-      // TODO: change gamePhase SCSS color 
+    if (gameState.currentGamePhase === 'bellum') {
+      if (gameState.currentPlayer === 'player') {
+        this.readyPlayerOne();
+      }
+
+      // TODO: change gamePhase SCSS color
       const mainContainerTwo = this.mainComponent.mainContainerTwo.element;
       // ? Do I want to manipulate the gameboard in anyway on transition to bellum
     }
-    
-    if (this.gameState.currentGamePhase === 'postBellum') {
-      // TODO: change gamePhase SCSS color 
+
+    if (gameState.currentGamePhase === 'postBellum') {
+      // TODO: change gamePhase SCSS color
       // ? do something fun ?
     }
   };

@@ -82,17 +82,50 @@ export const waitForAnimationEnd = (element: HTMLElement): Promise<void> => {
     element.addEventListener('animationend', handler);
   });
 }
-export const waitForTransitionEnd = (element: HTMLElement, callback?: () => void): Promise<void> => {
+export const waitForTransitionEnd = (
+  element: HTMLElement,
+  timeout = 1000, // ? make timeout value slightly longer than the longest transition duration
+  expectedCount?: number, // ? optional number of transitionend events to wait for (e.g., for nested transitions)
+  callback?: () => void // ? optional callback, same as `if (callback) callback();`
+): Promise<void> => {
   return new Promise((resolve) => {
-    const handler = () => {
-      element.removeEventListener('transitionend', handler);
-      resolve();
-      if (callback) callback();
-    };
-    element.addEventListener('transitionend', handler);
-  });
-}
+    let resolved = false;
+    let transitionCount = 0;
 
+    const cleanup = () => {
+      if (!resolved) {
+        resolved = true;
+        element.removeEventListener('transitionend', handler);
+        clearTimeout(timer); // clear fallback timeout once resolved
+        resolve();
+        callback?.();
+      }
+    };
+
+    const handler = (event: TransitionEvent) => {
+      // ? If expecting multiple transitions, count until expectedCount is met
+      if (expectedCount !== undefined && expectedCount > 0) {
+        transitionCount++;
+        if (transitionCount >= expectedCount) {
+          cleanup();
+        }
+        return;
+      }
+
+      // ? Only resolve if transition event is on the element itself
+      if (event.target === element) {
+        cleanup();
+      }
+    };
+
+    element.addEventListener('transitionend', handler);
+
+    // Fallback timeout if `transitionend` event doesn't fire
+    const timer = setTimeout(() => {
+      cleanup();
+    }, timeout);
+  });
+};
 export const waitForEvent = <K extends keyof HTMLElementEventMap>(
   element: HTMLElement,
   eventType: K,

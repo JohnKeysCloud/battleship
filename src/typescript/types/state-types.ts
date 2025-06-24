@@ -18,6 +18,10 @@ export type MessageTarget = 'your' | 'their';
 export type MessageType = 'turn' | 'attack';
 export type PlayerType = 'player' | 'opponent';
 
+export enum gameboardStateValue {
+  inactive = 0,
+  active = 1,
+}
 // 💭 --------------------------------------------------------------
 
 export interface PlayerState {

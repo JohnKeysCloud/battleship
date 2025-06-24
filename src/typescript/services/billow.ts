@@ -53,13 +53,13 @@ export class BillowBot {
   } 
 
   private async determineNextTarget(): Promise<Coordinates> {
-    await this.ponder();
+    await this.ponder(500);
     return this.getNextAttackCoordinates(this.#lastAttackCoordinates, this.#wasLastTargetHit);
   }
 
-  private ponder(): Promise<void> {
+  private ponder(timeCapsuleMS: number): Promise<void> {
     // ? animate board
-    return new Promise((resolve) => setTimeout(resolve, 3000));
+    return new Promise((resolve) => setTimeout(resolve, timeCapsuleMS));
   }
 
   private populatepossibleAttacksSet() {

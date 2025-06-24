@@ -157,11 +157,18 @@ main {
     display: grid;
     place-items: center;
     position: relative;
+    
+    .gameboard-container.locked {
+        pointer-events: none;
+
+        .ship-container {
+          pointer-events: none;
+        }
+      }
 
     &.player-turn {
       #player-gameboard-container {
         opacity: 0.5;
-        pointer-events: none;
         position: absolute;
         transform: scale(0.8) translateY(60px);
         z-index: 0;
@@ -169,7 +176,6 @@ main {
 
       #opponent-gameboard-container {
         opacity: 1;
-        pointer-events: auto;
         position: relative;
         transform: scale(1) translateY(0);
         z-index: 1;

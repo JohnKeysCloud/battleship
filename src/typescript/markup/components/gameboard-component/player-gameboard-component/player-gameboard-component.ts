@@ -26,8 +26,8 @@ import {
   } from '../../../../types/logic-types'
 import {
   AttackResult,
-  CurrentPlayer,
   PlayerState,
+  gameboardStateValue,
 } from '../../../../types/state-types';
 import { GridCellDataKey } from '../../../../types/dom-types';
 import {
@@ -101,7 +101,7 @@ export class PlayerGameboardComponent {
       'refreshGameboard',
       this.refreshGameboardWrapper
     );
-    this.gameState.eventBus.on('switchGameboardControls', this.toggleGameboardControls);
+    this.gameState.eventBus.on('togglePlayerGameboardControls', this.toggleGameboardControls);
     this.gameState.eventBus.on('receiveBillowAttack', this.receiveAttack);
   }
 
@@ -522,13 +522,10 @@ export class PlayerGameboardComponent {
     const gridCellDataKey: GridCellDataKey = `[data-x="${attackCoordinates[0]}"][data-y="${attackCoordinates[1]}"]`;
     const gridCell: HTMLDivElement | null =
       this.gameboardContainer.querySelector<HTMLDivElement>(gridCellDataKey);
-    
+
     if (!gridCell) {
       throw new Error('Grid cell not found.');
     }
-
-    // ! test
-    gridCell.style.backgroundColor = 'red';
 
     if (this.hasTargetBeenAttacked(attackCoordinates)) {
       /* </💭>
@@ -549,15 +546,18 @@ export class PlayerGameboardComponent {
         hit: false,
       } as AttackResult;
     }
-    
+
+    // ! temporary
+    gridCell.style.backgroundColor = 'red';
+
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
-    
-    // ! youAreHere
-    // ? this needs to come after togglePLayerTurn in this class but not in the opponent class; however, the method relies on the currentPlayer state.
-    this.gameState.switchGameboardControls();
 
-    await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
+    try {
+      await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
+    } catch (error) {
+      console.error('Error in triggerPrePlayerToggleAnimations', error);
+    }
 
     this.togglePlayerTurn(attackResult);
 
@@ -660,10 +660,11 @@ export class PlayerGameboardComponent {
     await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
-  private toggleGameboardControls = (currentPlayer: CurrentPlayer): void => {
-    currentPlayer === 'opponent'
-      ? (this.gameboardContainer.style.pointerEvents = 'none')
-      : (this.gameboardContainer.style.pointerEvents = 'auto');
+  private toggleGameboardControls = (newGameboardState: gameboardStateValue): void => {
+    this.gameboardContainer.classList.toggle(
+      'locked',
+      newGameboardState === gameboardStateValue.inactive
+    );
   };
 
   private triggerPrePlayerToggleAnimations = async (
@@ -791,7 +792,7 @@ export class PlayerGameboardComponent {
       // TODO: Make this less hacky 🫠 by adding class instead?
       // Enable drag events for grid cells under ship containers
       setTimeout(() => {
-        shipContainerElement.style.pointerEvents = 'none';
+        shipContainerElement.classList.add('locked');
       }, 0);
 
       // Make clone visible
@@ -1189,7 +1190,7 @@ export class PlayerGameboardComponent {
       this.shipDragClone.classList.remove('visible');
 
       // Restore ship container draggability
-      shipContainerElement.style.pointerEvents = 'auto';
+      shipContainerElement.classList.remove('locked');
     };
 
     const shipContainerElement: HTMLDivElement = e.target;
