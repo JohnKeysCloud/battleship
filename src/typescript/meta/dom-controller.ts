@@ -110,8 +110,7 @@ export class DOMController {
 
     this.mainComponent.mainContainerOne.swapByOrder();
     this.mainComponent.mainContainerThree.swapByOrder();
-
-    await this.updateGameboardOnTransition(this.gameState);
+    await this.updateGameboardsOnTransition(this.gameState);
 
     // TODO: If multiplayer becomes the dominant mode, reverse this check to reduce conditionals
     if (this.gameState.currentPlayer === 'opponent') {
@@ -149,12 +148,25 @@ export class DOMController {
     }
   };
 
-  private updateGameboardOnTransition = async (
+  private updateGameboardContainerState = async (gameState: GameState): Promise<void> => {
+    const gameboardContainer = this.mainComponent.mainContainerTwo.element;
+
+    gameboardContainer.classList.toggle('parabellum', gameState.currentGamePhase === 'parabellum');
+    gameboardContainer.classList.toggle('bellum', gameState.currentGamePhase === 'bellum');
+    gameboardContainer.classList.toggle('postBellum', gameState.currentGamePhase === 'postBellum');
+
+    await waitForTransitionEnd(gameboardContainer, 1000);
+  };
+
+  private updateGameboardsOnTransition = async (
     gameState: GameState
   ): Promise<void> => {
+      await this.updateGameboardContainerState(gameState);
+
     if (gameState.currentGamePhase === 'parabellum') {
       // TODO: reset gamePhase SCSS color
       this.resetGame();
+      return;
     }
 
     if (gameState.currentGamePhase === 'bellum') {
@@ -162,8 +174,6 @@ export class DOMController {
         this.readyPlayerOne();
       }
 
-      // TODO: change gamePhase SCSS color
-      const mainContainerTwo = this.mainComponent.mainContainerTwo.element;
       // ? Do I want to manipulate the gameboard in anyway on transition to bellum
     }
 
@@ -171,6 +181,7 @@ export class DOMController {
       // TODO: change gamePhase SCSS color
       // ? do something fun ?
     }
+
   };
 
   private initializeSitRepScroller = (firstPlayer: PlayerType): void => {
