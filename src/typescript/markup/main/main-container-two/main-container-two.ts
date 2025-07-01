@@ -26,7 +26,7 @@ export class MainContainerTwo {
       this.gameState
     );
 
-    this.mainContainerTwo = createElement('section', ['main-container'], {
+    this.mainContainerTwo = createElement('section', ['main-container', 'parabellum'], {
       id: 'main-container-two',
     });
   }

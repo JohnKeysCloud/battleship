@@ -6,6 +6,11 @@
   --post-bellum-heading-text-shadow-color: var(--color-binky); 
 }
 
+#content {
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   color: ghostwhite;
@@ -164,7 +169,198 @@ main {
         .ship-container {
           pointer-events: none;
         }
+    }
+
+    &.parabellum {
+      .gameboard-container {
+        &:has(.ship-container[data-dragging="true"]) .ship-container::before {
+          animation-play-state: paused;
+        }
       }
+      
+      #player-gameboard-container {
+        .ship-container {
+          &:not(.adrift):hover {
+            transition: transform 380ms ease-out;
+            transform: scale(1.05);
+          }
+
+          &:not(.adrift):active {
+            transition: transform 380ms ease-in-out;
+            transform: scale(1);
+          }
+
+          &.adrift {
+            cursor: grab;
+
+            &::before {
+              animation: playerGameboardPulse 1s ease-out alternate infinite;
+            }
+          }
+
+          // * Edible ghost flicker pseudo-element
+          &::before {
+            animation: none;
+            background-color: #2121DE;
+            box-shadow: inset 0 0 6px -2px ghostwhite;
+            border-radius: inherit;
+            content: '';
+            opacity:0;
+            overflow: auto;
+            inset: 0;
+            position: absolute;
+            z-index: 1;
+          }
+
+          &[data-dragging="true"] {
+            opacity: 0.25;
+          }
+        }
+
+        .grid-cell {
+          &::before {
+            border-radius: 50%;
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background-color: var(--color-funky);
+            box-shadow: 0 0 8px var(--color-funky);
+            z-index: 1;
+          }
+
+          &::after {
+            border-radius: 50%;
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background-color: var(--color-binky);
+            box-shadow: 0 0 8px var(--color-binky);
+            z-index: 1;
+          }
+
+          &.placement-is-valid {
+            &::before {
+              opacity: 1;
+            }
+          }
+
+          &.placement-is-invalid {
+            &::after {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+
+    &.bellum {
+      #player-gameboard-container {
+        .ship-container {
+          cursor: pointer;
+
+          &:hover {
+            transition: transform 380ms ease-out;
+            transform: scale(1.05);
+          }
+
+          &:active {
+            transition: transform 380ms ease-in-out;
+            transform: scale(1);
+          }
+        }
+      }
+
+      #opponent-gameboard-container {
+        .grid-cell {
+          cursor: pointer;
+        }
+      }
+
+      .opponent-ship-container {
+        &.sunk {
+          animation: cycloneFadeIn 0.5s ease-in forwards;
+          display: grid;
+          opacity: 1;
+          pointer-events: auto;
+          rotate: 0deg;
+          scale: 1;
+        }
+      }
+
+      .grid-cell {
+        .hit-marker {
+          border-radius: inherit;
+          inset: 0;
+          position: absolute;
+          pointer-events: none;
+
+          &::before,
+          &::after {
+            border-radius: inherit;
+            content: '';
+            inset: 0;
+            opacity: 0;
+            transition: all 500ms ease-in-out;
+            visibility: hidden;
+            position: absolute;
+          }
+
+          // ? hit state
+          &::before { 
+            background-color: var(--color-binky);
+            box-shadow: 0 0 3px var(--color-binky);
+            transform: scale(0.50);
+          }
+
+          // ? miss state
+          &::after {
+            background-color: rgba(99, 99, 99, 1);
+            box-shadow: 0 0 8px ghostwhite;
+            transform: scale(0.33);
+          }
+        }
+
+        &.hit .hit-marker::before,
+        &.miss .hit-marker::after {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        &.hit,
+        &.miss {
+          cursor: not-allowed;
+        }
+      }
+
+      .ship-unit {
+        // * Cooked pseudo-element
+        &::before {
+          background-image: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnAyejY2bndtZXo0dHd6OHluMXprOWZ6cWsyZzR5bjE2YmdvcjhmZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/D3fe42PWaeBGT2RpPo/giphy.webp');
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 50px 50px;
+          box-shadow: inset 0 0 6px 1px black;
+          content: '';
+          inset: 0;
+          opacity: 0;
+          position: absolute;
+          pointer-events: none;
+          transition: inherit;
+          z-index: 1;
+        }
+          &.cooked {
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    &.post-bellum {
+
+    }
 
     &.player-turn {
       #player-gameboard-container {
@@ -315,7 +511,4 @@ main {
   }
 }
 
-#content {
-  display: flex;
-  flex-direction: column;
-}
+

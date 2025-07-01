@@ -102,6 +102,8 @@ export class OpponentGameboardComponent {
     const cellFragment: DocumentFragment = new DocumentFragment();
 
     gameboard.forEach((row: ShipSymbolValueArray, rowIndex: number) => {
+      // ? The ship symbol value isn't used to classify opponent board grid cells,
+      // ? otherwise players could inspect dev tools and see where the opponent's ships are.
       row.forEach((_: ShipSymbolValue, colIndex: number) => {
         const hitMarker: HTMLDivElement = createElement('div', [
           `${this.id}-hit-marker`,
@@ -125,7 +127,7 @@ export class OpponentGameboardComponent {
           'grid-cell-container',
         ]);
         gridCellContainer.appendChild(gridCell);
-
+        
         cellFragment.appendChild(gridCellContainer);
       });
     });

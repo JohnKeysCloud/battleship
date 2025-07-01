@@ -250,6 +250,11 @@ export class PlayerGameboardComponent {
       row.forEach((symbol: ShipSymbolValue, colIndex) => {
         const symbolDescription: string = symbol.description!.toLowerCase();
 
+        const hitMarker: HTMLDivElement = createElement('div', [
+          `${this.id}-hit-marker`,
+          'hit-marker',
+        ]);
+
         const gridCell: HTMLDivElement = createElement(
           'div',
           [
@@ -264,6 +269,7 @@ export class PlayerGameboardComponent {
             role: 'gridCell',
           }
         );
+        gridCell.appendChild(hitMarker);
 
         const gridCellContainer: HTMLDivElement = createElement(
           'div',
@@ -272,8 +278,8 @@ export class PlayerGameboardComponent {
             'grid-cell-container',
           ]
         );
-
         gridCellContainer.appendChild(gridCell);
+
         cellFragment.appendChild(gridCellContainer);
       });
     });
@@ -547,12 +553,9 @@ export class PlayerGameboardComponent {
       } as AttackResult;
     }
 
-    // ! temporary
-    gridCell.style.backgroundColor = 'red';
-
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
-
+    
     try {
       await this.triggerPrePlayerToggleAnimations(attackResult, gridCell);
     } catch (error) {
@@ -785,9 +788,6 @@ export class PlayerGameboardComponent {
     ): void => {
       // Set dragging attribute to true
       shipContainerElement.setAttribute('data-dragging', 'true');
-
-      // Lower Ship Container Opacity
-      shipContainerElement.classList.add('lower-opacity');
 
       // TODO: Make this less hacky 🫠 by adding class instead?
       // Enable drag events for grid cells under ship containers
@@ -1182,9 +1182,6 @@ export class PlayerGameboardComponent {
 
       // Lower grid cell validation pseudo-element opacity
       currentDragOverCell.classList.remove(cellFeedbackClass);
-
-      // Lower ship container opacity
-      shipContainerElement.classList.remove('lower-opacity');
 
       // Re-hide drag clone
       this.shipDragClone.classList.remove('visible');

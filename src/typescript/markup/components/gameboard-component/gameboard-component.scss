@@ -32,30 +32,26 @@
   transition: opacity 1s ease, transform 0.5s ease, z-index 0s ease;  // ? Transition test
   width: min(380px, 90vw);
 
-    &:has(.ship-container.lower-opacity) .ship-container::before {
-      animation-play-state: paused;
-    }
+  .gameboard,
+  .gameboard-background {
+    display: grid;
+    gap: min(1.2vw, 0.75rem);
+    // ? row-start / column-start / row-span / column-span
+    grid-area: 1 / 1 / span 1 / span 1; 
+    grid-template: repeat(var(--grid-size), 1fr) / repeat(var(--grid-size), 1fr);
+  }
 
-    .gameboard,
-    .gameboard-background {
-      display: grid;
-      gap: min(1.2vw, 0.75rem);
-      // ? row-start / column-start / row-span / column-span
-      grid-area: 1 / 1 / span 1 / span 1; 
-      grid-template: repeat(var(--grid-size), 1fr) / repeat(var(--grid-size), 1fr);
-    }
+  .gameboard {
+    border-radius: inherit;
+    pointer-events: none;
+    width: 100%;
+    z-index: 1;
+  }
 
-    .gameboard {
-      border-radius: inherit;
-      pointer-events: none;
-      width: 100%;
-      z-index: 1;
-    }
+  .gameboard-background {
+    border-radius: inherit;
 
-    .gameboard-background {
-      border-radius: inherit;
-
-      .grid-cell-container {
+    .grid-cell-container {
         border-radius: 50%;
         box-shadow: inset 3px 3px 6px rgb(22, 22, 22),
         inset -3px -3px 6px rgb(33, 33, 33);
@@ -66,43 +62,9 @@
           position: relative;
           width: 100%;
           z-index: 0;
-
-          &::before {
-            border-radius: 50%;
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background-color: var(--color-funky);
-            box-shadow: 0 0 8px var(--color-funky);
-            z-index: 1;
-          }
-
-          &::after {
-            border-radius: 50%;
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background-color: var(--color-binky);
-            box-shadow: 0 0 8px var(--color-binky);
-            z-index: 1;
-          }
-
-          &.placement-is-valid {
-            &::before {
-              opacity: 1;
-            }
-          }
-
-          &.placement-is-invalid {
-            &::after {
-              opacity: 1;
-            }
-          }
         }
-      }
     }
+  }
 }
 
 #player-gameboard-container {
@@ -161,99 +123,16 @@
 
   .grid-cell {
     cursor: pointer;
-    position: relative;
-
-    // !
-    .hit-marker {
-      border-radius: inherit;
-      inset: 0;
-      position: absolute;
-      pointer-events: none;
-      // transform: scale(0.50);
-
-      &::before,
-      &::after {
-        border-radius: inherit;
-        content: '';
-        inset: 0;
-        opacity: 0;
-        transition: all 500ms ease-in-out;
-        visibility: hidden;
-        position: absolute;
-      }
-
-      // ? hit state
-      &::before { 
-        background-color: var(--color-binky);
-        box-shadow: 0 0 3px var(--color-binky);
-        transform: scale(0.50);
-      }
-      
-      // ? miss state
-      &::after {
-        background-color: rgba(99, 99, 99, 1);
-        box-shadow: 0 0 8px ghostwhite;
-        transform: scale(0.33);
-      }
-    }
-
-    &.hit .hit-marker::before,
-    &.miss .hit-marker::after {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    &.hit,
-    &.miss {
-      cursor: not-allowed;
-    }
   }
 }
 
 .ship-container {
   border: var(--ship-container-border-size) solid black;
   border-radius: 10vw;
-  cursor: pointer;
   display: grid;
   overflow: hidden;
   pointer-events: auto;
   position: relative;
-
-  &:not(.adrift):hover {
-    transition: transform 380ms ease-out;
-    transform: scale(1.05);
-  }
-
-  &:not(.adrift):active {
-    transition: transform 380ms ease-in-out;
-    transform: scale(1);
-  }
-
-  &.adrift {
-    cursor: grab;
-
-    &::before {
-      animation: playerGameboardPulse 1s ease-out alternate infinite;
-    }
-  }
-
-  // ? edible ghost flicker element
-  &::before {
-    animation: none;
-    background-color: #2121DE;
-    box-shadow: inset 0 0 6px -2px ghostwhite;
-    border-radius: inherit;
-    content: '';
-    opacity:0;
-    overflow: auto;
-    inset: 0;
-    position: absolute;
-    z-index: 1;
-  }
-
-  &.lower-opacity {
-    opacity: 0.25;
-  }
 }
 
 .ship-unit {
@@ -261,28 +140,6 @@
   pointer-events: none;
   transition: opacity 380ms ease-in;
   z-index: 0;
-
-  // ? cooked styles
-  &::before {
-    background-image: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnAyejY2bndtZXo0dHd6OHluMXprOWZ6cWsyZzR5bjE2YmdvcjhmZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/D3fe42PWaeBGT2RpPo/giphy.webp');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 50px 50px;
-    box-shadow: inset 0 0 6px 1px black;
-    content: '';
-    inset: 0;
-    opacity: 0;
-    position: absolute;
-    pointer-events: none;
-    transition: inherit;
-    z-index: 1;
-  }
-
-  &.cooked {
-    &::before {
-      opacity: 1;
-    }
-  }
 
   &.ship-unit-horizontal:not(:last-of-type) {
     border-right: 1px solid black;
@@ -319,15 +176,6 @@
   position: relative;
   rotate: 0;
   scale: 0;
-
-  &.sunk {
-    animation: cycloneFadeIn 0.5s ease-in forwards;
-    display: grid;
-    opacity: 1;
-    pointer-events: auto;
-    rotate: 0deg;
-    scale: 1;
-  }
 
   &#opponent-battleship-container {
     background-color: var(--color-battleship);
