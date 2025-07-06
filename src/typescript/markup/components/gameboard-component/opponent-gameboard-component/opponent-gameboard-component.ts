@@ -15,6 +15,7 @@ import {
   waitForTransitionEnd,
   delay,
   waitForEvent,
+  sleep,
 } from '../../../../utilities/random-utilities';
 import { AttackResult, PlayerState, gameboardStateValue } from '../../../../types/state-types';
 import '../gameboard-component.scss';
@@ -331,8 +332,9 @@ export class OpponentGameboardComponent {
 
     const lastUnit = shipUnits[shipUnits.length - 1];
 
-    // Wait for the animation of the last unit to end
-    await waitForTransitionEnd(lastUnit);
+    // '1600' + 100ms after transition end in main.scss (1.5s)
+    await waitForTransitionEnd(lastUnit, 999);
+    await sleep(1000);
   }
 
   private hasTargetBeenAttacked(coordinates: Coordinates): boolean {

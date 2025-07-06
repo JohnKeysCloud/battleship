@@ -73,6 +73,12 @@ export const generateListFragment = (
   return listFragment;
 };
 
+/**
+ * Pauses execution for the specified milliseconds.
+ * @param ms - Time to sleep in milliseconds.
+ */
+export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const waitForAnimationEnd = (element: HTMLElement): Promise<void> => {
   return new Promise((resolve) => {
     const handler = () => {

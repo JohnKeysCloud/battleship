@@ -13,6 +13,7 @@ import {
   ShipType,
   PositionArray,
   ShipSymbolDescription,
+  CoordinatesArray,
 } from '../types/logic-types';
 import { PlayerType } from '../types/state-types';
 
@@ -24,6 +25,11 @@ export const isCoordinates = (value: unknown): value is Coordinates => {
 
   return value.every((coordinate) => typeof coordinate === 'number');
 };
+export const isCoordinatesArray = (
+  value: unknown
+): value is CoordinatesArray =>
+  Array.isArray(value) && value.length > 0 && value.every(isCoordinates);
+
 export const isOccupiedCoordinatesSet = (
   value: unknown
 ): value is OccupiedCoordinatesSet => {
@@ -61,6 +67,10 @@ export const isFleetCoordinates = (
   }
   return true;
 };
+export const isHTMLDivElement = (el: Element): el is HTMLDivElement => el instanceof HTMLDivElement;
+export const isHTMLDivElementArray = (value: unknown): value is HTMLDivElement[] =>
+  Array.isArray(value) && value.length > 0 && value.every(isHTMLDivElement);
+export const isHTMLElement = (el: Element): el is HTMLElement => el instanceof HTMLElement;
 export const isPlainObject = (value: unknown): value is object => {
   if (typeof value !== 'object' || value === null) return false;
 

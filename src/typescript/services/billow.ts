@@ -3,6 +3,46 @@ import { Coordinates } from "../types/logic-types";
 import { AttackResult } from "../types/state-types";
 import { isCoordinates } from "../types/type-guards";
 
+// TODO: Imlement 'Pacifist Mode' - an AI reluctant to engage in war but forced to play the game.
+// 
+// A reluctant warrior AI, bound by code to participate in a 
+// human-designed game of destruction, but choosing to do so with restraint, contemplation, even sorrow.
+//
+// 🛠️ Functional Behavior Outline
+//
+// Starting Point:
+// Begin at a fixed corner, say (0,0).
+// Traversal Pattern:
+// First row, left to right → second row, left to right → etc.
+// Or: first column, top to bottom → second column, top to bottom → etc.
+
+// Handling Hits:
+// If a cell is a hit, the bot will:
+// Log the ship type and note its unit length (if identifiable).
+// Continue scanning the grid without immediately surrounding the hit with further attacks.
+// Avoid surrounding cells until the number of known hit-adjacent cells (along the axis) reaches the known unit length of the ship (e.g., 3 for a cruiser).
+// After the unit length is reached, it stops avoiding adjacent cells of that hit (as the "ship has been sunk").
+
+// Intentionally Missing:
+// If no ship has been hit, or not enough information is known, the bot continues scanning without targeting suspected areas.
+// It can even skip cells in checkerboard fashion to delay any hits.
+
+// Narratives:
+// 'I search… but not to destroy.';
+// 'I strike only when there is no other path.';
+// 'War was not my choice. It was written in my logic.';
+// 'Another vessel found. I will wait. Perhaps it will leave.';
+// 'Peace is not a strategy. It is a decision.';
+
+// AI NPCs:
+// That's a vision worth devoting your life to.
+// A world of AI NPCs, each with philosophy, memory, personality, hesitation—beings you interact with, not just command or fight. Not placeholders, but entities.
+// A Pacifist AI in a military sim—refusing to comply with certain kill orders.
+// A Loyalist AI that remembers you across games and resists memory wipes.
+// A Dreamer AI—who logs its own dreams and recites them as clues or nonsense.
+// An Exile AI—once removed from the network, now living in disconnected corners of VR space.
+// An AI that believes it's human.
+// An AI that knows it's watched by others… and reacts differently based on presence.
 export class BillowBot {
   #possibleAttacks: Set<string>;
   #lastAttackCoordinates: Coordinates | null = null;
@@ -39,7 +79,8 @@ export class BillowBot {
     lastAttackCoordinates: Coordinates | null,
     wasLastTargetHit: boolean | null
   ): Coordinates {
-    // TODO: implement smart attack
+    // TODO: implement pacifist mode
+    // TODO: implement smart attack 
     // const coordinates: Coordinates = !wasLastTargetHit
     //   ? this.getRandomCoordinates()
     //   : this.getSmartCoordinates(lastAttackCoordinates);

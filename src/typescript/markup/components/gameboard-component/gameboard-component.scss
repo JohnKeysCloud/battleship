@@ -138,7 +138,7 @@
 .ship-unit {
   position: relative;
   pointer-events: none;
-  transition: opacity 380ms ease-in;
+  transition: opacity 0.8s ease-in;
   z-index: 0;
 
   &.ship-unit-horizontal:not(:last-of-type) {
