@@ -20,7 +20,6 @@ import {
   CoordinatesArray,
   Fleet,
   Gameboard,
-  IPlacementConfigurations,
   Orientation,
   ShipLength,
   ShipSymbolValue,
@@ -103,7 +102,10 @@ export class PlayerGameboardComponent {
       'refreshGameboard',
       this.refreshGameboardWrapper
     );
-    this.gameState.eventBus.on('togglePlayerGameboardControls', this.toggleGameboardControls);
+    this.gameState.eventBus.on(
+      'togglePlayerGameboardControls',
+      this.toggleGameboardControls
+    );
     this.gameState.eventBus.on('receiveBillowAttack', this.receiveAttack);
   }
 
@@ -273,13 +275,10 @@ export class PlayerGameboardComponent {
         );
         gridCell.appendChild(hitMarker);
 
-        const gridCellContainer: HTMLDivElement = createElement(
-          'div',
-          [
-            `${this.id}-${symbolDescription}-grid-cell-container`,
-            'grid-cell-container',
-          ]
-        );
+        const gridCellContainer: HTMLDivElement = createElement('div', [
+          `${this.id}-${symbolDescription}-grid-cell-container`,
+          'grid-cell-container',
+        ]);
         gridCellContainer.appendChild(gridCell);
 
         cellFragment.appendChild(gridCellContainer);
@@ -328,10 +327,7 @@ export class PlayerGameboardComponent {
       shipLength
     );
 
-    this.syncShipUnitDataAttributes(
-      shipContainerElement,
-      shipType,
-    );
+    this.syncShipUnitDataAttributes(shipContainerElement, shipType);
 
     return shipContainerElement;
   }
@@ -430,31 +426,26 @@ export class PlayerGameboardComponent {
     return [`${gridStartMain} / span ${shipLength}`, gridCrossAxis];
   }
 
-  private getShipGridPlacementData(ship: BattleshipBuilder): {
+  // TODO: create return signature type
+  private getShipPlacementData(shipType: ShipType): {
     bowCoordinates: Coordinates;
     orientation: Orientation;
     shipLength: ShipLength;
   } {
-    const placementConfigurations: IPlacementConfigurations =
+    const ship: BattleshipBuilder =
+      this.playerState.fleetBuilder.getShip(shipType);
+    
+    const { coordinatesArray, orientation } =
       ship.currentplacementConfigurations;
 
-    if (
-      !placementConfigurations.coordinatesArray ||
-      !placementConfigurations.orientation
-    )
+    if (!coordinatesArray || !orientation) {
       throw new Error(`The ${ship.type} has no placement configurations.`);
-
-    const bowCoordinates: Coordinates =
-      placementConfigurations.coordinatesArray[0];
-    const orientation: Orientation =
-      placementConfigurations.orientation;
-
-    const shipLength: ShipLength = ship.length;
+    }
 
     return {
-      bowCoordinates,
+      bowCoordinates: coordinatesArray[0],
       orientation,
-      shipLength,
+      shipLength: ship.length,
     };
   }
 
@@ -466,29 +457,48 @@ export class PlayerGameboardComponent {
     this.placeFleetOnGameboard(fleetElements);
   }
 
-  private async handleShipUnitCooked(
-    shipContainerElement: HTMLDivElement
+  private async cookShipUnit(
+    shipType: ShipType,
+    attackCoordinates: Coordinates
   ): Promise<void> {
-    const shipUnits = Array.from(
-      shipContainerElement.children
-    ) as HTMLElement[];
+    const shipContainerElement = this.fleetElements.get(shipType);
 
-    // Stagger animations
-    shipUnits.forEach((unit, i) => {
-      setTimeout(() => {
-        unit.classList.add('cooked');
-      }, 333 * (i + 1));
-    });
+    if (!shipContainerElement) {
+      throw new Error(`The ${shipType} has no fleet element.`);
+    }
+    const [x, y]: Coordinates = attackCoordinates; // TODO: fix this
+    const attackedShipUnit = shipContainerElement.querySelector(
+      `[data-x="${x}"][data-y="${y}"]`
+    );
+    attackedShipUnit?.classList.add('cooked');
 
-    const lastUnit = shipUnits[shipUnits.length - 1];
+    if (attackedShipUnit) {
+      attackedShipUnit.classList.add('cooked');
 
-    // Wait for the animation of the last unit to end
-    await waitForTransitionEnd(lastUnit);
+      if (!isHTMLElement(attackedShipUnit))
+        throw new Error('The attacked ship must be an HTML Element.');
+
+      // '1600' +100ms after transition end in main.scss (1.5s)
+      await waitForTransitionEnd(attackedShipUnit, 999);
+      await sleep(2000);
+    } else {
+      console.warn(
+        `No ship unit found at coordinates (${x}, ${y}) on ${shipType}.`
+      );
+    }
   }
 
-  private hasTargetBeenAttacked(
-    coordinates: Coordinates
-  ): boolean {
+  private handleSinkingShip = async (shipType: ShipType): Promise<void> => {
+    const shipContainerElement = this.fleetElements.get(shipType);
+    
+    if (!shipContainerElement) {
+      throw new Error(`The ${shipType} has no fleet element.`);
+    }
+
+    await this.sinkShip(shipContainerElement);
+  };
+
+  private hasTargetBeenAttacked(coordinates: Coordinates): boolean {
     const alreadyAttacked =
       this.playerState.gameboardRepository.hasTargetBeenAttacked(coordinates);
 
@@ -545,9 +555,13 @@ export class PlayerGameboardComponent {
 
     const attackResult: AttackResult =
       this.playerState.gameboardController.receiveAttack(attackCoordinates);
-    
+
     try {
-      await this.triggerPrePlayerToggleAnimations(attackResult, gridCell, attackCoordinates);
+      await this.triggerPrePlayerToggleAnimations(
+        attackResult,
+        gridCell,
+        attackCoordinates
+      );
     } catch (error) {
       console.error('Error in triggerPrePlayerToggleAnimations', error);
     }
@@ -555,13 +569,13 @@ export class PlayerGameboardComponent {
     this.togglePlayerTurn(attackResult);
 
     return attackResult;
-  }
+  };
 
   private receiveAttack = async (
     attackCoordinates: Coordinates
   ): Promise<AttackResult> => {
     return await this._receiveAttack(attackCoordinates);
-  }
+  };
 
   private refreshGameboard(boardContainer: HTMLElement): void {
     /* </💭>
@@ -573,7 +587,7 @@ export class PlayerGameboardComponent {
     │ operations.                                                                 │
     └─────────────────────────────────────────────────────────────────────────────┘
    */
-    
+
     const gameboard = boardContainer.querySelector(`#${this.id}-gameboard`);
     const gameboardBackground = boardContainer.querySelector(
       `#${this.id}-gameboard-background`
@@ -624,7 +638,7 @@ export class PlayerGameboardComponent {
 
   private syncShipUnitDataAttributes = (
     shipContainerElement: HTMLDivElement,
-    shipType: ShipType,
+    shipType: ShipType
   ): void => {
     const ship: BattleshipBuilder =
       this.playerState.fleetBuilder.getShip(shipType);
@@ -636,27 +650,28 @@ export class PlayerGameboardComponent {
         "The ship's coordinates array is improperly structured or non-existent."
       );
     }
-    
-    const shipUnitElements = Array.from(
-      shipContainerElement.children
-    ).filter(isHTMLElement);
 
-		if (!isHTMLDivElementArray(shipUnitElements)) throw new Error('All ship unit\'s must be HTML DIV elements.');
-		
-		// The length of the coordinates should be exactly the amount of ship unit elements.
-		if (coordinatesArray.length !== shipUnitElements.length) {
-			throw new Error(
-				`Mismatch between ship units (${shipUnitElements.length}) and coordinates (${coordinatesArray.length}) for ${shipType}`
-			);
-		}
+    const shipUnitElements = Array.from(shipContainerElement.children).filter(
+      isHTMLElement
+    );
+
+    if (!isHTMLDivElementArray(shipUnitElements))
+      throw new Error("All ship unit's must be HTML DIV elements.");
+
+    // The length of the coordinates should be exactly the amount of ship unit elements.
+    if (coordinatesArray.length !== shipUnitElements.length) {
+      throw new Error(
+        `Mismatch between ship units (${shipUnitElements.length}) and coordinates (${coordinatesArray.length}) for ${shipType}`
+      );
+    }
 
     coordinatesArray.forEach(([x, y], index) => {
       const unit = shipUnitElements[index];
       unit.setAttribute('data-x', String(x));
       unit.setAttribute('data-y', String(y));
     });
-  }
-    
+  };
+
   private sinkShip = async (
     shipContainerElement: HTMLDivElement
   ): Promise<void> => {
@@ -666,32 +681,51 @@ export class PlayerGameboardComponent {
 
     // await waitForEvent(shipContainerElement, 'animationend');
 
-    // await this.handleShipUnitCooked(shipContainerElement);
+    // await this.cookShipUnit(shipContainerElement);
 
     // await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
+
+    // ! SINK THAT SHIT FAM
+    console.log(
+      '🚀 ~ PlayerGameboardComponent ~ handleSinkingShip= ~ shipContainerElement:',
+      shipContainerElement
+    );
+    // shipContainerElement.classList.add('sunk');
+
+    // await waitForTransitionEnd(shipContainerElement, 999);
+    // await sleep(2000);
   };
 
-  private toggleGameboardControls = (newGameboardState: gameboardStateValue): void => {
+  private toggleGameboardControls = (
+    newGameboardState: gameboardStateValue
+  ): void => {
     this.gameboardContainer.classList.toggle(
       'locked',
       newGameboardState === gameboardStateValue.inactive
     );
   };
 
+  // `attackCoordinates` is optional because it is not needed for the opponent gameboard.
+  // This is done to prepare for merging the opponent and player gameboard component modules.
   private triggerPrePlayerToggleAnimations = async (
     attackResult: AttackResult,
     gridCell: HTMLDivElement,
-    attackCoordinates: Coordinates
+    attackCoordinates?: Coordinates
   ): Promise<void> => {
-    await Promise.all([
-      this.updateGameboardPostAttack(attackResult, gridCell, attackCoordinates),
-      this.gameState.eventBus.emit('setAndScrollToNextSitRep', attackResult),
-    ]);
+    const boardUpdate = this.updateGameboardPostAttack(
+      attackResult,
+      gridCell,
+      attackCoordinates
+    );
+    const sitRepUpdate = this.gameState.eventBus.emit(
+      'setAndScrollToNextSitRep',
+      attackResult
+    );
+
+    await Promise.all([boardUpdate, sitRepUpdate]);
   };
 
-  private updateFleetElements = (
-    fleetBuilder: BattleshipFleetBuilder
-  ) => {
+  private updateFleetElements = (fleetBuilder: BattleshipFleetBuilder) => {
     if (this.fleetElements.size) this.fleetElements.clear();
 
     for (const ship of Object.values(fleetBuilder.fleet)) {
@@ -712,10 +746,8 @@ export class PlayerGameboardComponent {
       }
 
       const bowCoordinates: Coordinates = coordinatesArray[0];
-      const [gridPlacementValue, gridCrossAxis]: [
-        GridPlacementValue,
-        number
-      ] = this.getGridPlacementValue(bowCoordinates, orientation, shipLength);
+      const [gridPlacementValue, gridCrossAxis]: [GridPlacementValue, number] =
+        this.getGridPlacementValue(bowCoordinates, orientation, shipLength);
 
       this.setFleetElement(
         shipType,
@@ -730,82 +762,30 @@ export class PlayerGameboardComponent {
   private updateGameboardPostAttack = async (
     attackResult: AttackResult,
     gridCell: HTMLDivElement,
-    attackCoordinates: Coordinates
+    attackCoordinates?: Coordinates
   ): Promise<void> => {
     const { hit, isSunk, type } = attackResult;
 
     if (!hit) {
       gridCell.classList.add('miss');
+      return;
     }
 
-    if (hit && !isSunk) {
-      gridCell.classList.add('hit');
+    if (!isShipType(type))
+      throw new Error(`The ${type} is not a valid ship type.`);
 
-      if (!isShipType(type))
-        throw new Error(`The ${type} is not a valid ship type.`);
+    gridCell.classList.add('hit');
 
-      const ship: BattleshipBuilder =
-        this.playerState.fleetBuilder.getShip(type);
-
-      if (!this.fleetElements.has(ship.type)) {
-        throw new Error(`The ${ship.type} has no fleet element.`);
-      }
-
-      const shipContainerElement = this.fleetElements.get(ship.type);
-
-      if (!shipContainerElement) {
-        throw new Error(`The ${ship.type} has no fleet element.`);
-      }
-
-      const [x, y]: Coordinates = attackCoordinates;
-
-      console.log('shipContainerElement', shipContainerElement);
-      const attackedShipUnit = shipContainerElement.querySelector(`[data-x="${x}"][data-y="${y}"]`);
-      attackedShipUnit?.classList.add('cooked');
-
-      if (attackedShipUnit) {
-        attackedShipUnit.classList.add('cooked');
-
-        if (!isHTMLElement(attackedShipUnit))
-          throw new Error('The attacked ship must be an HTML Element.');
-
-        // '1600' +100ms after transition end in main.scss (1.5s)
-        await waitForTransitionEnd(attackedShipUnit, 999);
-        await sleep(2000);
-      } else {
-        console.warn(
-          `No ship unit found at coordinates (${x}, ${y}) on ${ship.type}.`
+    if (!isSunk) {
+      if (!attackCoordinates)
+        throw new Error(
+          'Attack coordinates not found. They are required for updating the player gameboard post attack.'
         );
-      }
-
-
-      
-    }
-
-    if (hit && isSunk) {
-      if (!isShipType(type))
-        throw new Error(`The ${type} is not a valid ship type.`);
-
-      gridCell.classList.add('hit');
-
-      const ship: BattleshipBuilder =
-        this.playerState.fleetBuilder.getShip(type);
-
-      const { bowCoordinates, orientation, shipLength } =
-        this.getShipGridPlacementData(ship);
-
-      if (!this.fleetElements.has(ship.type)) {
-        throw new Error(`The ${ship.type} has no fleet element.`);
-      }
-
-      const shipContainerElement = this.fleetElements.get(ship.type);
-
-      if (!shipContainerElement) {
-        throw new Error(`The ${ship.type} has no fleet element.`);
-      }
-
-      console.log('shipContainerElement', shipContainerElement);
-    }
+      await this.cookShipUnit(type, attackCoordinates);
+      return;
+    } 
+    
+    await this.handleSinkingShip(type);
   };
 
   // 💭 --------------------------------------------------------------
@@ -906,8 +886,7 @@ export class PlayerGameboardComponent {
       if (!match || !match.groups)
         throw new Error('No matches found when parsing');
 
-      const shipBorderValueSplit =
-        match.groups as ShipBorderValueSplit;
+      const shipBorderValueSplit = match.groups as ShipBorderValueSplit;
 
       dragState.shipBorderValueSplit = shipBorderValueSplit;
 
@@ -963,12 +942,7 @@ export class PlayerGameboardComponent {
           ];
 
           for (const validBowCoordinates of allValidBowCoordinates) {
-            if (
-              !areArraysEqual(
-                validBowCoordinates,
-                gridCellCoordinates
-              )
-            )
+            if (!areArraysEqual(validBowCoordinates, gridCellCoordinates))
               continue;
             gridCell.classList.add('valid-bow-coordinates');
           }
@@ -1000,20 +974,18 @@ export class PlayerGameboardComponent {
     };
 
     const shipContainerElement: HTMLDivElement = e.target;
-    const orientation: Orientation =
-      getConvertedTypeFromAttr(
-        shipContainerElement,
-        'data-orientation',
-        isOrientation
-      );
+    const orientation: Orientation = getConvertedTypeFromAttr(
+      shipContainerElement,
+      'data-orientation',
+      isOrientation
+    );
 
     const fleet: Fleet = this.playerState.fleetBuilder.fleet;
-    const shipType: ShipType =
-      getConvertedTypeFromAttr(
-        shipContainerElement,
-        'data-shiptype',
-        isShipType
-      );
+    const shipType: ShipType = getConvertedTypeFromAttr(
+      shipContainerElement,
+      'data-shiptype',
+      isShipType
+    );
 
     const cloneSnapOffset: CloneSnapOffset = getCloneSnapOffset(
       shipContainerElement,
@@ -1056,8 +1028,7 @@ export class PlayerGameboardComponent {
     )
       return;
 
-    const cloneSnapOffset: CloneSnapOffset | null =
-      dragState.cloneSnapOffset;
+    const cloneSnapOffset: CloneSnapOffset | null = dragState.cloneSnapOffset;
 
     if (!cloneSnapOffset)
       throw new Error(
@@ -1159,10 +1130,7 @@ export class PlayerGameboardComponent {
     if (!xAttr || !yAttr) {
       throw new Error('Missing or invalid grid cell coordinates.');
     }
-    const newCoordinates: Coordinates = [
-      Number(xAttr),
-      Number(yAttr),
-    ];
+    const newCoordinates: Coordinates = [Number(xAttr), Number(yAttr)];
 
     this.playerState.gameboardController.placePiece({
       ship: dragState.currentShipInstance!,
@@ -1192,8 +1160,7 @@ export class PlayerGameboardComponent {
       }
 
       // Get bow coordinates
-      const initialBowCoordinates: Coordinates =
-        coordinatesArray[0];
+      const initialBowCoordinates: Coordinates = coordinatesArray[0];
 
       // Re-place ship on logic gameboard
       this.playerState.gameboardController.placePiece({
@@ -1260,12 +1227,11 @@ export class PlayerGameboardComponent {
 
     const shipContainerElement: HTMLDivElement = e.target;
 
-    const shipType: ShipType =
-      getConvertedTypeFromAttr(
-        shipContainerElement,
-        'data-shiptype',
-        isShipType
-      );
+    const shipType: ShipType = getConvertedTypeFromAttr(
+      shipContainerElement,
+      'data-shiptype',
+      isShipType
+    );
 
     const ship = this.playerState.fleetBuilder.getShip(shipType);
 
