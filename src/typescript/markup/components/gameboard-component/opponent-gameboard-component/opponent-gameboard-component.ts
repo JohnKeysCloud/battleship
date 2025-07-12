@@ -13,7 +13,6 @@ import {
   capitalize,
   createElement,
   waitForTransitionEnd,
-  delay,
   waitForEvent,
   sleep,
 } from '../../../../utilities/random-utilities';
@@ -173,7 +172,7 @@ export class OpponentGameboardComponent {
 
     const shipContainerElement: HTMLDivElement = createElement(
       'div',
-      ['opponent-ship-container'],
+      ['ship-container', 'opponent-ship-container'],
       {
         id: `${this.id}-${shipType}-container`,
       }
@@ -441,9 +440,11 @@ export class OpponentGameboardComponent {
 
     await waitForEvent(shipContainerElement, 'animationend');
 
-    await this.cookAllShipUnits(shipContainerElement);
+    // ? When unifying gameboard component modules, this will only be called if
+    // ? the sunken ship is on opponent gameboard. All other logic is equivalent.
+    await this.cookAllShipUnits(shipContainerElement); 
 
-    await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
+    await sleep(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
   private toggleGameboardControls = (

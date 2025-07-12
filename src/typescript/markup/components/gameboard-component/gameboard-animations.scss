@@ -11,6 +11,18 @@
   }
 }
 
+@keyframes cycloneWobble {
+    0%   { transform: translateX(0) rotateX(0deg); }
+    10%  { transform: translateX(-15px) rotateX(12deg); }
+    20%  { transform: translateX(12px) rotateX(-10deg); }
+    30%  { transform: translateX(-9px) rotateX(8deg); }
+    40%  { transform: translateX(6px) rotateX(-6deg); }
+    50%  { transform: translateX(-4px) rotateX(4deg); }
+    60%  { transform: translateX(2px) rotateX(-3deg); }
+    70%  { transform: translateX(-1px) rotateX(2deg); }
+    100% { transform: translateX(0) rotateX(0deg); }
+}
+
 @keyframes playerGameboardPulse {
   0% {
     opacity: 0.5;

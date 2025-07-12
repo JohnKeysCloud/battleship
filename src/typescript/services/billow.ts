@@ -47,6 +47,7 @@ export class BillowBot {
   #possibleAttacks: Set<string>;
   #lastAttackCoordinates: Coordinates | null = null;
   #wasLastTargetHit: boolean | null = null;
+  #ponderTime: number = 500;
 
   constructor(
     private readonly gameState: GameState
@@ -94,7 +95,7 @@ export class BillowBot {
   } 
 
   private async determineNextTarget(): Promise<Coordinates> {
-    await this.ponder(500);
+    await this.ponder(this.#ponderTime);
     return this.getNextAttackCoordinates(this.#lastAttackCoordinates, this.#wasLastTargetHit);
   }
 

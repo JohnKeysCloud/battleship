@@ -5,10 +5,6 @@ export const areArraysEqual = <T>(arrayOne: T[], arrayTwo: T[]) =>
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-export const delay = (ms: number): Promise<void> => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
 export const getConvertedTypeFromAttr = <T extends string>(
   element: HTMLElement,
   attribute: string,

@@ -162,23 +162,13 @@ main {
     display: grid;
     place-items: center;
     position: relative;
-    
-    .gameboard-container.locked {
-        pointer-events: none;
 
-        .ship-container {
-          pointer-events: none;
-        }
-    }
-
-    &.parabellum {
-      .gameboard-container {
+    &.parabellum {    
+      #player-gameboard-container {
         &:has(.ship-container[data-dragging="true"]) .ship-container::before {
           animation-play-state: paused;
         }
-      }
-      
-      #player-gameboard-container {
+
         .ship-container {
           &:not(.adrift):hover {
             transition: transform 380ms ease-out;
@@ -256,6 +246,22 @@ main {
     }
 
     &.bellum {
+      &.player-turn {
+        #player-gameboard-container {
+          opacity: 0.5;
+          position: absolute;
+          transform: scale(0.8) translateY(60px);
+          z-index: 0;
+        }
+
+        #opponent-gameboard-container {
+          opacity: 1;
+          position: relative;
+          transform: scale(1) translateY(0);
+          z-index: 1;
+        }
+      }
+
       #player-gameboard-container {
         .ship-container {
           cursor: pointer;
@@ -269,6 +275,10 @@ main {
             transition: transform 380ms ease-in-out;
             transform: scale(1);
           }
+
+          &.sunk {
+            animation: cycloneWobble 1.2s ease-in forwards;
+          }
         }
       }
 
@@ -276,16 +286,22 @@ main {
         .grid-cell {
           cursor: pointer;
         }
-      }
 
-      .opponent-ship-container {
-        &.sunk {
+        .ship-container.sunk {
           animation: cycloneFadeIn 0.5s ease-in forwards;
           display: grid;
           opacity: 1;
           pointer-events: auto;
           rotate: 0deg;
-          scale: 1;
+          scale: 1;  
+        }
+      }
+
+      .gameboard-container.locked {
+        pointer-events: none;
+
+        .ship-container {
+          pointer-events: none;
         }
       }
 
@@ -362,21 +378,7 @@ main {
 
     }
 
-    &.player-turn {
-      #player-gameboard-container {
-        opacity: 0.5;
-        position: absolute;
-        transform: scale(0.8) translateY(60px);
-        z-index: 0;
-      }
 
-      #opponent-gameboard-container {
-        opacity: 1;
-        position: relative;
-        transform: scale(1) translateY(0);
-        z-index: 1;
-      }
-    }
   }
 
   #main-container-three {

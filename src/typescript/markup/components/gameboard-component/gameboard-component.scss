@@ -167,31 +167,11 @@
 }
 
 .opponent-ship-container {
-  border: var(--ship-container-border-size) solid black;
-  border-radius: 10vw;
   cursor: pointer;
   display: none;
-  overflow: hidden;
   pointer-events: none;
-  position: relative;
   rotate: 0;
   scale: 0;
-
-  &#opponent-battleship-container {
-    background-color: var(--color-battleship);
-  }
-  &#opponent-carrier-container {
-    background-color: var(--color-carrier);
-  }
-  &#opponent-destroyer-container {
-    background-color:  var(--color-destroyer);
-  }
-  &#opponent-patrolBoat-container {
-    background-color: var(--color-patrolBoat);
-  }
-  &#opponent-submarine-container {
-    background-color: var(--color-submarine);
-  }
 }
 
 .ship-container-clone {

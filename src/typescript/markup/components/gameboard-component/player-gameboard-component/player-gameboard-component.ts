@@ -45,6 +45,7 @@ import {
   createElement,
   getConvertedTypeFromAttr,
   sleep,
+  waitForAnimationEnd,
   waitForTransitionEnd,
 } from '../../../../utilities/random-utilities';
 
@@ -306,7 +307,7 @@ export class PlayerGameboardComponent {
 
     const shipContainerElement: HTMLDivElement = createElement(
       'div',
-      ['ship-container', 'adrift'],
+      ['ship-container', 'player-ship-container', 'adrift'],
       {
         id: `${this.id}-${shipType}-container`,
         'data-dragging': 'false',
@@ -677,23 +678,11 @@ export class PlayerGameboardComponent {
   ): Promise<void> => {
     const DELAY_AFTER_TRANSITION_SECOND: number = 1;
 
-    // shipContainerElement.classList.add('sunk');
+    shipContainerElement.classList.add('sunk');
 
-    // await waitForEvent(shipContainerElement, 'animationend');
+    await waitForAnimationEnd(shipContainerElement);
 
-    // await this.cookShipUnit(shipContainerElement);
-
-    // await delay(DELAY_AFTER_TRANSITION_SECOND * 1000);
-
-    // ! SINK THAT SHIT FAM
-    console.log(
-      '🚀 ~ PlayerGameboardComponent ~ handleSinkingShip= ~ shipContainerElement:',
-      shipContainerElement
-    );
-    // shipContainerElement.classList.add('sunk');
-
-    // await waitForTransitionEnd(shipContainerElement, 999);
-    // await sleep(2000);
+    await sleep(DELAY_AFTER_TRANSITION_SECOND * 1000);
   };
 
   private toggleGameboardControls = (
@@ -776,16 +765,17 @@ export class PlayerGameboardComponent {
 
     gridCell.classList.add('hit');
 
-    if (!isSunk) {
-      if (!attackCoordinates)
-        throw new Error(
-          'Attack coordinates not found. They are required for updating the player gameboard post attack.'
-        );
-      await this.cookShipUnit(type, attackCoordinates);
-      return;
-    } 
+    if (!attackCoordinates) {
+      throw new Error(
+        'Attack coordinates not found. They are required for updating the player gameboard post attack.'
+      );
+    }
+
+    await this.cookShipUnit(type, attackCoordinates);
+
+    if (!isSunk) return;
     
-    await this.handleSinkingShip(type);
+    await this.handleSinkingShip(type);    
   };
 
   // 💭 --------------------------------------------------------------
