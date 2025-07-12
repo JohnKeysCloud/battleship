@@ -5,7 +5,7 @@ import {
   MessageType,
   PlayerType,
 } from '../../types/state-types';
-import { createElement, delay, waitForTransitionEnd } from '../random-utilities';
+import { createElement, sleep, waitForTransitionEnd } from '../random-utilities';
 /* 
   ┌─────────────────────────────────────────────────────────────────────────┐
   │ TODO: Make more reusable by enabling custom messages and adding         │
@@ -96,7 +96,7 @@ export class CycloneSitRepScroller {
 
     this.resetSitRepContainer();
 
-    await delay(DELAY_AFTER_TRANSITION_SECONDS * 1000); 
+    await sleep(DELAY_AFTER_TRANSITION_SECONDS * 1000); 
   };
 
   // 💭 --------------------------------------------------------------
