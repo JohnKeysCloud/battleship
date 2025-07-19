@@ -1,9 +1,9 @@
-    
-import { HitPointCollection } from '../../../../types/dom-types';
-import { Fleet, ShipType } from "../../../../types/logic-types";
-import { PlayerType } from "../../../../types/state-types";
-import { capitalize, createElement } from "../../../../utilities/random-utilities";
-import { isPlayerType } from '../../../../types/type-guards';
+import './score-board-component.scss';
+import { HitPointCollection } from '../../../types/dom-types';
+import { Fleet, ShipType } from "../../../types/logic-types";
+import { PlayerType } from "../../../types/state-types";
+import { capitalize, createElement } from "../../../utilities/random-utilities";
+import { isPlayerType } from '../../../types/type-guards';
 
 export class ScoreBoardComponent {
   private readonly scoreBoardID: string = 'score-board';

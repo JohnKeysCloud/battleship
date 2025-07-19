@@ -4,7 +4,7 @@ import { PlayerGameboardComponent } from "../../components/gameboard-component/p
 import { InstructionsComponent } from "../../components/buttons/instructions-component/instructions-component";
 import { ShipShufflerButtonComponent } from "../../components/buttons/ship-shuffler-component/ship-shuffler-component";
 import { ReadyUpButtonComponent } from "../../components/buttons/ready-up-component/ready-up-component";
-import { ScoreBoardComponent } from "../../components/buttons/score-board-component/score-board-component";
+import { ScoreBoardComponent } from "../../components/score-board-component/score-board-component";
 
 import { createMainThreeParabellumFragment } from "./main-three-parabellum";
 import { createMainThreeBellumFragment } from "./main-three-bellum";

@@ -1,5 +1,5 @@
 import { createElement } from "../../../utilities/random-utilities";
-import { ScoreBoardComponent } from "../../components/buttons/score-board-component/score-board-component";
+import { ScoreBoardComponent } from "../../components/score-board-component/score-board-component";
 
 export function createMainThreeBellumFragment(scoreBoard: ScoreBoardComponent): DocumentFragment {
   const mainContainerThreeBellumWrapper = createElement('div', ['bellum'], {

@@ -794,9 +794,9 @@ export class PlayerGameboardComponent {
 
       // TODO: Make this less hacky 🫠 by adding class instead?
       // Enable drag events for grid cells under ship containers
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         shipContainerElement.classList.add('locked');
-      }, 0);
+      });
 
       // Make clone visible
       this.shipDragClone.classList.add('visible');
