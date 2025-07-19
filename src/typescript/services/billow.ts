@@ -60,9 +60,6 @@ export class BillowBot {
   public attack = async (): Promise<AttackResult> => {
     try {
       const attackCoordinates: Coordinates = await this.determineNextTarget();
-
-      console.log('attackCoordinates', attackCoordinates);
-
       const [attackResult]: AttackResult[] = await this.gameState.eventBus.emit('receiveBillowAttack', attackCoordinates);
     
       if (attackResult.hit) {

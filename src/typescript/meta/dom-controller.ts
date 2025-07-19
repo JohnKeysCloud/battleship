@@ -1,7 +1,6 @@
 import '../../styles/sass/index.scss';
 
 import { GameState } from '../state/game-state';
-import { players } from '../state/player-state';
 import { CycloneLightboxController } from '../utilities/cycloneLightbox.ts/cyclone-lightbox';
 
 // 💭 markup
@@ -9,7 +8,7 @@ import { createHeader } from '../markup/header/header';
 import { MainComponent } from '../markup/main/main-component';
 import { InstructionsDialogComponent } from '../markup/components/instructions-dialog-component/instructions-dialog-component';
 import { CycloneSitRepScroller } from '../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller';
-import { AttackResult, PlayerType, gameboardStateValue } from '../types/state-types';
+import { AttackResult, PlayerCore, PlayerType, gameboardStateValue } from '../types/state-types';
 import { BillowBot } from '../services/billow';
 import { waitForTransitionEnd } from '../utilities/random-utilities';
 
@@ -29,6 +28,7 @@ export class DOMController {
 
   constructor(
     private readonly gameState: GameState,
+    private readonly playerCore: PlayerCore,
     private readonly billowBot: BillowBot | null // make optional if multiplayer
   ) {
     if (!document) throw new Error('Fuck!');
@@ -42,7 +42,7 @@ export class DOMController {
       'instructions-dialog-close-button'
     );
     this.mainComponent = new MainComponent(
-      players,
+      this.playerCore,
       this.instructionsLightboxController,
       this.cycloneSitRepScroller,
       this.gameState
@@ -104,47 +104,15 @@ export class DOMController {
       if (!this.gameState.currentPlayer)
         throw new Error('Current player must be set in game state.');
 
-      // ? set initial sit rep scroller text content
-      this.initializeSitRepScroller(this.gameState.currentPlayer); // ? make dynamic
+      this.initializeSitRepScroller(this.gameState.currentPlayer); 
     }
 
     this.mainComponent.mainContainerOne.swapByOrder();
     this.mainComponent.mainContainerThree.swapByOrder();
     await this.updateGameboardsOnTransition(this.gameState);
 
-    // TODO: If multiplayer becomes the dominant mode, reverse this check to reduce conditionals
-    if (this.gameState.currentPlayer === 'opponent') {
-      // ? && playing against billow (if multiplayer is introduced)
-
-      console.log('billowBot', this.billowBot);
-
-      if (this.billowBot) {
-        const billowAttackResult: AttackResult = await this.billowBot.attack();
-
-        // 💭 ADD STUFF HERE? --------------------------------------------------------------
-        // * debugging
-        console.log('billowAttackResult', billowAttackResult);
-
-        // 💭 emit billowAttack
-        // TODO: emit receive attack in the playergameboardcomponentin billowBot.ts
-        // match coordinates with corresponding grid cell on player gameboard
-
-        // 💭 method on billowBot `ponderAttackCoordinates` called by `billowAttack` event listener.
-        // apply animation to multiple random unattacked grid cells one at a time.
-        // (start off fast, slow down as time goes on (2 second long animation?)
-        // selected grid cell gets 'selected cell' animation (1 second long animation?)
-        // at the end of selected cell animation, apply hit / miss styles to the selected grid cell.
-
-        // 💭 method on playerGameboardComponent `receiveAttack`? called by `billowAttack` event listener.
-        // await one of the following:
-        // if hit, add cooked to ship unit at that coordinate
-        // if miss, add miss styles to grid cell at that coordinate
-
-        // 💭 check end game state
-        // check if all player ships are sunk
-        // if yes, declare winner
-        // if no, toggle turn
-      }
+    if (this.gameState.currentPlayer === 'opponent' && this.billowBot) {
+      await this.billowBot.attack();
     }
   };
 

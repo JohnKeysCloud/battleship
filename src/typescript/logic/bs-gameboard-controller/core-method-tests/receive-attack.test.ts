@@ -1,29 +1,35 @@
 import {
   ShipType
 } from '../../../types/logic-types';
-import { PlayerState } from '../../../types/state-types';
-import { createPlayerStateObject } from '../../../state/player-state';
+import { PlayerContext } from '../../../types/state-types';
+import { createPlayerContext } from '../../../state/player-state';
 
-let playerState: PlayerState = createPlayerStateObject();
+let playerContext: PlayerContext = createPlayerContext();
 
 beforeEach(() => {
-  playerState = createPlayerStateObject()
+  playerContext = createPlayerContext();
 });
 
 describe('receive attack method', () => {
   test('get ship', () => {
     // Place carrier on gameboard
-    playerState.gameboardController.placePiece({
-      ship: playerState.fleetBuilder.getShip(ShipType.Carrier),
+    playerContext.gameboardController.placePiece({
+      ship: playerContext.fleetBuilder.getShip(ShipType.Carrier),
       coordinates: [0, 0],
       orientation: 'vertical',
     });
 
     // receiveAttack on Gameboard at coordinates [0,1]
-    const shipType = playerState.gameboardController.receiveAttack(
+    const shipType = playerContext.gameboardController.receiveAttack(
       [0, 1]
     );
 
-    expect(shipType).toBe(playerState.fleetBuilder.getShip(ShipType.Carrier));
+    const expectedAttackResult = {
+      hit: true,
+      isSunk: false,
+      type: ShipType.Carrier,
+    };
+
+    expect(shipType).toEqual(expectedAttackResult);
   });
 });

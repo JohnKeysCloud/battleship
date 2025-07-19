@@ -6,10 +6,10 @@ import {
   BattleshipBuilder,
   SHIP_SYMBOLS
 } from '../logic/bs-ship-builder/bs-ship-builder';
-import { PlayerState } from './state-types';
+import { PlayerContext } from './state-types';
 
 // 💭 --------------------------------------------------------------
-// 💭 Enumerations
+// 💭 Enumerations/Helpers
 
 export enum AnglesOfRotation {
   Degrees0 = 0,
@@ -25,6 +25,24 @@ export enum ShipType {
   PatrolBoat = 'patrolBoat',
   Submarine = 'submarine',
 };
+
+export const getShipTypes = (version: FleetVersion): ShipType[] =>
+  version === 1990
+    ? [
+        ShipType.Carrier,
+        ShipType.Battleship,
+        ShipType.Submarine,
+        ShipType.Destroyer,
+        ShipType.PatrolBoat,
+      ]
+    : [
+        ShipType.Carrier,
+        ShipType.Battleship,
+        ShipType.Submarine,
+        ShipType.Cruiser,
+        ShipType.Destroyer,
+        ShipType.PatrolBoat,
+      ];
 
 // 💭 --------------------------------------------------------------
 // 💭 Types
@@ -96,7 +114,7 @@ export interface IBattleshipFleetBuilderSet {
   playerTwoFleetBuilder: BattleshipFleetBuilder;
 }
 export interface IBattleshipGameboardController extends IGridGameboardController {
-  playerState: Omit<PlayerState, 'gameboardController' | 'fleetBuilder'>;
+  playerState: Omit<PlayerContext, 'gameboardController' | 'fleetBuilder'>;
   getValidPositions(
     shipPlacementConfigs: IShipPlacementConfigurations
   ): IValidPositionsResult;

@@ -1,40 +1,52 @@
-import { initApp } from './typescript/meta/init-app';
 import { DOMController } from './typescript/meta/dom-controller';
 import { GameState } from './typescript/state/game-state';
 import EventBus from './typescript/utilities/event-bus';
 import { BillowBot } from './typescript/services/billow';
+import { FleetVersion } from './typescript/types/logic-types';
+import { PlayerCore } from './typescript/types/state-types';
+import { initalizePlayerCore } from './typescript/state/player-state';
+import { randomizeBSGameboards } from './typescript/meta/init/randomize-gameboard';
+
 class App {
-  public readonly eventBus: EventBus;
+  // Instantiate foundational dependencies
+  public readonly playerCore: PlayerCore = initalizePlayerCore();
+  public readonly eventBus: EventBus = new EventBus();
+  public readonly isMultiplayer: boolean = false;
+  public readonly version: FleetVersion = 1990;
+
+  // Runtime-initialized components
   public readonly gameState: GameState;
+  public readonly billowBot: BillowBot | null;
   public readonly domController: DOMController;
-  public readonly isMultiplayer: boolean = false; // ? move elsewhere if multiplayer is implemented
-  public readonly billowBot: BillowBot | null; 
 
   private constructor() {
-    this.eventBus = new EventBus();
-    this.gameState = new GameState(this.isMultiplayer, this.eventBus);
-    this.billowBot = !this.isMultiplayer ? new BillowBot(this.gameState) : null; 
-    this.domController = new DOMController(this.gameState, this.billowBot);
-    // ? pass isMultiplayer to the DOMController so a multiplayer button can be rendered if multiplayer is implemented
+    randomizeBSGameboards(this.playerCore);
+
+    this.gameState = new GameState(
+      this.isMultiplayer,
+      this.eventBus,
+      this.version
+    );
+    this.billowBot = !this.isMultiplayer ? new BillowBot(this.gameState) : null;
+    this.domController = new DOMController(
+      this.gameState,
+      this.playerCore,
+      this.billowBot
+    );
   }
 
   public static powerOn() {
-    console.time('Loading');
-    initApp(); 
-    console.timeEnd('Loading');
+    const app = new App();
+    app.pressStart();
 
-    return new App();
+    return app;
   }
 
-  public pressStart() {
+  public pressStart = (): void => {
     this.domController.render();
-  }
+  };
 }
 
 console.time('powerOn');
-export const app = App.powerOn(); // ? pass in isMultiplayer as a parameter
+export const app = App.powerOn(); 
 console.timeEnd('powerOn');
-
-console.time('pressStart');
-app.pressStart();
-console.timeEnd('pressStart');

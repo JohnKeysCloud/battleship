@@ -3,6 +3,7 @@ import {
   FleetConfigs,
   ShipType,
   FleetVersion,
+  getShipTypes,
 } from '../../types/logic-types';
 import {
   BattleshipBuilder,
@@ -10,7 +11,10 @@ import {
 import { isShipType } from '../../types/type-guards';
 
 export class BattleshipFleetBuilder {
-  private constructor(public readonly fleet: Fleet, public readonly version: FleetVersion) {}
+  private constructor(
+    public readonly fleet: Fleet,
+    public readonly version: FleetVersion
+  ) { }
 
   private static createFleet(fleetConfigs: FleetConfigs): Fleet {
     const fleet: Fleet = {};
@@ -30,8 +34,9 @@ export class BattleshipFleetBuilder {
       BattleshipFleetBuilder.createFleet({
         carrier: { type: ShipType.Carrier, version: 2002 },
         battleship: { type: ShipType.Battleship, version: 2002 },
-        destroyer: { type: ShipType.Destroyer, version: 2002 },
         submarine: { type: ShipType.Submarine, version: 2002 },
+        cruiser: { type: ShipType.Cruiser, version: 2002 },
+        destroyer: { type: ShipType.Destroyer, version: 2002 },
         patrolBoat: { type: ShipType.PatrolBoat, version: 2002 },
       }),
       2002
@@ -44,13 +49,16 @@ export class BattleshipFleetBuilder {
       BattleshipFleetBuilder.createFleet({
         carrier: { type: ShipType.Carrier, version: 1990 },
         battleship: { type: ShipType.Battleship, version: 1990 },
-        cruiser: { type: ShipType.Cruiser, version: 1990 },
         submarine: { type: ShipType.Submarine, version: 1990 },
         destroyer: { type: ShipType.Destroyer, version: 1990 },
+        patrolBoat: { type: ShipType.PatrolBoat, version: 1990 },
       }),
       1990
     );
   }
+
+  public static shipTypes = (version: FleetVersion): ShipType[] =>
+    getShipTypes(version);
 
   getShip(shipType: ShipType): BattleshipBuilder {
     const ship = this.fleet[shipType];

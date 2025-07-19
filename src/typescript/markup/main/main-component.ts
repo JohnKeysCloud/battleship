@@ -1,4 +1,4 @@
-import { PlayerState } from "../../types/state-types";
+import { PlayerCore } from "../../types/state-types";
 import { createElement } from "../../utilities/random-utilities";
 
 import { createMainContainerOne } from "./main-container-one/main-container-one";
@@ -9,7 +9,6 @@ import { InstructionsComponent } from "../components/buttons/instructions-compon
 import { CycloneHotSwapContainer } from "../../utilities/cycloneHotSwapContainer";
 import { CycloneLightboxController } from "../../utilities/cycloneLightbox.ts/cyclone-lightbox";
 import { CycloneSitRepScroller } from "../../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller";
-import EventBus from "../../utilities/event-bus";
 import { GameState } from "../../state/game-state";
 
 export class MainComponent {
@@ -22,7 +21,7 @@ export class MainComponent {
   private readonly instructionsButton: InstructionsComponent;
 
   constructor(
-    private readonly players: { player: PlayerState; opponent: PlayerState },
+    private readonly playerCore: PlayerCore,
     private readonly instructionsLightboxController: CycloneLightboxController,
     private readonly cycloneSitRepScroller: CycloneSitRepScroller,
     // ? maybe set to return string used to update ui via the css-class `player-turn` || `opponent-turn`
@@ -34,7 +33,7 @@ export class MainComponent {
 
     this.mainContainerOne = this.createMainContainerOne();
     this.mainContainerTwo = new MainContainerTwo(
-      this.players,
+      this.playerCore,
       this.gameState
     );
     this.mainContainerThree = this.createMainContainerThree();
@@ -53,7 +52,8 @@ export class MainComponent {
     return createMainContainerThree(
       this.mainContainerTwo.playerGameboard,
       this.instructionsButton,
-      this.gameState
+      this.gameState,
+      this.playerCore
     );
   }
 

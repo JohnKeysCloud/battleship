@@ -24,9 +24,14 @@ export enum gameboardStateValue {
 }
 // 💭 --------------------------------------------------------------
 
-export interface PlayerState {
+export interface PlayerContext {
   gameboardBuilder: BattleshipBoardBuilder;
   gameboardController: BattleshipBoardController;
   gameboardRepository: BattleshipBoardRepository;
   fleetBuilder: BattleshipFleetBuilder;
 };
+
+export interface PlayerCore {
+  player: PlayerContext;
+  opponent: PlayerContext;
+}

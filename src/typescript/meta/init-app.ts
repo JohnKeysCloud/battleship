@@ -1,5 +1,6 @@
-import { randomizeBSGameboards } from "./init/randomize-gameboard";
+// import { randomizeBSGameboards } from "./init/randomize-gameboard";
+// import { PlayerCore } from "../types/state-types";
 
-export function initApp() {
-  randomizeBSGameboards(); 
-}
+// export function initApp(playerCore: PlayerCore) {
+//   randomizeBSGameboards(playerCore); 
+// }

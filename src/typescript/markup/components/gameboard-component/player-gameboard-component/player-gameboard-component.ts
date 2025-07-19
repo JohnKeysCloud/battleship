@@ -28,7 +28,7 @@ import {
   } from '../../../../types/logic-types'
 import {
   AttackResult,
-  PlayerState,
+  PlayerContext,
   gameboardStateValue,
 } from '../../../../types/state-types';
 import { GridCellDataKey } from '../../../../types/dom-types';
@@ -86,7 +86,7 @@ export class PlayerGameboardComponent {
   };
 
   constructor(
-    public readonly playerState: PlayerState,
+    public readonly playerState: PlayerContext,
     private readonly gameState: GameState
   ) {
     this.gameboardContainer = this.generateBoardContainer(
@@ -631,8 +631,6 @@ export class PlayerGameboardComponent {
       gridCrossAxis,
       orientation
     );
-
-    console.log('shipElement', shipElement);
 
     this.fleetElements.set(shipType, shipElement);
   };

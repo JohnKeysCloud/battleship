@@ -16,7 +16,7 @@ import {
   waitForEvent,
   sleep,
 } from '../../../../utilities/random-utilities';
-import { AttackResult, PlayerState, gameboardStateValue } from '../../../../types/state-types';
+import { AttackResult, PlayerContext, gameboardStateValue } from '../../../../types/state-types';
 import '../gameboard-component.scss';
 import '../gameboard-animations.scss';
 
@@ -33,7 +33,7 @@ export class OpponentGameboardComponent {
   private fleetElements: Map<ShipType, HTMLDivElement> = new Map();
 
   constructor(
-    public readonly playerState: PlayerState,
+    public readonly playerState: PlayerContext,
     private readonly gameState: GameState
   ) {
     this.gameboardContainer = this.generateBoardContainer(

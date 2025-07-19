@@ -19,7 +19,7 @@ describe('`BattleshipBuilder`', () => {
 
   // Setup a new cruiser before each test
   beforeEach(() => {
-    cruiser = createShip(ShipType.Cruiser, 1990);
+    cruiser = createShip(ShipType.Cruiser, 2002);
   });
 
   // Define the lifecycle test cases

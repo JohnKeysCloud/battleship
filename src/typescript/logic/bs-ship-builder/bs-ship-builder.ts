@@ -24,11 +24,11 @@ const sizeLookup: Record<SizeLookupKey, ShipLength | undefined> = {
   'battleship-2002': 4,
   'carrier-1990': 5,
   'carrier-2002': 5,
-  'cruiser-1990': 3,
-  'cruiser-2002': undefined, // Explicitly mark missing values
-  'destroyer-1990': 2,
-  'destroyer-2002': 3,
-  'patrolBoat-1990': undefined,
+  'cruiser-1990': undefined, // Explicitly mark missing values
+  'cruiser-2002': 3,
+  'destroyer-1990': 3,
+  'destroyer-2002': 2,
+  'patrolBoat-1990': 2,
   'patrolBoat-2002': 2,
   'submarine-1990': 3,
   'submarine-2002': 3,

@@ -9,13 +9,13 @@ import {
   ShipLength,
 } from '../../../../types/logic-types';
 import { createAxisArrayKey, createShipConfigurations } from '../../../../utilities/logic-utilities';
-import { createPlayerStateObject } from '../../../../state/player-state';
+import { createPlayerContext } from '../../../../state/player-state';
 
 describe('`getValidShipPositions`', () => {
-  let playerState = createPlayerStateObject();
+  let playerState = createPlayerContext();
 
   beforeEach(() => {
-    playerState = createPlayerStateObject();
+    playerState = createPlayerContext();
   });
 
   // Test function utility

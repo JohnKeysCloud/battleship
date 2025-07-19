@@ -1,13 +1,15 @@
 import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
-import { players } from "../../state/player-state";
+import { PlayerCore } from "../../types/state-types";
 
-export const randomizeBSGameboards = () => {
+export const randomizeBSGameboards = (playerCore: PlayerCore) => {
+  const { player, opponent } = playerCore;
+
   randomizeBSGameboard(
-    players.player.gameboardController,
-    players.player.fleetBuilder.fleet
+    player.gameboardController,
+    player.fleetBuilder.fleet
   );
   randomizeBSGameboard(
-    players.opponent.gameboardController,
-    players.opponent.fleetBuilder.fleet
+    opponent.gameboardController,
+    opponent.fleetBuilder.fleet
   );
 };

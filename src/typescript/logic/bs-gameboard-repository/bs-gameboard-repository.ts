@@ -23,7 +23,6 @@ export class BattleshipBoardRepository {
   }
 
   public get inBoundRotationalPlacePieceForFleet(): InBoundRotationalPlacePieceParamsForFleet {
-    console.log(this.#inBoundRotationalPlacePieceParamsForFleet);
     return this.#inBoundRotationalPlacePieceParamsForFleet;
   }
 

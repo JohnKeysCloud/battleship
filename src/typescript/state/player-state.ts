@@ -3,14 +3,14 @@ import { BattleshipBoardBuilder } from "../logic/bs-gameboard-builder/bs-gameboa
 import { BattleshipBoardController } from "../logic/bs-gameboard-controller/bs-gameboard-controller";
 import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-gameboard-repository";
 import { FleetVersion } from "../types/logic-types";
-import { PlayerState } from "../types/state-types";
+import { PlayerContext, PlayerCore } from "../types/state-types";
 
-export const createPlayerStateObject = (fleetVersion: FleetVersion = 2002) => { 
+export const createPlayerContext = (fleetVersion: FleetVersion = 1990) => { 
   const gameboardBuilder = new BattleshipBoardBuilder();
   const gameboardRepository = new BattleshipBoardRepository();
-  const fleetBuilder = fleetVersion === 2002
-    ? BattleshipFleetBuilder.createHasbroFleet()
-    : BattleshipFleetBuilder.createMBFleet();
+  const fleetBuilder = fleetVersion === 1990
+    ? BattleshipFleetBuilder.createMBFleet()
+    : BattleshipFleetBuilder.createHasbroFleet();
   const gameboardController = new BattleshipBoardController({
     gameboardBuilder,
     gameboardRepository,
@@ -25,10 +25,20 @@ export const createPlayerStateObject = (fleetVersion: FleetVersion = 2002) => {
   }
 }
 
-const player: PlayerState = createPlayerStateObject();
-const opponent: PlayerState = createPlayerStateObject();
+export const initalizePlayerCore = (): PlayerCore => {
+  const playerContext = createPlayerContext();
+  const opponentContext = createPlayerContext();
 
-export const players: { player: PlayerState; opponent: PlayerState } = {
+  return {
+    player: playerContext,
+    opponent: opponentContext,
+  }
+}
+
+const player: PlayerContext = createPlayerContext();
+const opponent: PlayerContext = createPlayerContext();
+
+export const players: { player: PlayerContext; opponent: PlayerContext } = {
   player,
   opponent,
 };

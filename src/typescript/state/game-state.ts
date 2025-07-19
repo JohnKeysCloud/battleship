@@ -1,5 +1,7 @@
 import { GamePhase, CurrentPlayer, gameboardStateValue } from "../types/state-types";
 import EventBus from "../utilities/event-bus";
+import { FleetVersion } from "../types/logic-types";
+
 export class GameState {
   public currentGamePhase: GamePhase = 'parabellum';
   public currentPlayer: CurrentPlayer = null;
@@ -9,7 +11,8 @@ export class GameState {
 
   constructor(
     public readonly isMultiplayer: boolean,
-    public readonly eventBus: EventBus
+    public readonly eventBus: EventBus,
+    public readonly version: FleetVersion
   ) {}
 
   // ! connect

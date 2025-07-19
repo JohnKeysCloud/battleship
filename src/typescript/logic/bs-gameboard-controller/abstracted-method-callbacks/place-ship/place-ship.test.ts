@@ -7,11 +7,11 @@ import {
   ShipSymbolValue,
   ShipType
 } from '../../../../types/logic-types';
-import { PlayerState } from '../../../../types/state-types';
+import { PlayerContext } from '../../../../types/state-types';
 import { BattleshipBuilder } from '../../../bs-ship-builder/bs-ship-builder';
 import { BattleshipFleetBuilder } from '../../../bs-fleet-builder/bs-fleet-builder';
 import { createPositionObject } from '../../../../utilities/logic-utilities';
-import { createPlayerStateObject } from '../../../../state/player-state';
+import { createPlayerContext } from '../../../../state/player-state';
 
 describe('`placeShip`', () => {
   // 💭 --------------------------------------------------------------
@@ -20,10 +20,10 @@ describe('`placeShip`', () => {
   const getNewCarrierTestShip = (): BattleshipBuilder =>
     BattleshipFleetBuilder.createHasbroFleet().getShip(ShipType.Carrier);
 
-  let playerState: PlayerState = createPlayerStateObject();
+  let playerState: PlayerContext = createPlayerContext();
 
   beforeEach(() => {
-    playerState = createPlayerStateObject();
+    playerState = createPlayerContext();
   });
 
   const placeShip = (input: IPlacePieceWrapperParams) =>

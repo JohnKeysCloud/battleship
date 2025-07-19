@@ -12,9 +12,9 @@ describe('BattleshipFleetBuilder', () => {
   test('should create a fleet with correct ships', () => {
     expect(fleetBuilder.getShip(ShipType.Carrier)).toBeDefined();
     expect(fleetBuilder.getShip(ShipType.Battleship)).toBeDefined();
-    expect(fleetBuilder.getShip(ShipType.Cruiser)).toBeDefined();
-    expect(fleetBuilder.getShip(ShipType.Destroyer)).toBeDefined();
     expect(fleetBuilder.getShip(ShipType.Submarine)).toBeDefined();
+    expect(fleetBuilder.getShip(ShipType.Destroyer)).toBeDefined();
+    expect(fleetBuilder.getShip(ShipType.PatrolBoat)).toBeDefined();
   });
 
   test('should create a fleet with specified versions for MBFleet', () => {
@@ -25,7 +25,7 @@ describe('BattleshipFleetBuilder', () => {
   });
 
   test('should throw an error for a ship type not in the fleet', () => {
-    const fleet: BattleshipFleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+    const fleet: BattleshipFleetBuilder = BattleshipFleetBuilder.createMBFleet();
     expect(() => fleet.getShip(ShipType.Cruiser)).toThrow(
       'Ship of type cruiser not found in fleet.'
     ); 

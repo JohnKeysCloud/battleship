@@ -25,7 +25,7 @@ import {
   ShipSymbolValue,
   ShipSymbolDescription,
 } from '../../types/logic-types';
-import { AttackResult, PlayerState } from '../../types/state-types';
+import { AttackResult, PlayerContext } from '../../types/state-types';
 import {
   areCoordinatesInBounds,
   arePositionsEqual,
@@ -46,7 +46,7 @@ import { placeShip } from './abstracted-method-callbacks/place-ship/place-ship';
 
 export class BattleshipBoardController implements IBattleshipGameboardController {
   constructor(
-    public readonly playerState: Omit<PlayerState, 'gameboardController'>
+    public readonly playerState: Omit<PlayerContext, 'gameboardController'>
   ) {}
 
   // 💭 --------------------------------------------------------------
