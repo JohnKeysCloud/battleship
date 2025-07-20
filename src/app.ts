@@ -11,7 +11,7 @@ class App {
   // Instantiate foundational dependencies
   public readonly eventBus: EventBus = new EventBus();
   public readonly isMultiplayer: boolean = false;
-  public readonly version: FleetVersion = 2002;
+  public readonly version: FleetVersion = 1990;
   public readonly playerCore: PlayerCore = initalizePlayerCore(this.version);
 
   // Runtime-initialized components
