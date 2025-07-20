@@ -699,7 +699,7 @@ export class PlayerGameboardComponent {
     gridCell: HTMLDivElement,
     attackCoordinates?: Coordinates
   ): Promise<void> => {
-    const boardUpdate = this.updateGameboardPostAttack(
+    const uiUpdate = this.updateUIPostAttack(
       attackResult,
       gridCell,
       attackCoordinates
@@ -709,7 +709,7 @@ export class PlayerGameboardComponent {
       attackResult
     );
 
-    await Promise.all([boardUpdate, sitRepUpdate]);
+    await Promise.all([uiUpdate, sitRepUpdate]);
   };
 
   private updateFleetElements = (fleetBuilder: BattleshipFleetBuilder) => {
@@ -746,7 +746,7 @@ export class PlayerGameboardComponent {
     }
   };
 
-  private updateGameboardPostAttack = async (
+  private updateUIPostAttack = async (
     attackResult: AttackResult,
     gridCell: HTMLDivElement,
     attackCoordinates?: Coordinates
@@ -760,15 +760,20 @@ export class PlayerGameboardComponent {
 
     if (!isShipType(type))
       throw new Error(`The ${type} is not a valid ship type.`);
-
-    gridCell.classList.add('hit');
-
+    
     if (!attackCoordinates) {
       throw new Error(
         'Attack coordinates not found. They are required for updating the player gameboard post attack.'
       );
     }
 
+    gridCell.classList.add('hit');
+        this.gameState.eventBus.emit('markNextHitPoint', {
+      playerType: 'player',
+      shipType: type,
+    });
+
+    
     await this.cookShipUnit(type, attackCoordinates);
 
     if (!isSunk) return;

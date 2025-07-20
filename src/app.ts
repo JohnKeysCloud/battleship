@@ -9,10 +9,10 @@ import { randomizeBSGameboards } from './typescript/meta/init/randomize-gameboar
 
 class App {
   // Instantiate foundational dependencies
-  public readonly playerCore: PlayerCore = initalizePlayerCore();
   public readonly eventBus: EventBus = new EventBus();
   public readonly isMultiplayer: boolean = false;
-  public readonly version: FleetVersion = 1990;
+  public readonly version: FleetVersion = 2002;
+  public readonly playerCore: PlayerCore = initalizePlayerCore(this.version);
 
   // Runtime-initialized components
   public readonly gameState: GameState;

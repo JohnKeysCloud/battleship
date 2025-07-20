@@ -5,12 +5,22 @@ import { BattleshipBoardRepository } from "../logic/bs-gameboard-repository/bs-g
 import { FleetVersion } from "../types/logic-types";
 import { PlayerContext, PlayerCore } from "../types/state-types";
 
-export const createPlayerContext = (fleetVersion: FleetVersion = 1990) => { 
+export const createPlayerContext = (fleetVersion: FleetVersion) => { 
   const gameboardBuilder = new BattleshipBoardBuilder();
   const gameboardRepository = new BattleshipBoardRepository();
-  const fleetBuilder = fleetVersion === 1990
-    ? BattleshipFleetBuilder.createMBFleet()
-    : BattleshipFleetBuilder.createHasbroFleet();
+
+  let fleetBuilder: BattleshipFleetBuilder;
+  switch (fleetVersion) {
+    case 1990:
+      fleetBuilder = BattleshipFleetBuilder.createMBFleet();
+      break;
+    case 2002:
+      fleetBuilder = BattleshipFleetBuilder.createHasbroFleet();
+      break;
+    default:
+      throw new Error(`There was no Battleship version created in ${fleetVersion}.`);
+  }
+
   const gameboardController = new BattleshipBoardController({
     gameboardBuilder,
     gameboardRepository,
@@ -25,20 +35,12 @@ export const createPlayerContext = (fleetVersion: FleetVersion = 1990) => {
   }
 }
 
-export const initalizePlayerCore = (): PlayerCore => {
-  const playerContext = createPlayerContext();
-  const opponentContext = createPlayerContext();
+export const initalizePlayerCore = (fleetVersion: FleetVersion): PlayerCore => {
+  const playerContext = createPlayerContext(fleetVersion);
+  const opponentContext = createPlayerContext(fleetVersion);
 
   return {
     player: playerContext,
     opponent: opponentContext,
   }
 }
-
-const player: PlayerContext = createPlayerContext();
-const opponent: PlayerContext = createPlayerContext();
-
-export const players: { player: PlayerContext; opponent: PlayerContext } = {
-  player,
-  opponent,
-};

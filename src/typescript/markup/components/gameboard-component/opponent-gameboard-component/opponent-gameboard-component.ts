@@ -483,13 +483,13 @@ export class OpponentGameboardComponent {
     attackResult: AttackResult,
     gridCell: HTMLDivElement
   ): Promise<void> => {
-    const boardUpdate = this.updateGameboardPostAttack(attackResult, gridCell);
+    const uiUpdate = this.updateUIPostAttack(attackResult, gridCell);
     const sitRepUpdate = this.gameState.eventBus.emit(
       'setAndScrollToNextSitRep',
       attackResult
     );
 
-    await Promise.all([boardUpdate, sitRepUpdate]);
+    await Promise.all([uiUpdate, sitRepUpdate]);
   };
 
   private updateFleetElements(fleetBuilder: BattleshipFleetBuilder): void {
@@ -522,7 +522,7 @@ export class OpponentGameboardComponent {
     }
   }
 
-  private updateGameboardPostAttack = async (
+  private updateUIPostAttack = async (
     attackResult: AttackResult,
     gridCell: HTMLDivElement
   ): Promise<void> => {
@@ -537,7 +537,11 @@ export class OpponentGameboardComponent {
       throw new Error(`The ${type} is not a valid ship type.`);
 
     gridCell.classList.add('hit');
-    
+    this.gameState.eventBus.emit('markNextHitPoint', {
+      playerType: 'opponent',
+      shipType: type,
+    });
+
     if (!isSunk) return;
 
     await this.handleSinkingShip(type);

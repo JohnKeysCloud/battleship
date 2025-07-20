@@ -1,23 +1,47 @@
 import './score-board-component.scss';
-import { HitPointCollection } from '../../../types/dom-types';
-import { Fleet, ShipType } from "../../../types/logic-types";
+import { HitMarkPayload, HitPointMap } from './score-board.types';
+
+import { GameState } from '../../../state/game-state';
+import { Fleet, FleetSet, ShipType } from "../../../types/logic-types";
 import { PlayerType } from "../../../types/state-types";
+import { isHTMLDivElement, isPlayerType } from '../../../types/type-guards';
+
 import { capitalize, createElement } from "../../../utilities/random-utilities";
-import { isPlayerType } from '../../../types/type-guards';
 
 export class ScoreBoardComponent {
   private readonly scoreBoardID: string = 'score-board';
   private readonly scoreBoardContainer: HTMLDivElement;
   private readonly shipLabelList: HTMLDivElement;
   private readonly fleetStatusContainers: HTMLDivElement[];
+  public readonly hitPointMap: HitPointMap = {
+    player: {
+      battleship: [],
+      carrier: [],
+      cruiser: [],
+      destroyer: [],
+      patrolBoat: [],
+      submarine: [],
+    },
+    opponent: {
+      battleship: [],
+      carrier: [],
+      cruiser: [],
+      destroyer: [],
+      patrolBoat: [],
+      submarine: [],
+    },
+  };
 
   constructor(
-    private readonly fleets: { [key in PlayerType]: Fleet },
-    private readonly shipTypes: ShipType[]
+    private readonly gameState: GameState,
+    private readonly fleets: FleetSet,
+    private readonly shipTypes: ShipType[],
   ) {
     this.fleetStatusContainers = this.createFleetStatusContainers(this.fleets);
     this.shipLabelList = this.createShipLabelList(this.shipTypes);
     this.scoreBoardContainer = this.createScoreBoardContainer();
+
+    this.gameState.eventBus.on('markNextHitPoint',this.markNextHitPoint);
   }
 
   public render(targetElement: HTMLElement) {
@@ -64,6 +88,8 @@ export class ScoreBoardComponent {
         hitPointContainer.append(hitpointElement);
       }
 
+      this.storeShipHitPointData(hitPointContainer, playerType, ship.type);
+
       hitPointsFragment.appendChild(hitPointContainer);
     });
 
@@ -98,7 +124,7 @@ export class ScoreBoardComponent {
     return fleetStatusContainer;
   }
 
-  private createFleetStatusContainers(fleets: { [key in PlayerType]: Fleet }) {
+  private createFleetStatusContainers(fleets: FleetSet) {
     const fleetStatusContainers = Object.entries(fleets).map(
       ([playerType, fleet]) => {
         if (!isPlayerType(playerType)) throw new Error('Invalid player type.');
@@ -137,5 +163,29 @@ export class ScoreBoardComponent {
     shipLabelList.appendChild(shipLabelListItemsFragment);
 
     return shipLabelList;
+  }
+
+  private markNextHitPoint = (hitMarkPayload: HitMarkPayload): void => {
+    const { playerType, shipType } = hitMarkPayload;
+
+    if (!this.hitPointMap[playerType]?.[shipType]) {
+      throw new Error(`Missing hit-point data for: ${playerType} - ${shipType}.`);
+    }
+    
+    const nextHitPoint = this.hitPointMap[playerType][shipType].pop();
+    nextHitPoint?.classList.add('hit');
+  }
+
+  private storeShipHitPointData(
+    hitPointContainer: HTMLDivElement,
+    playerType: PlayerType,
+    shipType: ShipType
+  ): void {
+    const reversedHitPointArray = Array.from(
+      hitPointContainer.children
+    ).reverse();
+
+    this.hitPointMap[playerType][shipType] =
+      reversedHitPointArray.filter(isHTMLDivElement);
   }
 }

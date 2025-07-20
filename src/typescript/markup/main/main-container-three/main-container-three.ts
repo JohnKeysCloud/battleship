@@ -47,6 +47,7 @@ export function createMainContainerThree(
   );
 
   const scoreBoard = new ScoreBoardComponent(
+    gameState,
     fleets,
     shipTypes
   );

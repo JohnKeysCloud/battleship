@@ -6,7 +6,7 @@ import {
   BattleshipBuilder,
   SHIP_SYMBOLS
 } from '../logic/bs-ship-builder/bs-ship-builder';
-import { PlayerContext } from './state-types';
+import { PlayerContext, PlayerType } from './state-types';
 
 // 💭 --------------------------------------------------------------
 // 💭 Enumerations/Helpers
@@ -56,6 +56,7 @@ export type OccupiedCoordinatesSet = Set<CoordinatesToString> | null;
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;
 };
+export type FleetSet = { [key in PlayerType]: Fleet };
 export type FleetConfigs = {
   [key in ShipType]?: ShipConfig;
 };

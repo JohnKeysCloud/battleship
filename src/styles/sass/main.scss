@@ -423,6 +423,16 @@ main {
             }
           }
         }
+
+        .hit-point-container {
+          .hit-point.hit {
+            &::before,
+            &::after {
+              opacity: 1;
+              scale: 1;
+            }
+          }
+        }
       }
     }
 

@@ -6,6 +6,7 @@
   --color-destroyer: var(--color-clyde);
   --color-patrolBoat: var(--color-inky);
   --color-submarine: var(--color-pinky);
+  --color-cruiser: var(--color-funky);
 
   // pixels only
   --ship-container-border-size: 6px;
@@ -163,6 +164,9 @@
   }
   &.submarine-unit {
     background-color: var(--color-submarine);
+  }
+  &.cruiser-unit {
+    background-color: var(--color-cruiser);
   }
 }
 
