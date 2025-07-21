@@ -161,13 +161,20 @@ export class PlayerGameboardComponent {
     }
 
     if (hit && isSunk) {
-      const gameOver = this.checkForWin();
-      if (!gameOver) {
+      const isGameOver: boolean = this.isGmaeOver();
+      if (!isGameOver) {
         this.gameState.togglePlayerTurn();
         return;
       }
 
-      // ? if it is game over, do some shit
+      // TODO: Do something fun with this value.. set winner in repository ?
+      alert(
+        `${
+          this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
+        } mother fucker! #TYPESHIT`
+      );
+
+      this.gameState.transitionToNextPhase();
     }
   }
 
@@ -206,19 +213,8 @@ export class PlayerGameboardComponent {
   }
 
   // TODO: move this to game state
-  private checkForWin(): boolean {
-    if (!this.playerState.gameboardRepository.areAllShipsSunk()) return false;
-
-    // TODO: Do something fun with this value.. set winner in repository ?
-    alert(
-      `${
-        this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
-      } mother fucker! #TYPESHIT`
-    );
-
-    this.gameState.transitionToNextPhase();
-
-    return true;
+  private isGmaeOver(): boolean {
+    return this.playerState.gameboardRepository.areAllShipsSunk();
   }
 
   private createDragImage(): HTMLImageElement {

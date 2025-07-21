@@ -37,13 +37,14 @@ class App {
 
   public static powerOn() {
     const app = new App();
-    app.pressStart();
-
+    app.bootUp();
     return app;
   }
 
-  public pressStart = (): void => {
+  public bootUp = (): void => {
+    console.time('bootUp');
     this.domController.render();
+    console.timeEnd('bootUp');
   };
 }
 

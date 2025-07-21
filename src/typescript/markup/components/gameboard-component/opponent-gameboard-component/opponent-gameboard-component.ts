@@ -84,19 +84,8 @@ export class OpponentGameboardComponent {
   // 💭 --------------------------------------------------------------
   // 💭 Helpers
 
-  private checkForWin(): boolean {
-    if (!this.playerState.gameboardRepository.areAllShipsSunk()) return false;
-
-    // TODO: Do something fun with this value.. set winner in repository ?
-    alert(
-      `${
-        this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
-      } mother fucker! #TYPESHIT`
-    );
-
-    this.gameState.transitionToNextPhase();
-
-    return true;
+  private isGameOver(): boolean {
+    return this.playerState.gameboardRepository.areAllShipsSunk();
   }
 
   private async cookAllShipUnits(
@@ -469,13 +458,20 @@ export class OpponentGameboardComponent {
     }
 
     if (hit && isSunk) {
-      const gameOver = this.checkForWin();
-      if (!gameOver) {
+      const isGameOver = this.isGameOver();
+      if (!isGameOver) {
         this.gameState.togglePlayerTurn();
         return;
       }
 
-      // ? if it is game over, do some shit
+      // TODO: Do something fun with this value.. set winner in repository ?
+      alert(
+        `${
+          this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
+        } mother fucker! #TYPESHIT`
+      );
+
+      this.gameState.transitionToNextPhase();
     }
   }
 

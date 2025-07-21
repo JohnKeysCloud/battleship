@@ -98,38 +98,34 @@ export class DOMController {
   };
 
   private transitionToNextPhase = async (): Promise<void> => {
-    if (this.gameState.currentGamePhase === 'bellum') {
-      this.gameState.setInitialPlayer();
-
-      if (!this.gameState.currentPlayer)
-        throw new Error('Current player must be set in game state.');
-
-      this.initializeSitRepScroller(this.gameState.currentPlayer); 
-    }
-
     this.mainComponent.mainContainerOne.swapByOrder();
     this.mainComponent.mainContainerThree.swapByOrder();
-    await this.updateGameboardsOnTransition(this.gameState);
-
-    if (this.gameState.currentPlayer === 'opponent' && this.billowBot) {
-      await this.billowBot.attack();
-    }
+    await this.handlePhaseChangeUpdates(this.gameState);
   };
 
-  private updateGameboardContainerState = async (gameState: GameState): Promise<void> => {
-    const gameboardContainer = this.mainComponent.mainContainerTwo.element;
-
-    gameboardContainer.classList.toggle('parabellum', gameState.currentGamePhase === 'parabellum');
-    gameboardContainer.classList.toggle('bellum', gameState.currentGamePhase === 'bellum');
-    gameboardContainer.classList.toggle('postBellum', gameState.currentGamePhase === 'postBellum');
-
-    await waitForTransitionEnd(gameboardContainer, 1000);
-  };
-
-  private updateGameboardsOnTransition = async (
+  private updateGameboardContainerState = async (
     gameState: GameState
   ): Promise<void> => {
-      await this.updateGameboardContainerState(gameState);
+    const gameboardContainer = this.mainComponent.mainContainerTwo.element;
+
+    gameboardContainer.classList.toggle(
+      'parabellum',
+      gameState.currentGamePhase === 'parabellum'
+    );
+    gameboardContainer.classList.toggle(
+      'bellum',
+      gameState.currentGamePhase === 'bellum'
+    );
+    gameboardContainer.classList.toggle(
+      'postBellum',
+      gameState.currentGamePhase === 'postBellum'
+    );
+  };
+
+  private handlePhaseChangeUpdates = async (
+    gameState: GameState
+  ): Promise<void> => {
+    await this.updateGameboardContainerState(gameState);
 
     if (gameState.currentGamePhase === 'parabellum') {
       // TODO: reset gamePhase SCSS color
@@ -138,18 +134,13 @@ export class DOMController {
     }
 
     if (gameState.currentGamePhase === 'bellum') {
-      if (gameState.currentPlayer === 'player') {
-        this.readyPlayerOne();
-      }
-
-      // ? Do I want to manipulate the gameboard in anyway on transition to bellum
+      this.pressStart(gameState);
     }
 
     if (gameState.currentGamePhase === 'postBellum') {
-      // TODO: change gamePhase SCSS color
-      // ? do something fun ?
+      // youAreHere
+      this.content.innerHTML = 'Beep boop beep!';
     }
-
   };
 
   private initializeSitRepScroller = (firstPlayer: PlayerType): void => {
@@ -176,6 +167,26 @@ export class DOMController {
 
     this.cycloneSitRepScroller.initialize(firstPlayer);
   };
+
+  private async pressStart(gameState: GameState): Promise<void> {
+    this.gameState.setInitialPlayer();
+
+    if (!this.gameState.currentPlayer)
+      throw new Error('Current player must be set in game state.');
+
+    this.initializeSitRepScroller(this.gameState.currentPlayer);
+
+    if (gameState.currentPlayer === 'player') {
+      this.readyPlayerOne();
+    } else if (gameState.currentPlayer === 'opponent' && this.billowBot) {
+      await this.billowBot.attack();
+    } else if (
+      gameState.currentPlayer === 'opponent' &&
+      !this.billowBot
+    ) {
+      // ! multiplayer - wait for response
+    }
+  }
 
   private resetGame = () => {
     this.mainComponent.mainContainerOne.swapFragmentByKey('parabellum');
