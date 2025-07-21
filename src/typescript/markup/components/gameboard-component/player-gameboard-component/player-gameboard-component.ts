@@ -161,7 +161,7 @@ export class PlayerGameboardComponent {
     }
 
     if (hit && isSunk) {
-      const isGameOver: boolean = this.isGmaeOver();
+      const isGameOver: boolean = this.isGameOver();
       if (!isGameOver) {
         this.gameState.togglePlayerTurn();
         return;
@@ -213,7 +213,7 @@ export class PlayerGameboardComponent {
   }
 
   // TODO: move this to game state
-  private isGmaeOver(): boolean {
+  private isGameOver(): boolean {
     return this.playerState.gameboardRepository.areAllShipsSunk();
   }
 
