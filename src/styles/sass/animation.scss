@@ -1,3 +1,15 @@
+@keyframes grow {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  100% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
 @keyframes modalIn {
   0% {
     opacity: 0;
@@ -20,15 +32,12 @@
   }
 }
 
-@keyframes grow {
-  0% {
-    opacity: 1;
-    transform: scale(1);
+@keyframes pulse {
+  from {
+    opacity: 1
   }
-  
-  100% {
+  to {
     opacity: 0;
-    transform: scale(1.75);
   }
 }
 

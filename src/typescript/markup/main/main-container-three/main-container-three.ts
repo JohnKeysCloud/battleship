@@ -57,9 +57,7 @@ export function createMainContainerThree(
       shipShufflerButton,
       readyUpButton
     ),
-    bellum: createMainThreeBellumFragment(
-      scoreBoard,
-    ),
+    bellum: createMainThreeBellumFragment(scoreBoard),
     postBellum: createMainThreePostBellumFragment(),
   };
   

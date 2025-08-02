@@ -52,6 +52,9 @@ export type AxisArrayKey = `row-${number}` | `column-${number}`;
 export type Coordinates = [number, number];
 export type CoordinatesArray = Coordinates[];
 export type CoordinatesToString = `[${number}, ${number}]`;
+export type FleetPlacementConfig = Partial<
+  Record<ShipType, IPlacementConfigurations>
+>;
 export type OccupiedCoordinatesSet = Set<CoordinatesToString> | null;
 export type Fleet = {
   [key in ShipType]?: BattleshipBuilder;

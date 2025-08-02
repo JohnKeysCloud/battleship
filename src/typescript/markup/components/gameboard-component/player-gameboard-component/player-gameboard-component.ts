@@ -167,13 +167,7 @@ export class PlayerGameboardComponent {
         return;
       }
 
-      // TODO: Do something fun with this value.. set winner in repository ?
-      alert(
-        `${
-          this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
-        } mother fucker! #TYPESHIT`
-      );
-
+      this.gameState.eventBus.emit('updateVictoryBannerText', 'You Lose Dumbass!'); 
       this.gameState.transitionToNextPhase();
     }
   }
@@ -793,8 +787,6 @@ export class PlayerGameboardComponent {
       // Set dragging attribute to true
       shipContainerElement.setAttribute('data-dragging', 'true');
 
-      // TODO: Make this less hacky 🫠 by adding class instead?
-      // Enable drag events for grid cells under ship containers
       requestAnimationFrame(() => {
         shipContainerElement.classList.add('locked');
       });

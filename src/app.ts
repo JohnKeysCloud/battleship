@@ -7,27 +7,30 @@ import { PlayerCore } from './typescript/types/state-types';
 import { initalizePlayerCore } from './typescript/state/player-state';
 import { randomizeBSGameboards } from './typescript/meta/init/randomize-gameboard';
 
-class App {
+export class App {
   // Instantiate foundational dependencies
-  public readonly eventBus: EventBus = new EventBus();
   public readonly isMultiplayer: boolean = false;
   public readonly version: FleetVersion = 1990;
-  public readonly playerCore: PlayerCore = initalizePlayerCore(this.version);
+  public eventBus: EventBus = new EventBus();
+  public playerCore: PlayerCore = initalizePlayerCore(this.version);
 
   // Runtime-initialized components
   public readonly gameState: GameState;
-  public readonly billowBot: BillowBot | null;
-  public readonly domController: DOMController;
+  public billowBot: BillowBot | null;
+  public domController: DOMController;
 
   private constructor() {
     randomizeBSGameboards(this.playerCore);
 
     this.gameState = new GameState(
-      this.isMultiplayer,
+      this.playerCore,
       this.eventBus,
+      this.isMultiplayer,
       this.version
     );
-    this.billowBot = !this.isMultiplayer ? new BillowBot(this.gameState) : null;
+    this.billowBot = !this.isMultiplayer
+      ? new BillowBot(this.gameState)
+      : null;
     this.domController = new DOMController(
       this.gameState,
       this.playerCore,
@@ -35,7 +38,7 @@ class App {
     );
   }
 
-  public static powerOn() {
+  public static pressStart() {
     const app = new App();
     app.bootUp();
     return app;
@@ -48,6 +51,6 @@ class App {
   };
 }
 
-console.time('powerOn');
-export const app = App.powerOn(); 
-console.timeEnd('powerOn');
+console.time('pressStart');
+App.pressStart(); 
+console.timeEnd('pressStart');

@@ -43,6 +43,7 @@ export class MainComponent {
 
   private createMainContainerOne(): CycloneHotSwapContainer {
     return createMainContainerOne(
+      this.gameState.eventBus,
       this.instructionsButton,
       this.cycloneSitRepScroller
     );

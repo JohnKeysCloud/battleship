@@ -9,10 +9,11 @@
 
   .ready-up-button-text {
     display: inline-block;
-    bottom: -1.75rem;
+    bottom: 1.6rem;
     left: 0;
     right: 0;
     position: absolute;
+    transition: opacity 100ms ease-out;
   }
 
   .inactive-ready-up-button,
@@ -40,6 +41,10 @@
     }
     .active-ready-up-button {
       opacity: 1;
+    }
+
+    .ready-up-button-text {
+      opacity: 0;
     }
   }
 }

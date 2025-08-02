@@ -167,6 +167,11 @@ button {
   border: none;
   font-family: inherit;
   padding: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 picture img {

@@ -1,14 +1,15 @@
 :root {
-  --phase-of-war-color: var(--color-edible-ghost);
+  --phase-of-war-color: var(--parabellum-color);
 
-  --parabellum-heading-text-shadow-color: var(--phase-of-war-color);
-  --bellum-heading-text-shadow-color: var(--color-pacman); 
-  --post-bellum-heading-text-shadow-color: var(--color-binky); 
+  --parabellum-color: var(--color-edible-ghost);
+  --bellum-color: var(--color-pacman); 
+  --postBellum-color: var(--color-binky); 
 }
 
 #content {
   display: flex;
   flex-direction: column;
+  transition: scale 3s ease-in-out;
 }
 
 body {
@@ -48,7 +49,7 @@ h1 {
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 h3 {
@@ -153,9 +154,26 @@ main {
       }
     }
 
-    // .post-bellum {
-    // ?
-    // }
+    .post-bellum {
+      #game-over-heading {
+        color: var(--phase-of-war-color);
+        margin-bottom: 0.5rem;
+        position: relative;
+        
+        &::before {
+          animation: pulse 333ms infinite linear alternate;
+          color: inherit;
+          content: 'Game Over';
+          inset: 0;
+          position: absolute;
+          text-shadow: 0 0 12px inherit;
+        }
+      }
+      #victory-banner {
+        // ? might not be necessary when moved to proper place
+        text-align: center; 
+      }
+    }
   }
 
   #main-container-two {
@@ -391,13 +409,13 @@ main {
 
   #main-container-three {
     display: grid;
-    height: 200px;
     place-items: start center;
 
     .parabellum {
       align-items: center;
       display: flex;
       gap: 3rem;
+      padding-top: 1rem;
       justify-content: start;
     }
 
@@ -436,8 +454,45 @@ main {
       }
     }
 
-    // .post-bellum {
-    // ?
-    // }
+    .post-bellum {
+      height: 75px;
+      padding-block: 2rem;
+      width: min(380px, 90vw);
+
+      #end-game-button-container {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+
+        #play-again-button {
+          --button-color: var(--color-funky);
+        }
+
+        #find-new-opponent-button {
+          --button-color: var(--color-pacman);
+        }
+
+        .end-game-button {
+          border: 1px solid var(--button-color);
+          border-radius: 18px;
+          box-shadow: inset 0 0 8px;
+          color: var(--button-color);
+          font-size: 1.25rem;
+          padding-block: 6px;
+          transition: all 100ms ease-in-out;
+          width: 50%;
+          text-shadow: 0 0 3px var(--button-color);
+          
+          &:hover:not(:disabled) {
+            opacity: 0.85;
+          }
+
+          &:active:not(:disabled) {
+            opacity: 1;
+            scale: 0.98;
+          }
+        }
+      }
+    }
   }
 }

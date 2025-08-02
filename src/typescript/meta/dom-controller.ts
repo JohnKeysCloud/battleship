@@ -8,9 +8,10 @@ import { createHeader } from '../markup/header/header';
 import { MainComponent } from '../markup/main/main-component';
 import { InstructionsDialogComponent } from '../markup/components/instructions-dialog-component/instructions-dialog-component';
 import { CycloneSitRepScroller } from '../utilities/cycloneSitRepScroller.ts/cyclone-sit-rep-scroller';
-import { AttackResult, PlayerCore, PlayerType, gameboardStateValue } from '../types/state-types';
+import { PlayerCore, PlayerType, gameboardStateValue } from '../types/state-types';
 import { BillowBot } from '../services/billow';
 import { waitForTransitionEnd } from '../utilities/random-utilities';
+import { FragmentKey } from '../types/dom-types';
 
 // 💭 --------------------------------------------------------------
 
@@ -48,98 +49,37 @@ export class DOMController {
       this.gameState
     );
 
-    this.gameState.eventBus.on(
-      'transitionToNextPhase',
-      this.transitionToNextPhase
-    );
-    this.gameState.eventBus.on(
-      'updateUIActiveGameboard',
-      this.updateUIActiveGameboard
-    );
-    this.gameState.eventBus.on(
-      'setAndScrollToNextSitRep',
-      this.cycloneSitRepScroller.setAndScrollToNextSitRep
-    );
-
     // this.footer = createFooter();
+
+    this.seatDomEventsOnBus();
   }
 
-  public render() {
-    this.content.appendChild(this.header);
-    this.mainComponent.render(this.content);
-    this.instructionsDialog.render(document.body);
-    // append footer via here
+  private get isMounted(): boolean {
+    return !!this.content.firstChild;
   }
 
-  // ? sets initial turn state styles (I like this name better 😎). {TIMELESS ARTIFACT 💭}
-  private readyPlayerOne = async (): Promise<void> => {
-    await this.updateUIActiveGameboard();
-    this.mainComponent.mainContainerTwo.opponentGameboard.toggleBellumListeners(
-      gameboardStateValue.active
-    );
-    this.gameState.eventBus.emit(
-      'togglePlayerGameboardControls',
-      gameboardStateValue.inactive
-    );
-    this.gameState.eventBus.emit(
-      'toggleOpponentGameboardControls',
-      gameboardStateValue.active
-    );
-  };
-
-  private updateUIActiveGameboard = async (): Promise<void> => {
-    const container = this.mainComponent.mainContainerTwo.element;
-    container.classList.toggle(
-      'player-turn',
-      this.gameState.currentPlayer === 'player'
-    );
-
-    await waitForTransitionEnd(container, 1000);
-  };
-
-  private transitionToNextPhase = async (): Promise<void> => {
-    this.mainComponent.mainContainerOne.swapByOrder();
-    this.mainComponent.mainContainerThree.swapByOrder();
-    await this.handlePhaseChangeUpdates(this.gameState);
-  };
-
-  private updateGameboardContainerState = async (
-    gameState: GameState
-  ): Promise<void> => {
-    const gameboardContainer = this.mainComponent.mainContainerTwo.element;
-
-    gameboardContainer.classList.toggle(
-      'parabellum',
-      gameState.currentGamePhase === 'parabellum'
-    );
-    gameboardContainer.classList.toggle(
-      'bellum',
-      gameState.currentGamePhase === 'bellum'
-    );
-    gameboardContainer.classList.toggle(
-      'postBellum',
-      gameState.currentGamePhase === 'postBellum'
-    );
+  private unmount = () => {
+    this.content.innerHTML = '';
   };
 
   private handlePhaseChangeUpdates = async (
     gameState: GameState
   ): Promise<void> => {
+    this.updatePhaseOfWarColor(gameState.currentGamePhase);
     await this.updateGameboardContainerState(gameState);
 
-    if (gameState.currentGamePhase === 'parabellum') {
-      // TODO: reset gamePhase SCSS color
-      this.resetGame();
-      return;
-    }
-
-    if (gameState.currentGamePhase === 'bellum') {
-      this.pressStart(gameState);
-    }
-
-    if (gameState.currentGamePhase === 'postBellum') {
-      // youAreHere
-      this.content.innerHTML = 'Beep boop beep!';
+    switch (gameState.currentGamePhase) {
+      case 'bellum':
+        this.deployForCombat(gameState);
+        // ? anything else?
+        break;
+      case 'postBellum':
+        // ? anyting else?
+        break;
+      default:
+        throw new Error(
+          `${gameState.currentGamePhase} is not a valid phase of war.`
+        );
     }
   };
 
@@ -168,7 +108,7 @@ export class DOMController {
     this.cycloneSitRepScroller.initialize(firstPlayer);
   };
 
-  private async pressStart(gameState: GameState): Promise<void> {
+  private async deployForCombat(gameState: GameState): Promise<void> {
     this.gameState.setInitialPlayer();
 
     if (!this.gameState.currentPlayer)
@@ -180,20 +120,91 @@ export class DOMController {
       this.readyPlayerOne();
     } else if (gameState.currentPlayer === 'opponent' && this.billowBot) {
       await this.billowBot.attack();
-    } else if (
-      gameState.currentPlayer === 'opponent' &&
-      !this.billowBot
-    ) {
+    } else if (gameState.currentPlayer === 'opponent' && !this.billowBot) {
       // ! multiplayer - wait for response
     }
   }
 
-  private resetGame = () => {
-    this.mainComponent.mainContainerOne.swapFragmentByKey('parabellum');
-    this.mainComponent.mainContainerThree.swapFragmentByKey('parabellum');
-    this.gameState.resetGameState();
+  // ? sets initial turn state styles (I like this name better 😎). {TIMELESS ARTIFACT 💭}
+  private readyPlayerOne = async (): Promise<void> => {
+    await this.updateUIActiveGameboard();
+    this.mainComponent.mainContainerTwo.opponentGameboard.toggleBellumListeners(
+      gameboardStateValue.active
+    );
+    this.gameState.eventBus.emit(
+      'togglePlayerGameboardControls',
+      gameboardStateValue.inactive
+    );
+    this.gameState.eventBus.emit(
+      'toggleOpponentGameboardControls',
+      gameboardStateValue.active
+    );
+  };
 
-    // ? or re-render the entire dom to ensure no lingering state
-    // ? or render a new main component ?
+  public render = () => {
+    if (this.isMounted) this.unmount();
+    this.content.appendChild(this.header);
+    this.mainComponent.render(this.content);
+    this.instructionsDialog.render(document.body);
+
+    // ! append footer via here
+  };
+
+  private seatDomEventsOnBus = () => {
+    this.gameState.eventBus.on(
+      'transitionToNextPhase',
+      this.transitionToNextPhase
+    );
+    this.gameState.eventBus.on(
+      'updateUIActiveGameboard',
+      this.updateUIActiveGameboard
+    );
+    this.gameState.eventBus.on(
+      'setAndScrollToNextSitRep',
+      this.cycloneSitRepScroller.setAndScrollToNextSitRep
+    );
+    this.gameState.eventBus.on('unmountDOM', this.unmount);
+  };
+
+  private transitionToNextPhase = async (): Promise<void> => {
+    this.mainComponent.mainContainerOne.swapByOrder();
+    this.mainComponent.mainContainerThree.swapByOrder();
+    await this.handlePhaseChangeUpdates(this.gameState);
+  };
+
+  private updateGameboardContainerState = async (
+    gameState: GameState
+  ): Promise<void> => {
+    const gameboardContainer = this.mainComponent.mainContainerTwo.element;
+
+    gameboardContainer.classList.toggle(
+      'parabellum',
+      gameState.currentGamePhase === 'parabellum'
+    );
+    gameboardContainer.classList.toggle(
+      'bellum',
+      gameState.currentGamePhase === 'bellum'
+    );
+    gameboardContainer.classList.toggle(
+      'postBellum',
+      gameState.currentGamePhase === 'postBellum'
+    );
+  };
+
+  private updatePhaseOfWarColor(phaseOfWar: FragmentKey) {
+    document.documentElement.style.setProperty(
+      '--phase-of-war-color',
+      `var(--${phaseOfWar}-color)`
+    );
+  }
+
+  private updateUIActiveGameboard = async (): Promise<void> => {
+    const container = this.mainComponent.mainContainerTwo.element;
+    container.classList.toggle(
+      'player-turn',
+      this.gameState.currentPlayer === 'player'
+    );
+
+    await waitForTransitionEnd(container, 1000);
   };
 }

@@ -147,7 +147,7 @@ export class BillowBot {
     // - Ship orientation inference: Use consecutive hits to determine if a
     //   ship is horizontal or vertical more quickly. 
 
-    return [0, 0] as Coordinates; // ! temporary return
+    return [0, 0] as Coordinates; // ! temporary return to satisfy TS
   }
 
   private rememberLastTargetHit(coordinates: Coordinates) {

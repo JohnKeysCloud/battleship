@@ -464,13 +464,8 @@ export class OpponentGameboardComponent {
         return;
       }
 
-      // TODO: Do something fun with this value.. set winner in repository ?
-      alert(
-        `${
-          this.gameState.currentPlayer === 'player' ? 'You win' : 'You lose'
-        } mother fucker! #TYPESHIT`
-      );
-
+      this.toggleBellumListeners(gameboardStateValue.inactive);
+      this.gameState.eventBus.emit('updateVictoryBannerText', 'You Win!');
       this.gameState.transitionToNextPhase();
     }
   }
@@ -551,5 +546,3 @@ export class OpponentGameboardComponent {
     return this.id;
   }
 }
-
-// TODO: add click listener that receieves an attack, toggles the state (updating main container one), etc.

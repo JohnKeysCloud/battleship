@@ -1,6 +1,8 @@
-import { GamePhase, CurrentPlayer, gameboardStateValue } from "../types/state-types";
+import { GamePhase, CurrentPlayer, gameboardStateValue, PlayerCore } from "../types/state-types";
 import EventBus from "../utilities/event-bus";
-import { FleetVersion } from "../types/logic-types";
+import { FleetPlacementConfig, FleetVersion, IPlacementConfigurations, IShipPlacementConfigurations } from "../types/logic-types";
+import { isShipType } from "../types/type-guards";
+import { App } from "../../app";
 
 export class GameState {
   public currentGamePhase: GamePhase = 'parabellum';
@@ -8,20 +10,19 @@ export class GameState {
   public static getInitialPlayer(): CurrentPlayer {
     return Math.random() > 0.5 ? 'player' : 'opponent';
   }
+  public endGamePlayerShipPositions: FleetPlacementConfig = {};
 
   constructor(
-    public readonly isMultiplayer: boolean,
+    public readonly playerCore: PlayerCore,
     public readonly eventBus: EventBus,
+    public readonly isMultiplayer: boolean,
     public readonly version: FleetVersion
-  ) {}
+  ) {
+    eventBus.on('resetGame', this.resetGame)
+  }
 
-  // ! connect
-  // Reset the game state and notify subscribers
-  public resetGameState = (): void => {
-    this.currentGamePhase = 'parabellum';
-    this.currentPlayer = null;
-    // Emit a game reset event
-    this.eventBus.emit('gameReset');
+  public resetGame = (): void => {
+    App.pressStart();
   };
 
   public setInitialPlayer = (): void => {
@@ -94,4 +95,3 @@ export class GameState {
     await this.eventBus.emit('updateUIActiveGameboard');
   };
 }
-

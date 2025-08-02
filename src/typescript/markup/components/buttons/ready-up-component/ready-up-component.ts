@@ -4,9 +4,6 @@ import { InstructionsComponent } from "../instructions-component/instructions-co
 import { ShipShufflerButtonComponent } from "../ship-shuffler-component/ship-shuffler-component";
 import './ready-up-component.scss';
 
-// ! for testing
-import { app } from "../../../../../app";
-
 export class ReadyUpButtonComponent {
   private readonly readyUpButton: HTMLButtonElement;
   private readonly readyUpButtonContainer: HTMLDivElement;
@@ -15,7 +12,7 @@ export class ReadyUpButtonComponent {
 
   #listenerAttached: boolean = false;
 
-  private readonly readyUp: () => void = () => { // TODO: replace any with GameState?
+  private readonly readyUp: () => void = () => {
     this.anchorShips();
     this.removeParabellumButtonListeners();
     this.transitionToBellum(); 
