@@ -1,5 +1,4 @@
 import { randomizeBSGameboard } from "../../setup/randomize-bs-gameboard";
-import { Orientation } from "../../types/logic-types";
 import { PlayerCore } from "../../types/state-types";
 
 export const randomizeBSGameboards = (playerCore: PlayerCore) => {

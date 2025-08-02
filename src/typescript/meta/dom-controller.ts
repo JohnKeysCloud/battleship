@@ -186,7 +186,7 @@ export class DOMController {
       gameState.currentGamePhase === 'bellum'
     );
     gameboardContainer.classList.toggle(
-      'postBellum',
+      'post-bellum',
       gameState.currentGamePhase === 'postBellum'
     );
   };

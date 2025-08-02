@@ -401,10 +401,17 @@ main {
     }
 
     &.post-bellum {
+      #player-gameboard-container {
+        .ship-container {
+          cursor: pointer;
 
+          &:hover {
+            transition: transform 380ms ease-out;
+            transform: scale(1.05);
+          }
+        }
+      }
     }
-
-
   }
 
   #main-container-three {
