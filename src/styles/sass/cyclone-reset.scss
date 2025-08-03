@@ -36,6 +36,10 @@
   font: inherit;
 }
 
+html, body {
+  min-height: 100dvh;
+}
+
 html {
   box-sizing: inherit;
 }
@@ -46,7 +50,6 @@ html:focus-within {
 
 body {
   position: relative;
-  min-height: 100vh;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
 }

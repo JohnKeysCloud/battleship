@@ -1,0 +1,61 @@
+footer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+  margin-top: auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+
+  &:hover {
+    #footnote {
+      opacity: 0.7;
+      transform: translateY(33px);
+    }
+
+    #cyclone-studios-container {
+      opacity: 1;
+      transform: scale(1.5) translateY(-33px) rotate(3turn);
+
+      #powered-by-text {
+        transform: scale(1);
+      }
+    }
+  } 
+
+  p {
+    color: var(--footer-text);
+    font-size: 1rem;
+  }
+
+  #footnote {
+    opacity: 0.7;
+    position: relative;
+    transform: translateY(10px);
+    transition: all 1s ease-in-out;
+  }
+
+  #cyclone-studios-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    opacity: 0.5;
+    transition: all 0.88s ease-in-out;
+
+    #powered-by-text {
+      color: var(--color-binky);
+      pointer-events: none;
+      text-shadow: 0 0 8px;
+      transform: scale(0);
+      transition: all 0.5s ease-in;
+    }
+
+    #cyclone-studios-logo {
+      filter: drop-shadow(0 0 3px var(--color-mashumaro));
+      margin-inline: auto;
+      object-fit: scale-down;
+      width: 50px;
+    }
+  }
+}

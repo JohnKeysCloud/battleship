@@ -465,7 +465,7 @@ export class OpponentGameboardComponent {
       }
 
       this.toggleBellumListeners(gameboardStateValue.inactive);
-      this.gameState.eventBus.emit('updateVictoryBannerText', 'You Win!');
+      this.gameState.eventBus.emit('updateVictoryBannerText', 'You Win Clanker!');
       this.gameState.transitionToNextPhase();
     }
   }

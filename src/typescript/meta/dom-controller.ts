@@ -12,6 +12,7 @@ import { PlayerCore, PlayerType, gameboardStateValue } from '../types/state-type
 import { BillowBot } from '../services/billow';
 import { waitForTransitionEnd } from '../utilities/random-utilities';
 import { FragmentKey } from '../types/dom-types';
+import { CycloneFooter } from '../utilities/cycloneFooter/cyclone-footer';
 
 // 💭 --------------------------------------------------------------
 
@@ -25,7 +26,7 @@ export class DOMController {
   private readonly header: HTMLElement = createHeader();
   private readonly instructionsDialog: InstructionsDialogComponent =
     new InstructionsDialogComponent();
-  // private readonly footer: HTMLElement;
+  private readonly footer: HTMLElement;
 
   constructor(
     private readonly gameState: GameState,
@@ -49,7 +50,7 @@ export class DOMController {
       this.gameState
     );
 
-    // this.footer = createFooter();
+    this.footer = new CycloneFooter().element;
 
     this.seatDomEventsOnBus();
   }
@@ -145,6 +146,7 @@ export class DOMController {
     if (this.isMounted) this.unmount();
     this.content.appendChild(this.header);
     this.mainComponent.render(this.content);
+    this.content.appendChild(this.footer);
     this.instructionsDialog.render(document.body);
 
     // ! append footer via here

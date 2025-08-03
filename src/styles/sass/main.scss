@@ -6,18 +6,22 @@
   --postBellum-color: var(--color-binky); 
 }
 
-#content {
-  display: flex;
-  flex-direction: column;
-  transition: scale 3s ease-in-out;
-}
-
 body {
   background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;  
   color: ghostwhite;
   font-family: 'pixeBoy', monospace;
   line-height: 1;
   text-shadow: 0 0 8px black;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100dvh;
 }
 
 header {
@@ -155,6 +159,24 @@ main {
     }
 
     .post-bellum {
+      position: relative;
+
+      &::before {
+        animation: 3s endGameCycloneC linear infinite alternate;
+        content: '';
+        background-image: url('https://cyclone-studios.s3.us-east-2.amazonaws.com/s3_cyclone-studios/alphaLogos/cycloneC/animated/gif+files/realistic-white-outline.gif');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size:contain;
+        display: grid;
+        filter: drop-shadow(0 0 3px var(--phase-of-war-color));
+        pointer-events: none;
+        position: absolute;
+        inset:  0;
+        display: grid;
+        z-index: -1;
+      }
+
       #game-over-heading {
         color: var(--phase-of-war-color);
         margin-bottom: 0.5rem;
